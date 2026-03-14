@@ -2,6 +2,10 @@
 
 An AI chat app with special focus on handling projects context. Manage projects with reusable context and chat with AI models using project-specific references.
 
+| Light Theme | Dark Theme |
+|:-----------:|:----------:|
+| ![Light](assets/light.png) | ![Dark](assets/dark.png) |
+
 ## What's Implemented
 
 ### Core Features
