@@ -1,5 +1,5 @@
-import 'package:app/components/app_dialog.dart';
-import 'package:app/components/button.widget.dart';
+import 'package:contextchat/components/app_dialog.dart';
+import 'package:contextchat/components/button.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

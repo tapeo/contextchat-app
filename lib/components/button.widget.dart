@@ -1,4 +1,4 @@
-import 'package:app/components/click_opacity.dart';
+import 'package:contextchat/components/click_opacity.dart';
 import 'package:flutter/material.dart';
 
 enum ButtonSize { small, medium, large }

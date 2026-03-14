@@ -1,7 +1,7 @@
-import 'package:app/chat/chat.model.dart';
-import 'package:app/chat/chats.state.dart';
-import 'package:app/database/chat_database.service.dart';
-import 'package:app/database/database.service.dart';
+import 'package:contextchat/chat/chat.model.dart';
+import 'package:contextchat/chat/chats.state.dart';
+import 'package:contextchat/database/chat_database.service.dart';
+import 'package:contextchat/database/database.service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final chatsProvider = NotifierProvider<ChatsNotifier, ChatsState>(

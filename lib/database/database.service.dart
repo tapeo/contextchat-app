@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:app/chat/chat.model.dart';
-import 'package:app/projects/projects.model.dart';
+import 'package:contextchat/chat/chat.model.dart';
+import 'package:contextchat/projects/projects.model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_database.service.dart';

@@ -1,5 +1,5 @@
-name: app
-description: "A new Flutter project."
+name: contextchat
+description: "An AI chat app with special focus on handling projects context."
 publish_to: "none"
 
 version: 1.0.0+1

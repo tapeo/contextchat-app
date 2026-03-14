@@ -1,19 +1,19 @@
 import 'dart:convert';
 
-import 'package:app/chat/chat.model.dart';
-import 'package:app/chat/chat.state.dart';
-import 'package:app/chat/chats.provider.dart';
-import 'package:app/chat/message.model.dart';
-import 'package:app/database/chat_database.service.dart';
-import 'package:app/database/database.service.dart';
-import 'package:app/database/project_database.service.dart';
-import 'package:app/openrouter/openrouter.model.dart';
-import 'package:app/openrouter/openrouter.provider.dart';
-import 'package:app/openrouter/openrouter_models.provider.dart';
-import 'package:app/projects/project_file_types.dart';
-import 'package:app/projects/projects.model.dart';
-import 'package:app/projects/projects.provider.dart';
 import 'package:collection/collection.dart';
+import 'package:contextchat/chat/chat.model.dart';
+import 'package:contextchat/chat/chat.state.dart';
+import 'package:contextchat/chat/chats.provider.dart';
+import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/database/chat_database.service.dart';
+import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/database/project_database.service.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
+import 'package:contextchat/openrouter/openrouter.provider.dart';
+import 'package:contextchat/openrouter/openrouter_models.provider.dart';
+import 'package:contextchat/projects/project_file_types.dart';
+import 'package:contextchat/projects/projects.model.dart';
+import 'package:contextchat/projects/projects.provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final chatProvider = NotifierProvider.family<ChatNotifier, ChatState, String>(

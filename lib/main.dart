@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:app/app/app.dart';
-import 'package:app/database/database.service.dart';
-import 'package:app/file_storage/file_storage.provider.dart';
-import 'package:app/theme.dart';
+import 'package:contextchat/app/app.dart';
+import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/file_storage/file_storage.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

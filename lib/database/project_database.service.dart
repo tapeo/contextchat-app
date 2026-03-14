@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:app/projects/projects.model.dart';
+import 'package:contextchat/projects/projects.model.dart';
 import 'package:path/path.dart';
 
 import 'database_filesystem.dart';

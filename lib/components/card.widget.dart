@@ -1,4 +1,4 @@
-import 'package:app/components/click_opacity.dart';
+import 'package:contextchat/components/click_opacity.dart';
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
@@ -27,9 +27,7 @@ class CardWidget extends StatelessWidget {
         color: color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color:
-              borderColor ??
-              Theme.of(context).dividerColor,
+          color: borderColor ?? Theme.of(context).dividerColor,
         ),
         boxShadow: [
           BoxShadow(

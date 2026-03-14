@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:app/openrouter/openrouter.model.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -40,7 +40,10 @@ class OpenRouterService {
     String? responseId;
     int? createdTimestamp;
     try {
-      final request = http.Request('POST', Uri.parse('$baseUrl/chat/completions'));
+      final request = http.Request(
+        'POST',
+        Uri.parse('$baseUrl/chat/completions'),
+      );
       request.headers.addAll({
         'Authorization': 'Bearer $apiKey',
         'Content-Type': 'application/json',
@@ -106,10 +109,9 @@ class OpenRouterService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
 
-      final models =
-          (data['data'] as List)
-              .map((json) => OpenRouterModel.fromJson(json))
-              .toList();
+      final models = (data['data'] as List)
+          .map((json) => OpenRouterModel.fromJson(json))
+          .toList();
 
       return models;
     } else {

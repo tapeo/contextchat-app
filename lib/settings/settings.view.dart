@@ -1,10 +1,10 @@
-import 'package:app/components/app_snackbar.dart';
-import 'package:app/components/card.widget.dart';
-import 'package:app/components/icon_button.widget.dart';
-import 'package:app/components/input.widget.dart';
-import 'package:app/database/database.service.dart';
-import 'package:app/openrouter/openrouter.provider.dart';
-import 'package:app/openrouter/openrouter_models.provider.dart';
+import 'package:contextchat/components/app_snackbar.dart';
+import 'package:contextchat/components/card.widget.dart';
+import 'package:contextchat/components/icon_button.widget.dart';
+import 'package:contextchat/components/input.widget.dart';
+import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/openrouter/openrouter.provider.dart';
+import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

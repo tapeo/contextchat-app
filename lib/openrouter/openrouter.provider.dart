@@ -1,7 +1,7 @@
-import 'package:app/file_storage/file_storage.provider.dart';
-import 'package:app/openrouter/openrouter.model.dart';
-import 'package:app/openrouter/openrouter.service.dart';
-import 'package:app/openrouter/openrouter.state.dart';
+import 'package:contextchat/file_storage/file_storage.provider.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
+import 'package:contextchat/openrouter/openrouter.service.dart';
+import 'package:contextchat/openrouter/openrouter.state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const String _apiKeyPref = 'openrouter_api_key';
@@ -35,11 +35,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     required String baseUrl,
     String? modelId,
   }) async {
-    state = state.copyWith(
-      apiKey: apiKey,
-      baseUrl: baseUrl,
-      modelId: modelId,
-    );
+    state = state.copyWith(apiKey: apiKey, baseUrl: baseUrl, modelId: modelId);
 
     if (apiKey != null) {
       await fileStorage.setString(_apiKeyPref, apiKey);

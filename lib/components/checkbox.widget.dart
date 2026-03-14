@@ -1,4 +1,4 @@
-import 'package:app/components/click_opacity.dart';
+import 'package:contextchat/components/click_opacity.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

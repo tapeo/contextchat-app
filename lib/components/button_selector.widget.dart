@@ -1,4 +1,4 @@
-import 'package:app/components/click_opacity.dart';
+import 'package:contextchat/components/click_opacity.dart';
 import 'package:flutter/material.dart';
 
 class ButtonSelectorWidget<T> extends StatelessWidget {
@@ -22,9 +22,7 @@ class ButtonSelectorWidget<T> extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Theme.of(context).dividerColor,
-        ),
+        border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),

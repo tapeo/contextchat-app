@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:app/chat/chats.provider.dart';
-import 'package:app/database/database.service.dart';
-import 'package:app/database/project_database.service.dart';
-import 'package:app/projects/projects.model.dart';
-import 'package:app/projects/projects.state.dart';
+import 'package:contextchat/chat/chats.provider.dart';
+import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/database/project_database.service.dart';
+import 'package:contextchat/projects/projects.model.dart';
+import 'package:contextchat/projects/projects.state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final projectsProvider = NotifierProvider<ProjectsNotifier, ProjectsState>(

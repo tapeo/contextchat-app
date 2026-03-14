@@ -1,4 +1,4 @@
-import 'package:app/projects/projects.model.dart';
+import 'package:contextchat/projects/projects.model.dart';
 import 'package:equatable/equatable.dart';
 
 const _currentProjectIdUnset = Object();

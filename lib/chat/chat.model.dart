@@ -1,4 +1,4 @@
-import 'package:app/chat/message.model.dart';
+import 'package:contextchat/chat/message.model.dart';
 import 'package:equatable/equatable.dart';
 
 class Chat extends Equatable {

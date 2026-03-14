@@ -1,6 +1,6 @@
-import 'package:app/openrouter/openrouter.model.dart';
-import 'package:app/openrouter/openrouter.provider.dart';
-import 'package:app/openrouter/openrouter.service.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
+import 'package:contextchat/openrouter/openrouter.provider.dart';
+import 'package:contextchat/openrouter/openrouter.service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
