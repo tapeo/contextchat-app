@@ -3,9 +3,13 @@ import 'package:contextchat/chat/chat.state.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/chat/message.model.dart';
 import 'package:contextchat/chat/select_ai_model.view.dart';
+import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
+import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
+import 'package:contextchat/settings/settings.view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -101,7 +105,39 @@ class _ChatUiState extends ConsumerState<ChatUi> {
   Future<void> _submitCurrentMessage(String? selectedModelId) async {
     final text = _textController.text.trim();
     if (text.isEmpty || selectedModelId == null) return;
+
+    final openRouterState = ref.read(openRouterProvider);
+    if (openRouterState.apiKey == null || openRouterState.apiKey!.isEmpty) {
+      _showSetupRequiredDialog();
+      return;
+    }
+
     await send(text, selectedModelId);
+  }
+
+  void _showSetupRequiredDialog() {
+    showAppDialog(
+      context: context,
+      title: const Text('OpenRouter setup required'),
+      content: const Text(
+        'You need to configure your OpenRouter API key before sending messages. Please go to Settings to set it up.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).push(
+              NoTransitionRoute(builder: (context) => const SettingsView()),
+            );
+          },
+          child: const Text('Go to Settings'),
+        ),
+      ],
+    );
   }
 
   Widget _buildMessage({required MessageRole role, required String content}) {
