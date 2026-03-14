@@ -2,13 +2,22 @@
 
 An AI chat app with special focus on handling projects context. Manage projects with reusable context and chat with AI models using project-specific references.
 
-| Light Theme | Dark Theme |
-|:-----------:|:----------:|
-| ![Light](assets/light.png) | ![Dark](assets/dark.png) |
+### Chat
+
+|                Light                 |                Dark                |
+| :----------------------------------: | :--------------------------------: |
+| ![Home Light](assets/home-light.png) | ![Home Dark](assets/home-dark.png) |
+
+### Settings
+
+|                    Light                     |                    Dark                    |
+| :------------------------------------------: | :----------------------------------------: |
+| ![Settings Light](assets/settings-light.png) | ![Settings Dark](assets/settings-dark.png) |
 
 ## What's Implemented
 
 ### Core Features
+
 - **Project Management**: Create, edit, and delete projects with validation and save feedback
 - **Project Context**: Store reusable base context instructions for each project
 - **File Import**: Import text files (PDFs, docs, code, etc.) directly into base context
@@ -17,12 +26,14 @@ An AI chat app with special focus on handling projects context. Manage projects 
 - **Model Selection**: Choose AI models per project with persistence
 
 ### AI Integration
+
 - **OpenRouter.ai Support**: Connect to OpenRouter.ai for access to multiple AI models
 - **Streaming Responses**: Real-time message streaming with smooth scroll behavior
 - **Vision Models**: Automatic image support for vision-capable models with validation
 - **System Context Injection**: Project base context and files are injected as system messages
 
 ### UI/UX
+
 - **Resizable Sidebar**: Drag to resize the sidebar (20-40% of window width)
 - **Keyboard Shortcuts**: Cmd+Enter (macOS) or Ctrl+Enter (Windows/Linux) to send messages
 - **Copy Messages**: One-click copy any message to clipboard
@@ -30,6 +41,7 @@ An AI chat app with special focus on handling projects context. Manage projects 
 - **Auto-scroll**: Smart auto-scroll that pauses when user scrolls up
 
 ### Data Storage
+
 - **Filesystem-based**: All data stored locally in app support directory
 - **Project Storage**:
   - `memory/projects/<projectId>/project.json` - metadata
@@ -40,6 +52,7 @@ An AI chat app with special focus on handling projects context. Manage projects 
 ## Roadmap
 
 ### Near-term
+
 - [ ] **Chat History Search**: Search through past conversations
 - [ ] **Message Management**: Edit and delete individual messages
 - [ ] **Chat Export**: Export chats to Markdown or JSON
@@ -47,6 +60,7 @@ An AI chat app with special focus on handling projects context. Manage projects 
 - [ ] **Code Syntax Highlighting**: Better formatting for code blocks
 
 ### Medium-term
+
 - [ ] **Multi-Provider Support**: Add support for OpenAI, Anthropic, and local models
 - [ ] **Chat Organization**: Folders, tags, or favorites for organizing chats
 - [ ] **Message Feedback**: Thumbs up/down for rating responses
@@ -54,6 +68,7 @@ An AI chat app with special focus on handling projects context. Manage projects 
 - [ ] **Full-Text Search**: Search across all projects and chat histories
 
 ### Future Ideas
+
 - [ ] **Token/Cost Tracking**: Monitor API usage and estimated costs
 - [ ] **Chat Templates**: Save and reuse common chat patterns
 - [ ] **Project Templates**: Pre-configured project setups for common workflows
