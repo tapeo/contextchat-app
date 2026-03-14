@@ -12,6 +12,7 @@ import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:contextchat/settings/settings.view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -182,13 +183,88 @@ class _ChatUiState extends ConsumerState<ChatUi> {
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.75,
               ),
-              child: SelectableText(
-                content,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-                  height: 1.4,
+              child: MarkdownBody(
+                data: content,
+                styleSheet: MarkdownStyleSheet(
+                  p: TextStyle(
+                    fontSize: 13,
+                    color: isUser
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                    height: 1.4,
+                  ),
+                  code: TextStyle(
+                    fontSize: 12,
+                    color: isUser
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                    backgroundColor: isUser
+                        ? colorScheme.primary.withValues(alpha: 0.3)
+                        : colorScheme.surfaceContainerHighest,
+                  ),
+                  codeblockDecoration: BoxDecoration(
+                    color: isUser
+                        ? colorScheme.primary.withValues(alpha: 0.2)
+                        : colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  blockquote: TextStyle(
+                    fontSize: 13,
+                    color: isUser
+                        ? colorScheme.onPrimary.withValues(alpha: 0.8)
+                        : colorScheme.onSurface.withValues(alpha: 0.8),
+                    fontStyle: FontStyle.italic,
+                  ),
+                  blockquoteDecoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: isUser
+                            ? colorScheme.onPrimary.withValues(alpha: 0.5)
+                            : colorScheme.primary,
+                        width: 4,
+                      ),
+                    ),
+                  ),
+                  h1: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isUser
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                  ),
+                  h2: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isUser
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                  ),
+                  h3: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isUser
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                  ),
+                  listBullet: TextStyle(
+                    fontSize: 13,
+                    color: isUser
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
+                  ),
+                  a: TextStyle(
+                    fontSize: 13,
+                    color: isUser
+                        ? colorScheme.onPrimary.withValues(alpha: 0.9)
+                        : colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
+                onTapLink: (text, href, title) {
+                  if (href != null) {
+                    // TODO: Implement link handling (e.g., url_launcher)
+                  }
+                },
               ),
             ),
           ),
