@@ -1,0 +1,56 @@
+import 'dart:io';
+
+import 'package:app/app/app.dart';
+import 'package:app/database/database.service.dart';
+import 'package:app/file_storage/file_storage.provider.dart';
+import 'package:app/theme.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final container = await providerContainer();
+
+  runApp(UncontrolledProviderScope(container: container, child: _Main()));
+}
+
+Future<ProviderContainer> providerContainer() async {
+  final debug = kDebugMode;
+
+  final fileStorage = FileStorage();
+  final database = DatabaseService();
+
+  final appDir = await getApplicationSupportDirectory();
+  final storageRoot = debug ? Directory('${appDir.path}/debug') : appDir;
+
+  await fileStorage.initialize(storageRoot);
+  await database.initialize(storageRoot);
+
+  final container = ProviderContainer(
+    overrides: [
+      fileStorageProvider.overrideWithValue(fileStorage),
+      databaseProvider.overrideWithValue(database),
+    ],
+  );
+
+  return container;
+}
+
+class _Main extends StatelessWidget {
+  const _Main();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
+      title: "ContextChat",
+      home: App(),
+    );
+  }
+}

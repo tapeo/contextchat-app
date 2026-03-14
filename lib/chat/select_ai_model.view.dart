@@ -1,0 +1,305 @@
+import 'package:app/chat/chat.provider.dart';
+import 'package:app/chat/chats.provider.dart';
+import 'package:app/components/app_dialog.dart';
+import 'package:app/components/button.widget.dart';
+import 'package:app/components/input.widget.dart';
+import 'package:app/components/list_tile.widget.dart';
+import 'package:app/components/text_button.widget.dart';
+import 'package:app/openrouter/openrouter.model.dart';
+import 'package:app/openrouter/openrouter_models.provider.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class SelectAiModelView extends ConsumerStatefulWidget {
+  const SelectAiModelView({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _SelectAiModelViewState();
+  }
+}
+
+class _SelectAiModelViewState extends ConsumerState<SelectAiModelView> {
+  String formatContextLength(int length) {
+    if (length >= 1000) {
+      double k = length / 1000.0;
+      return '${k.toStringAsFixed(k % 1 == 0 ? 0 : 1)}k tokens';
+    } else {
+      return '$length tokens';
+    }
+  }
+
+  String formatPrice(String? price) {
+    if (price == null || price.isEmpty || price == '0') {
+      return 'Free';
+    }
+    final priceValue = double.tryParse(price);
+    if (priceValue == null || priceValue == 0) {
+      return 'Free';
+    }
+    final pricePerMillion = priceValue * 1000000;
+    return '\$${pricePerMillion.toStringAsFixed(2)}/M';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  String? get chatId =>
+      ref.watch(chatsProvider.select((state) => state.selectedChatId));
+
+  Future<void> _openModelPicker(
+    BuildContext context,
+    List<OpenRouterModel> models,
+    String? selectedModelId,
+  ) async {
+    final pickedModelId = await showAppDialog<String>(
+      context: context,
+      title: const Text('Select model'),
+      content: _ModelPickerDialog(
+        models: models,
+        selectedModelId: selectedModelId,
+        formatContextLength: formatContextLength,
+        formatPrice: formatPrice,
+      ),
+      actions: [
+        TextButtonWidget(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    );
+
+    if (pickedModelId == null || chatId == null) return;
+    ref.read(chatProvider(chatId!).notifier).selectModel(pickedModelId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (chatId == null) {
+      return const ButtonWidget(onPressed: null, label: 'Select Model');
+    }
+
+    final selectedModelId = ref.watch(
+      chatProvider(chatId!).select((state) => state.selectedModelId),
+    );
+
+    final openRouterModelsState = ref.watch(openRouterModelsProvider);
+
+    if (openRouterModelsState.loading) {
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+
+    final selectedModel = openRouterModelsState.models.firstWhereOrNull(
+      (model) => model.id == selectedModelId,
+    );
+    return ButtonWidget(
+      onPressed: openRouterModelsState.models.isEmpty
+          ? null
+          : () => _openModelPicker(
+              context,
+              openRouterModelsState.models,
+              selectedModelId,
+            ),
+      label: selectedModel?.name ?? 'Select Model',
+    );
+  }
+}
+
+class _ModelPickerDialog extends StatefulWidget {
+  const _ModelPickerDialog({
+    required this.models,
+    required this.selectedModelId,
+    required this.formatContextLength,
+    required this.formatPrice,
+  });
+
+  final List<OpenRouterModel> models;
+  final String? selectedModelId;
+  final String Function(int) formatContextLength;
+  final String Function(String?) formatPrice;
+
+  @override
+  State<_ModelPickerDialog> createState() => _ModelPickerDialogState();
+}
+
+class _ModelPickerDialogState extends State<_ModelPickerDialog> {
+  late final TextEditingController _searchController;
+  String? _currentSort;
+  bool _isAscending = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _toggleSort(String sort) {
+    setState(() {
+      if (_currentSort == sort) {
+        _isAscending = !_isAscending;
+      } else {
+        _currentSort = sort;
+        _isAscending = true;
+      }
+    });
+  }
+
+  List<OpenRouterModel> get _filteredModels {
+    final query = _searchController.text.toLowerCase();
+    final filtered = widget.models
+        .where((model) => model.name.toLowerCase().contains(query))
+        .toList();
+
+    if (_currentSort == null) {
+      return filtered;
+    }
+
+    filtered.sort((a, b) {
+      int compare = 0;
+      switch (_currentSort) {
+        case 'price':
+          final aPrice = double.tryParse(a.pricing.prompt ?? '0') ?? 0;
+          final bPrice = double.tryParse(b.pricing.prompt ?? '0') ?? 0;
+          compare = aPrice.compareTo(bPrice);
+          break;
+        case 'contextLength':
+          compare = a.contextLength.compareTo(b.contextLength);
+          break;
+        case 'created':
+          compare = a.created.compareTo(b.created);
+          break;
+      }
+      return _isAscending ? compare : -compare;
+    });
+
+    return filtered;
+  }
+
+  Widget _buildSortButton(String sort, String label) {
+    final isSelected = _currentSort == sort;
+
+    return ButtonWidget(
+      onPressed: () => _toggleSort(sort),
+      label: '$label ${isSelected ? (_isAscending ? '↑' : '↓') : ''}',
+      size: ButtonSize.small,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final filteredModels = _filteredModels;
+
+    return SizedBox(
+      width: 520,
+      height: 420,
+      child: Column(
+        children: [
+          InputWidget(
+            controller: _searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              labelText: 'Search models',
+              labelStyle: theme.textTheme.bodySmall,
+              prefixIcon: const Icon(LucideIcons.search),
+              border: InputBorder.none,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _buildSortButton('price', 'Price'),
+              _buildSortButton('contextLength', 'Context'),
+              _buildSortButton('created', 'Created'),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: filteredModels.isEmpty
+                ? const Center(child: Text('No models match your search.'))
+                : ListView.builder(
+                    itemCount: filteredModels.length,
+                    itemBuilder: (context, index) {
+                      final model = filteredModels[index];
+                      return ListTileWidget(
+                        selected: model.id == widget.selectedModelId,
+                        title: Row(
+                          children: [
+                            Tooltip(
+                              richMessage: WidgetSpan(
+                                child: SizedBox(
+                                  width: 300,
+                                  child: Text(model.description),
+                                ),
+                              ),
+                              child: Icon(
+                                LucideIcons.info,
+                                size: 14,
+                                color: theme.iconTheme.color?.withAlpha(128),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                model.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'In: ${widget.formatPrice(model.pricing.prompt)}',
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                                Text(
+                                  'Out: ${widget.formatPrice(model.pricing.completion)}',
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              widget.formatContextLength(model.contextLength),
+                              style: theme.textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                        onTap: () => Navigator.of(context).pop(model.id),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}

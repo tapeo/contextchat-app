@@ -1,0 +1,229 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:app/chat/chat.model.dart';
+import 'package:app/chat/message.model.dart';
+import 'package:path/path.dart';
+
+import 'database_filesystem.dart';
+
+class ChatDatabaseService {
+  ChatDatabaseService(this._filesystem);
+
+  static const _chatMessageStart = '<!-- CHAT_MESSAGE_START';
+  static const _chatMessageEnd = '<!-- CHAT_MESSAGE_END -->';
+
+  final DatabaseFilesystem _filesystem;
+
+  Future<List<Chat>> getAllChats() async {
+    final chats = <Chat>[];
+    if (!await _filesystem.chatsDirectory.exists()) {
+      return chats;
+    }
+
+    final files = await _filesystem.chatsDirectory
+        .list()
+        .where(
+          (entity) =>
+              entity is File && extension(entity.path).toLowerCase() == '.md',
+        )
+        .cast<File>()
+        .toList();
+    files.sort(
+      (left, right) => basename(left.path).compareTo(basename(right.path)),
+    );
+
+    for (final file in files) {
+      final chat = await _readChat(file);
+      if (chat != null) {
+        chats.add(chat);
+      }
+    }
+
+    return chats;
+  }
+
+  Future<void> saveChat(Chat chat) async {
+    final file = _filesystem.chatFile(chat.id);
+    final existingMetadata = await _readChatMetadata(file);
+    final createdAt =
+        (existingMetadata['createdAt'] as String?) ??
+        _inferCreatedAt(chat).toIso8601String();
+    final updatedAt = DateTime.now().toUtc().toIso8601String();
+    final title = _deriveChatTitle(chat);
+
+    await _filesystem.writeStringAtomic(
+      file,
+      _encodeChatMarkdown(
+        chat,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        title: title,
+      ),
+    );
+  }
+
+  Future<void> deleteChat(String id) async {
+    final file = _filesystem.chatFile(id);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
+  Future<void> deleteChatsForProject(String projectId) async {
+    if (!await _filesystem.chatsDirectory.exists()) {
+      return;
+    }
+
+    final files = await _filesystem.chatsDirectory
+        .list()
+        .where(
+          (entity) =>
+              entity is File && extension(entity.path).toLowerCase() == '.md',
+        )
+        .cast<File>()
+        .toList();
+
+    for (final file in files) {
+      final metadata = await _readChatMetadata(file);
+      if (metadata['projectId'] == projectId && await file.exists()) {
+        await file.delete();
+      }
+    }
+  }
+
+  Future<Chat?> _readChat(File file) async {
+    if (!await file.exists()) {
+      return null;
+    }
+
+    final contents = await file.readAsString();
+    final frontmatter = _parseFrontmatter(contents);
+    final messagePattern = RegExp(
+      '${RegExp.escape(_chatMessageStart)} (.+?) -->\\s*\\n([\\s\\S]*?)\\n${RegExp.escape(_chatMessageEnd)}',
+      multiLine: true,
+    );
+    final matches = messagePattern.allMatches(contents);
+    final messages = <Message>[];
+
+    for (final match in matches) {
+      final metadata = json.decode(match.group(1)!);
+      if (metadata is! Map<String, dynamic>) {
+        throw const FormatException('Invalid chat message metadata');
+      }
+
+      messages.add(
+        Message(
+          id: metadata['id'] as String,
+          timestamp: metadata['timestamp'] as String,
+          content: match.group(2) ?? '',
+          role: MessageRole.values.firstWhere(
+            (role) => role.value == metadata['role'],
+          ),
+        ),
+      );
+    }
+
+    return Chat(
+      id: (frontmatter['id'] as String?) ?? basenameWithoutExtension(file.path),
+      projectId: frontmatter['projectId'] as String?,
+      messages: messages,
+    );
+  }
+
+  Future<Map<String, dynamic>> _readChatMetadata(File file) async {
+    if (!await file.exists()) {
+      return {};
+    }
+
+    return _parseFrontmatter(await file.readAsString());
+  }
+
+  String _encodeChatMarkdown(
+    Chat chat, {
+    required String createdAt,
+    required String updatedAt,
+    required String title,
+  }) {
+    final buffer = StringBuffer()
+      ..writeln('---')
+      ..writeln('id: ${json.encode(chat.id)}')
+      ..writeln('projectId: ${json.encode(chat.projectId)}')
+      ..writeln('createdAt: ${json.encode(createdAt)}')
+      ..writeln('updatedAt: ${json.encode(updatedAt)}')
+      ..writeln('title: ${json.encode(title)}')
+      ..writeln('---')
+      ..writeln('# Chat Transcript');
+
+    for (final message in chat.messages) {
+      buffer
+        ..writeln()
+        ..writeln(
+          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp})} -->',
+        )
+        ..writeln(message.content)
+        ..writeln(_chatMessageEnd);
+    }
+
+    return '${buffer.toString().trimRight()}\n';
+  }
+
+  Map<String, dynamic> _parseFrontmatter(String contents) {
+    if (!contents.startsWith('---\n')) {
+      return {};
+    }
+
+    final closingIndex = contents.indexOf('\n---\n', 4);
+    if (closingIndex == -1) {
+      return {};
+    }
+
+    final frontmatter = contents.substring(4, closingIndex);
+    final metadata = <String, dynamic>{};
+
+    for (final line in frontmatter.split('\n')) {
+      if (line.trim().isEmpty) {
+        continue;
+      }
+
+      final separatorIndex = line.indexOf(':');
+      if (separatorIndex == -1) {
+        continue;
+      }
+
+      final key = line.substring(0, separatorIndex).trim();
+      final rawValue = line.substring(separatorIndex + 1).trim();
+      metadata[key] = rawValue.isEmpty ? null : json.decode(rawValue);
+    }
+
+    return metadata;
+  }
+
+  DateTime _inferCreatedAt(Chat chat) {
+    if (chat.messages.isEmpty) {
+      return DateTime.now().toUtc();
+    }
+
+    return DateTime.tryParse(chat.messages.first.timestamp)?.toUtc() ??
+        DateTime.now().toUtc();
+  }
+
+  String _deriveChatTitle(Chat chat) {
+    for (final message in chat.messages) {
+      if (message.role != MessageRole.user) {
+        continue;
+      }
+
+      final normalized = message.content.trim().replaceAll(RegExp(r'\s+'), ' ');
+      if (normalized.isEmpty) {
+        continue;
+      }
+
+      return normalized.length > 80
+          ? '${normalized.substring(0, 77)}...'
+          : normalized;
+    }
+
+    return 'Chat ${chat.id}';
+  }
+}
