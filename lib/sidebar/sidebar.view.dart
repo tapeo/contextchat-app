@@ -6,6 +6,7 @@ import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/no_transition_route.dart';
 import 'package:contextchat/projects/project_setup.view.dart';
 import 'package:contextchat/projects/projects.provider.dart';
+import 'package:contextchat/prompts/prompts_library.view.dart';
 import 'package:contextchat/settings/settings.view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -228,6 +229,17 @@ class _SidebarFooter extends ConsumerWidget {
                 );
               },
             ),
+          IconButtonWidget(
+            tooltip: 'Prompts',
+            icon: const Icon(LucideIcons.bookText),
+            onPressed: () {
+              Navigator.of(context).push(
+                NoTransitionRoute(
+                  builder: (context) => const PromptsLibraryView(),
+                ),
+              );
+            },
+          ),
           IconButtonWidget(
             tooltip: 'Settings',
             icon: const Icon(LucideIcons.settings),

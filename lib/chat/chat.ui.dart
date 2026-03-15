@@ -1,8 +1,10 @@
 import 'package:contextchat/chat/chat.provider.dart';
 import 'package:contextchat/chat/chat.state.dart';
+import 'package:contextchat/chat/chat_draft.provider.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/chat/message.model.dart';
 import 'package:contextchat/chat/select_ai_model.view.dart';
+import 'package:contextchat/chat/select_prompt.view.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
@@ -296,6 +298,16 @@ class _ChatUiState extends ConsumerState<ChatUi> {
     }
 
     ChatState chatState = ref.watch(chatProvider(chatId!));
+    ref.watch(chatDraftProvider(chatId!));
+
+    ref.listen<String>(chatDraftProvider(chatId!), (previous, next) {
+      if (!mounted) return;
+      if (_textController.text == next) return;
+      _textController.value = TextEditingValue(
+        text: next,
+        selection: TextSelection.collapsed(offset: next.length),
+      );
+    });
 
     ref.listen<ChatState>(chatProvider(chatId!), (previous, next) {
       // If user is at/near bottom, keep following new messages and streamed content.
@@ -354,8 +366,16 @@ class _ChatUiState extends ConsumerState<ChatUi> {
           padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
           child: _Composer(
             controller: _textController,
+            onChanged: (value) =>
+                ref.read(chatDraftProvider(chatId!).notifier).setDraft(value),
             loading: loading,
             selectedModelId: selectedModelId,
+            onInsertPrompt: (promptText) {
+              if (chatId == null) return;
+              ref
+                  .read(chatDraftProvider(chatId!).notifier)
+                  .insert(promptText, replace: false);
+            },
             onSubmit: () => _submitCurrentMessage(selectedModelId),
           ),
         ),
@@ -371,6 +391,7 @@ class _ChatUiState extends ConsumerState<ChatUi> {
     try {
       await ref.read(chatProvider(chatId!).notifier).sendMessage(text);
       _textController.clear();
+      ref.read(chatDraftProvider(chatId!).notifier).clear();
     } catch (e) {
       _textController.text = temporaryText;
       _textController.selection = TextSelection.fromPosition(
@@ -384,14 +405,18 @@ class _ChatUiState extends ConsumerState<ChatUi> {
 class _Composer extends StatelessWidget {
   const _Composer({
     required this.controller,
+    required this.onChanged,
     required this.loading,
     required this.selectedModelId,
+    required this.onInsertPrompt,
     required this.onSubmit,
   });
 
   final TextEditingController controller;
+  final ValueChanged<String> onChanged;
   final bool loading;
   final String? selectedModelId;
+  final ValueChanged<String> onInsertPrompt;
   final Future<void> Function() onSubmit;
 
   @override
@@ -441,6 +466,7 @@ class _Composer extends StatelessWidget {
                   maxLines: 6,
                   enabled: !loading,
                   keyboardType: TextInputType.multiline,
+                  onChanged: onChanged,
                   decoration: InputDecoration(
                     hintText: 'Enter text here',
                     hintStyle: theme.textTheme.bodyMedium,
@@ -461,6 +487,10 @@ class _Composer extends StatelessWidget {
                         style: theme.textTheme.bodySmall,
                       ),
                       const Spacer(),
+                      SelectPromptView(
+                        onPicked: (promptText) => onInsertPrompt(promptText),
+                      ),
+                      const SizedBox(width: 8),
                       const SelectAiModelView(),
                       const SizedBox(width: 8),
                       if (loading)

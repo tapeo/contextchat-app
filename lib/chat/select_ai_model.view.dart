@@ -114,6 +114,7 @@ class _SelectAiModelViewState extends ConsumerState<SelectAiModelView> {
               selectedModelId,
             ),
       label: selectedModel?.name ?? 'Select Model',
+      size: ButtonSize.small,
     );
   }
 }

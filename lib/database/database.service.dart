@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:contextchat/chat/chat.model.dart';
 import 'package:contextchat/projects/projects.model.dart';
+import 'package:contextchat/prompts/prompt.model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_database.service.dart';
 import 'database_filesystem.dart';
+import 'prompt_database.service.dart';
 import 'project_database.service.dart';
 
 final databaseProvider = Provider<DatabaseService>((ref) {
@@ -22,16 +24,22 @@ final chatDatabaseProvider = Provider<ChatDatabaseService>((ref) {
   return ref.watch(databaseProvider).chats;
 });
 
+final promptDatabaseProvider = Provider<PromptDatabaseService>((ref) {
+  return ref.watch(databaseProvider).prompts;
+});
+
 class DatabaseService {
   DatabaseService({DatabaseFilesystem? filesystem})
     : _filesystem = filesystem ?? DatabaseFilesystem() {
     projects = ProjectDatabaseService(_filesystem);
     chats = ChatDatabaseService(_filesystem);
+    prompts = PromptDatabaseService(_filesystem);
   }
 
   final DatabaseFilesystem _filesystem;
   late final ProjectDatabaseService projects;
   late final ChatDatabaseService chats;
+  late final PromptDatabaseService prompts;
 
   String get memoryPath => _filesystem.memoryPath;
 
@@ -57,6 +65,9 @@ class DatabaseService {
           .toList(),
       'chats': (await chats.getAllChats())
           .map((chat) => chat.toJson())
+          .toList(),
+      'prompts': (await prompts.getAllPrompts())
+          .map((prompt) => prompt.toJson())
           .toList(),
     };
     return utf8.encode(json.encode(data));
@@ -91,6 +102,15 @@ class DatabaseService {
             Map<String, dynamic>.from(chatJson as Map<dynamic, dynamic>),
           );
           await chats.saveChat(chat);
+        }
+      }
+
+      if (decoded['prompts'] is List) {
+        for (final promptJson in decoded['prompts'] as List<dynamic>) {
+          final prompt = Prompt.fromJson(
+            Map<String, dynamic>.from(promptJson as Map<dynamic, dynamic>),
+          );
+          await prompts.savePrompt(prompt);
         }
       }
     } else {

@@ -7,19 +7,23 @@ class DatabaseFilesystem {
   late Directory _memoryDirectory;
   late Directory _projectsDirectory;
   late Directory _chatsDirectory;
+  late Directory _promptsDirectory;
 
   String get memoryPath => _memoryDirectory.path;
   Directory get projectsDirectory => _projectsDirectory;
   Directory get chatsDirectory => _chatsDirectory;
+  Directory get promptsDirectory => _promptsDirectory;
 
   Future<void> initialize(Directory directory) async {
     _memoryDirectory = Directory(join(directory.path, 'memory'));
     _projectsDirectory = Directory(join(_memoryDirectory.path, 'projects'));
     _chatsDirectory = Directory(join(_memoryDirectory.path, 'chats'));
+    _promptsDirectory = Directory(join(_memoryDirectory.path, 'prompts'));
 
     await _memoryDirectory.create(recursive: true);
     await _projectsDirectory.create(recursive: true);
     await _chatsDirectory.create(recursive: true);
+    await _promptsDirectory.create(recursive: true);
   }
 
   Future<void> reset() async {
@@ -36,9 +40,13 @@ class DatabaseFilesystem {
     if (await _chatsDirectory.exists()) {
       await _chatsDirectory.delete(recursive: true);
     }
+    if (await _promptsDirectory.exists()) {
+      await _promptsDirectory.delete(recursive: true);
+    }
 
     await _projectsDirectory.create(recursive: true);
     await _chatsDirectory.create(recursive: true);
+    await _promptsDirectory.create(recursive: true);
   }
 
   Directory projectDirectory(String projectId) {
@@ -59,6 +67,10 @@ class DatabaseFilesystem {
 
   File chatFile(String chatId) {
     return File(join(_chatsDirectory.path, '$chatId.md'));
+  }
+
+  File promptFile(String promptId) {
+    return File(join(_promptsDirectory.path, '$promptId.json'));
   }
 
   Future<void> writeJsonAtomic(File file, Map<String, dynamic> data) async {

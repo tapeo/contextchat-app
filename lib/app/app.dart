@@ -1,6 +1,7 @@
 import 'package:contextchat/chat/chat.ui.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/projects/projects.provider.dart';
+import 'package:contextchat/prompts/prompts.provider.dart';
 import 'package:contextchat/sidebar/sidebar.view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ class _AppState extends ConsumerState<App> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(projectsProvider.notifier).initialize();
       ref.read(chatsProvider.notifier).initialize();
+      ref.read(promptsProvider.notifier).initialize();
     });
     super.initState();
   }
