@@ -25,7 +25,7 @@ class ListTileStyle2 {
     iconSize: 24,
     titleFontSize: 14,
     subtitleFontSize: 12,
-    leadingSpacing: 12,
+    leadingSpacing: 16,
     trailingSpacing: 8,
     subtitleSpacing: 2,
   );
@@ -35,7 +35,7 @@ class ListTileStyle2 {
     iconSize: 20,
     titleFontSize: 13,
     subtitleFontSize: 11,
-    leadingSpacing: 12,
+    leadingSpacing: 16,
     trailingSpacing: 8,
     subtitleSpacing: 2,
   );
@@ -45,7 +45,7 @@ class ListTileStyle2 {
     iconSize: 18,
     titleFontSize: 12,
     subtitleFontSize: 10,
-    leadingSpacing: 4,
+    leadingSpacing: 8,
     trailingSpacing: 2,
     subtitleSpacing: 0,
   );
