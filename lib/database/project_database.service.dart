@@ -11,6 +11,9 @@ class ProjectDatabaseService {
 
   final DatabaseFilesystem _filesystem;
 
+  Directory getProjectDirectory(String projectId) =>
+      _filesystem.projectDirectory(projectId);
+
   Future<List<Project>> getAllProjects() async {
     final projects = <Project>[];
     if (!await _filesystem.projectsDirectory.exists()) {

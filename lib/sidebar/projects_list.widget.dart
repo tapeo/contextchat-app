@@ -5,6 +5,8 @@ import 'package:contextchat/components/card.widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/project_setup.view.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/sidebar/chats_list.widget.dart';
@@ -116,6 +118,16 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
           child: AdaptiveTextSelectionToolbar.buttonItems(
             anchors: TextSelectionToolbarAnchors(primaryAnchor: offset),
             buttonItems: [
+              ContextMenuButtonItem(
+                label: 'Open in file explorer',
+                onPressed: () async {
+                  _contextMenuController.remove();
+                  final directory = ref
+                      .read(projectDatabaseProvider)
+                      .getProjectDirectory(widget.projectId);
+                  await FileUtils.revealInFileManager(directory.path);
+                },
+              ),
               ContextMenuButtonItem(
                 label: 'Edit',
                 onPressed: () {

@@ -1,6 +1,8 @@
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
+import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,6 +62,15 @@ class _ChatsListState extends ConsumerState<ChatsList> {
           child: AdaptiveTextSelectionToolbar.buttonItems(
             anchors: TextSelectionToolbarAnchors(primaryAnchor: offset),
             buttonItems: [
+              ContextMenuButtonItem(
+                label: 'Open in file explorer',
+                onPressed: () async {
+                  _contextMenuController.remove();
+                  final file =
+                      ref.read(chatDatabaseProvider).getChatFile(chatId);
+                  await FileUtils.revealInFileManager(file.path);
+                },
+              ),
               ContextMenuButtonItem(
                 label: 'Delete',
                 onPressed: () {

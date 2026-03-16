@@ -15,6 +15,8 @@ class ChatDatabaseService {
 
   final DatabaseFilesystem _filesystem;
 
+  File getChatFile(String chatId) => _filesystem.chatFile(chatId);
+
   Future<List<Chat>> getAllChats() async {
     final chats = <Chat>[];
     if (!await _filesystem.chatsDirectory.exists()) {
