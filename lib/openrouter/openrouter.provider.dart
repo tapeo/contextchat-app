@@ -76,4 +76,24 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
       messages: messages,
     );
   }
+
+  Future<String> sendNonStreaming({
+    required List<OpenRouterMessage> messages,
+    String? modelId,
+  }) async {
+    final effectiveModelId = modelId ?? state.modelId;
+    if (effectiveModelId == null) {
+      throw Exception('No model selected');
+    }
+    if (state.apiKey == null) {
+      throw Exception('No API key provided');
+    }
+
+    return openRouter.sendNonStreaming(
+      baseUrl: state.baseUrl,
+      apiKey: state.apiKey!,
+      modelId: effectiveModelId,
+      messages: messages,
+    );
+  }
 }

@@ -163,14 +163,40 @@ class ChatNotifier extends Notifier<ChatState> {
         role: MessageRole.assistant,
       );
 
+      Chat updatedChat = state.chat.copyWith(
+        messages: [...state.chat.messages, finalMessage],
+      );
+
+      if (updatedChat.title == null && currentMessages.isEmpty) {
+        try {
+          final title = await openRouter.sendNonStreaming(
+            messages: [
+              OpenRouterMessage(
+                role: 'system',
+                content:
+                    'Generate a short, concise chat title (3-5 words max) based on the user message. Return only the title, no quotes or extra text.',
+              ),
+              OpenRouterMessage(role: 'user', content: text),
+            ],
+            modelId: state.selectedModelId,
+          );
+          updatedChat = updatedChat.copyWith(
+            title: title.replaceAll('"', '').replaceAll("'", ''),
+          );
+        } catch (e) {
+          // If title generation fails, we'll just use the default title
+        }
+      }
+
       state = state.copyWith(
-        chat: state.chat.copyWith(
-          messages: [...state.chat.messages, finalMessage],
-        ),
+        chat: updatedChat,
         accumulatedResponse: const Nullable(null),
         loading: false,
       );
+
       await _saveChat();
+
+      ref.read(chatsProvider.notifier).updateChat(updatedChat);
     } catch (e) {
       rethrow;
     } finally {

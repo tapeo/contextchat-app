@@ -4,14 +4,26 @@ import 'package:equatable/equatable.dart';
 class Chat extends Equatable {
   final String id;
   final String? projectId;
+  final String? title;
   final List<Message> messages;
 
-  const Chat({required this.id, this.projectId, required this.messages});
+  const Chat({
+    required this.id,
+    this.projectId,
+    this.title,
+    required this.messages,
+  });
 
-  Chat copyWith({String? id, String? projectId, List<Message>? messages}) {
+  Chat copyWith({
+    String? id,
+    String? projectId,
+    String? title,
+    List<Message>? messages,
+  }) {
     return Chat(
       id: id ?? this.id,
       projectId: projectId ?? this.projectId,
+      title: title ?? this.title,
       messages: messages ?? this.messages,
     );
   }
@@ -20,6 +32,7 @@ class Chat extends Equatable {
     return {
       'id': id,
       'projectId': projectId,
+      'title': title,
       'messages': messages
           .map(
             (m) => {
@@ -37,6 +50,7 @@ class Chat extends Equatable {
     return Chat(
       id: json['id'] as String,
       projectId: json['projectId'] as String?,
+      title: json['title'] as String?,
       messages: (json['messages'] as List<dynamic>)
           .map(
             (m) => Message(
@@ -51,5 +65,5 @@ class Chat extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, projectId, messages];
+  List<Object?> get props => [id, projectId, title, messages];
 }

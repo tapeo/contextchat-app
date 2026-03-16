@@ -58,4 +58,12 @@ class ChatsNotifier extends Notifier<ChatsState> {
   void selectChat(String id) {
     state = state.copyWith(selectedChatId: id);
   }
+
+  void updateChat(Chat updatedChat) {
+    state = state.copyWith(
+      chats: state.chats.map((chat) {
+        return chat.id == updatedChat.id ? updatedChat : chat;
+      }).toList(),
+    );
+  }
 }

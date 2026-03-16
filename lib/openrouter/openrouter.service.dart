@@ -94,6 +94,36 @@ class OpenRouterService {
     }
   }
 
+  Future<String> sendNonStreaming({
+    required String baseUrl,
+    required String apiKey,
+    required String modelId,
+    required List<OpenRouterMessage> messages,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/chat/completions'),
+      headers: {
+        'Authorization': 'Bearer $apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'model': modelId,
+        'messages': messages.map((e) => e.toJson()).toList(),
+        'stream': false,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final content = data['choices']?[0]?['message']?['content'] as String?;
+      if (content != null) {
+        return content.trim();
+      }
+    }
+
+    throw Exception('Failed to get response: ${response.statusCode}');
+  }
+
   Future<List<OpenRouterModel>> fetchModels(
     String baseUrl,
     String? apiKey,

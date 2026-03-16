@@ -76,16 +76,18 @@ class _ProjectSection extends ConsumerWidget {
   final String projectName;
   final bool isSelected;
 
+  String? _formatChatTitle(String? title) {
+    if (title == null || title.isEmpty) return null;
+    return title[0].toUpperCase() + title.substring(1);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chats = ref.watch(
-      chatsProvider.select(
-        (state) => state.chats.where((c) => c.projectId == projectId).toList(),
-      ),
-    );
-    final selectedChatId = ref.watch(
-      chatsProvider.select((state) => state.selectedChatId),
-    );
+    final chatsState = ref.watch(chatsProvider);
+    final chats = chatsState.chats
+        .where((c) => c.projectId == projectId)
+        .toList();
+    final selectedChatId = chatsState.selectedChatId;
     final theme = Theme.of(context);
 
     return CardWidget(
@@ -153,9 +155,15 @@ class _ProjectSection extends ConsumerWidget {
                       children: [
                         for (var index = 0; index < chats.length; index++)
                           ListTileWidget(
+                            key: ValueKey(chats[index].id),
                             selected: chats[index].id == selectedChatId,
                             style: ListTileStyle2.compact,
-                            title: Text('Chat ${index + 1}'),
+                            title: Text(
+                              _formatChatTitle(chats[index].title) ??
+                                  'Chat ${index + 1}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             trailing: IconButtonWidget(
                               tooltip: 'Delete chat',
                               icon: const Icon(LucideIcons.trash2, size: 10),

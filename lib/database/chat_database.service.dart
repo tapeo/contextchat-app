@@ -50,7 +50,7 @@ class ChatDatabaseService {
         (existingMetadata['createdAt'] as String?) ??
         _inferCreatedAt(chat).toIso8601String();
     final updatedAt = DateTime.now().toUtc().toIso8601String();
-    final title = _deriveChatTitle(chat);
+    final title = chat.title ?? _deriveChatTitle(chat);
 
     await _filesystem.writeStringAtomic(
       file,
@@ -127,6 +127,7 @@ class ChatDatabaseService {
     return Chat(
       id: (frontmatter['id'] as String?) ?? basenameWithoutExtension(file.path),
       projectId: frontmatter['projectId'] as String?,
+      title: frontmatter['title'] as String?,
       messages: messages,
     );
   }
