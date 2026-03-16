@@ -36,9 +36,7 @@ class AppTheme {
       thickness: 1,
       space: 1,
     ),
-    textTheme: GoogleFonts.bricolageGrotesqueTextTheme(
-      Typography.blackMountainView,
-    ),
+    textTheme: GoogleFonts.geistTextTheme(Typography.blackMountainView),
     useMaterial3: true,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -138,9 +136,7 @@ class AppTheme {
       thickness: 1,
       space: 1,
     ),
-    textTheme: GoogleFonts.bricolageGrotesqueTextTheme(
-      Typography.whiteMountainView,
-    ),
+    textTheme: GoogleFonts.geistTextTheme(Typography.whiteMountainView),
     useMaterial3: true,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     elevatedButtonTheme: ElevatedButtonThemeData(
