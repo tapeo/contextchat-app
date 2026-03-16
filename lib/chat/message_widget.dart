@@ -152,7 +152,7 @@ class MessageWidget extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+            padding: const EdgeInsets.fromLTRB(0, 2, 12, 0),
             child: IconButtonWidget(
               onPressed:
                   onCopy ??
@@ -167,7 +167,7 @@ class MessageWidget extends StatelessWidget {
                   },
               icon: Icon(
                 LucideIcons.copy,
-                size: 14,
+                size: 12,
                 color: colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
