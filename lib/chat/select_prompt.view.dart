@@ -53,7 +53,7 @@ class _SelectPromptViewState extends ConsumerState<SelectPromptView> {
       onPressed: promptsState.prompts.isEmpty
           ? null
           : () => _openPromptPicker(context),
-      label: 'Insert Prompt',
+      label: 'Prompts',
       size: ButtonSize.small,
     );
   }
@@ -139,9 +139,7 @@ class _PromptPickerDialogState extends State<_PromptPickerDialog> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: prompt.description.trim().isEmpty
-                            ? Text(
-                                '${prompt.variables.length} variable(s)',
-                              )
+                            ? Text('${prompt.variables.length} variable(s)')
                             : Text(
                                 prompt.description,
                                 maxLines: 1,
@@ -157,4 +155,3 @@ class _PromptPickerDialogState extends State<_PromptPickerDialog> {
     );
   }
 }
-
