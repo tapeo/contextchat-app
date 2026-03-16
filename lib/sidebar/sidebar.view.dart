@@ -1,9 +1,9 @@
 import 'package:contextchat/chat/chats.provider.dart';
+import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/button.widget.dart';
 import 'package:contextchat/components/card.widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
-import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/no_transition_route.dart';
 import 'package:contextchat/projects/project_setup.view.dart';
 import 'package:contextchat/projects/projects.provider.dart';
@@ -65,7 +65,7 @@ class SidebarView extends ConsumerWidget {
   }
 }
 
-class _ProjectSection extends ConsumerWidget {
+class _ProjectSection extends ConsumerStatefulWidget {
   const _ProjectSection({
     required this.projectId,
     required this.projectName,
@@ -76,16 +76,75 @@ class _ProjectSection extends ConsumerWidget {
   final String projectName;
   final bool isSelected;
 
+  @override
+  ConsumerState<_ProjectSection> createState() => _ProjectSectionState();
+}
+
+class _ProjectSectionState extends ConsumerState<_ProjectSection> {
+  final ContextMenuController _contextMenuController = ContextMenuController();
+
+  @override
+  void dispose() {
+    _contextMenuController.remove();
+    super.dispose();
+  }
+
   String? _formatChatTitle(String? title) {
     if (title == null || title.isEmpty) return null;
     return title[0].toUpperCase() + title.substring(1);
   }
 
+  void _deleteChat(String chatId) {
+    showAppDialog<bool>(
+      context: context,
+      title: const Text('Delete chat'),
+      content: const Text(
+        'Are you sure you want to delete this chat? This action cannot be undone.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            ref.read(chatsProvider.notifier).deleteChat(chatId);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Delete'),
+        ),
+      ],
+    );
+  }
+
+  void _showChatContextMenu(Offset offset, String chatId) {
+    _contextMenuController.show(
+      context: context,
+      contextMenuBuilder: (context) {
+        return TapRegion(
+          onTapOutside: (event) => _contextMenuController.remove(),
+          child: AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: TextSelectionToolbarAnchors(primaryAnchor: offset),
+            buttonItems: [
+              ContextMenuButtonItem(
+                label: 'Delete',
+                onPressed: () {
+                  _contextMenuController.remove();
+                  _deleteChat(chatId);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final chatsState = ref.watch(chatsProvider);
     final chats = chatsState.chats
-        .where((c) => c.projectId == projectId)
+        .where((c) => c.projectId == widget.projectId)
         .toList();
     final selectedChatId = chatsState.selectedChatId;
     final theme = Theme.of(context);
@@ -97,8 +156,8 @@ class _ProjectSection extends ConsumerWidget {
         children: [
           ListTileWidget(
             leading: const Icon(LucideIcons.folder),
-            title: Text(projectName),
-            selected: isSelected,
+            title: Text(widget.projectName),
+            selected: widget.isSelected,
             style: ListTileStyle2.compact,
             borderRadius: 16,
             borderRadiusGeometry: const BorderRadius.only(
@@ -109,38 +168,40 @@ class _ProjectSection extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButtonWidget(
-                  tooltip: 'Edit project',
+                  tooltip: 'Edit',
                   icon: Icon(LucideIcons.pencil, size: 10),
                   onPressed: () {
                     Navigator.of(context).push(
                       NoTransitionRoute(
                         builder: (context) =>
-                            ProjectSetupView(projectId: projectId),
+                            ProjectSetupView(projectId: widget.projectId),
                       ),
                     );
                   },
                 ),
                 IconButtonWidget(
-                  tooltip: 'Add chat',
+                  tooltip: 'New chat',
                   icon: Icon(LucideIcons.plus, size: 12),
                   onPressed: () async {
                     ref
                         .read(projectsProvider.notifier)
-                        .selectProject(projectId);
+                        .selectProject(widget.projectId);
                     final chatId = await ref
                         .read(chatsProvider.notifier)
-                        .createChat(projectId);
+                        .createChat(widget.projectId);
                     ref.read(chatsProvider.notifier).selectChat(chatId);
                   },
                 ),
               ],
             ),
             onTap: () {
-              ref.read(projectsProvider.notifier).selectProject(projectId);
+              ref
+                  .read(projectsProvider.notifier)
+                  .selectProject(widget.projectId);
             },
           ),
-          if (isSelected) Divider(height: 1, color: theme.dividerColor),
-          if (isSelected)
+          if (widget.isSelected) Divider(height: 1, color: theme.dividerColor),
+          if (widget.isSelected)
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
               child: chats.isEmpty
@@ -154,53 +215,30 @@ class _ProjectSection extends ConsumerWidget {
                   : Column(
                       children: [
                         for (var index = 0; index < chats.length; index++)
-                          ListTileWidget(
-                            key: ValueKey(chats[index].id),
-                            selected: chats[index].id == selectedChatId,
-                            style: ListTileStyle2.compact,
-                            title: Text(
-                              _formatChatTitle(chats[index].title) ??
-                                  'Chat ${index + 1}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          GestureDetector(
+                            onSecondaryTapUp: (details) => _showChatContextMenu(
+                              details.globalPosition,
+                              chats[index].id,
                             ),
-                            trailing: IconButtonWidget(
-                              tooltip: 'Delete chat',
-                              icon: const Icon(LucideIcons.trash2, size: 10),
-                              onPressed: () {
-                                showAppDialog<bool>(
-                                  context: context,
-                                  title: const Text('Delete chat'),
-                                  content: const Text(
-                                    'Are you sure you want to delete this chat? This action cannot be undone.',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        ref
-                                            .read(chatsProvider.notifier)
-                                            .deleteChat(chats[index].id);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Delete'),
-                                    ),
-                                  ],
-                                );
+                            child: ListTileWidget(
+                              key: ValueKey(chats[index].id),
+                              selected: chats[index].id == selectedChatId,
+                              style: ListTileStyle2.compact,
+                              title: Text(
+                                _formatChatTitle(chats[index].title) ??
+                                    'Chat ${index + 1}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () {
+                                ref
+                                    .read(projectsProvider.notifier)
+                                    .selectProject(widget.projectId);
+                                ref
+                                    .read(chatsProvider.notifier)
+                                    .selectChat(chats[index].id);
                               },
                             ),
-                            onTap: () {
-                              ref
-                                  .read(projectsProvider.notifier)
-                                  .selectProject(projectId);
-                              ref
-                                  .read(chatsProvider.notifier)
-                                  .selectChat(chats[index].id);
-                            },
                           ),
                       ],
                     ),
