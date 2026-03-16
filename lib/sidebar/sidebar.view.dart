@@ -94,6 +94,37 @@ class _ProjectSectionState extends ConsumerState<_ProjectSection> {
     return title[0].toUpperCase() + title.substring(1);
   }
 
+  void _editProject() {
+    Navigator.of(context).push(
+      NoTransitionRoute(
+        builder: (context) => ProjectSetupView(projectId: widget.projectId),
+      ),
+    );
+  }
+
+  void _deleteProject() {
+    showAppDialog<bool>(
+      context: context,
+      title: const Text('Delete project'),
+      content: const Text(
+        'Are you sure you want to delete this project? All associated chats and data will be permanently removed.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            ref.read(projectsProvider.notifier).deleteProject(widget.projectId);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Delete'),
+        ),
+      ],
+    );
+  }
+
   void _deleteChat(String chatId) {
     showAppDialog<bool>(
       context: context,
@@ -114,6 +145,36 @@ class _ProjectSectionState extends ConsumerState<_ProjectSection> {
           child: const Text('Delete'),
         ),
       ],
+    );
+  }
+
+  void _showProjectContextMenu(Offset offset) {
+    _contextMenuController.show(
+      context: context,
+      contextMenuBuilder: (context) {
+        return TapRegion(
+          onTapOutside: (event) => _contextMenuController.remove(),
+          child: AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: TextSelectionToolbarAnchors(primaryAnchor: offset),
+            buttonItems: [
+              ContextMenuButtonItem(
+                label: 'Edit',
+                onPressed: () {
+                  _contextMenuController.remove();
+                  _editProject();
+                },
+              ),
+              ContextMenuButtonItem(
+                label: 'Delete',
+                onPressed: () {
+                  _contextMenuController.remove();
+                  _deleteProject();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -154,51 +215,43 @@ class _ProjectSectionState extends ConsumerState<_ProjectSection> {
       padding: EdgeInsets.zero,
       child: Column(
         children: [
-          ListTileWidget(
-            leading: const Icon(LucideIcons.folder),
-            title: Text(widget.projectName),
-            selected: widget.isSelected,
-            style: ListTileStyle2.compact,
-            borderRadius: 16,
-            borderRadiusGeometry: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
+          GestureDetector(
+            onSecondaryTapUp: (details) =>
+                _showProjectContextMenu(details.globalPosition),
+            child: ListTileWidget(
+              leading: const Icon(LucideIcons.folder),
+              title: Text(widget.projectName),
+              selected: widget.isSelected,
+              style: ListTileStyle2.compact,
+              borderRadius: 16,
+              borderRadiusGeometry: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButtonWidget(
+                    tooltip: 'New chat',
+                    icon: Icon(LucideIcons.plus, size: 12),
+                    onPressed: () async {
+                      ref
+                          .read(projectsProvider.notifier)
+                          .selectProject(widget.projectId);
+                      final chatId = await ref
+                          .read(chatsProvider.notifier)
+                          .createChat(widget.projectId);
+                      ref.read(chatsProvider.notifier).selectChat(chatId);
+                    },
+                  ),
+                ],
+              ),
+              onTap: () {
+                ref
+                    .read(projectsProvider.notifier)
+                    .selectProject(widget.projectId);
+              },
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButtonWidget(
-                  tooltip: 'Edit',
-                  icon: Icon(LucideIcons.pencil, size: 10),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      NoTransitionRoute(
-                        builder: (context) =>
-                            ProjectSetupView(projectId: widget.projectId),
-                      ),
-                    );
-                  },
-                ),
-                IconButtonWidget(
-                  tooltip: 'New chat',
-                  icon: Icon(LucideIcons.plus, size: 12),
-                  onPressed: () async {
-                    ref
-                        .read(projectsProvider.notifier)
-                        .selectProject(widget.projectId);
-                    final chatId = await ref
-                        .read(chatsProvider.notifier)
-                        .createChat(widget.projectId);
-                    ref.read(chatsProvider.notifier).selectChat(chatId);
-                  },
-                ),
-              ],
-            ),
-            onTap: () {
-              ref
-                  .read(projectsProvider.notifier)
-                  .selectProject(widget.projectId);
-            },
           ),
           if (widget.isSelected) Divider(height: 1, color: theme.dividerColor),
           if (widget.isSelected)
