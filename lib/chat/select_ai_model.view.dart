@@ -113,7 +113,7 @@ class _SelectAiModelViewState extends ConsumerState<SelectAiModelView> {
               openRouterModelsState.models,
               selectedModelId,
             ),
-      label: selectedModel?.name ?? 'Select Model',
+      label: selectedModel?.name ?? selectedModelId ?? 'Select Model',
       size: ButtonSize.small,
     );
   }
@@ -215,15 +215,21 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
       height: 420,
       child: Column(
         children: [
+          _CustomModelInput(
+            onSelect: (customModelId) =>
+                Navigator.of(context).pop(customModelId),
+          ),
+          SizedBox(height: 8),
           InputWidget(
             controller: _searchController,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
               labelText: 'Search models',
               labelStyle: theme.textTheme.bodySmall,
-              prefixIcon: const Icon(LucideIcons.search),
               border: InputBorder.none,
+              isDense: true,
             ),
+            style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -235,7 +241,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
               _buildSortButton('created', 'Created'),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Expanded(
             child: filteredModels.isEmpty
                 ? const Center(child: Text('No models match your search.'))
@@ -262,10 +268,33 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(
-                                model.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    model.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  SelectionArea(
+                                    child: Text(
+                                      model.id,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color
+                                                ?.withAlpha(128),
+                                            fontFamily: 'monospace',
+                                          ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -301,6 +330,68 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _CustomModelInput extends StatefulWidget {
+  const _CustomModelInput({required this.onSelect});
+
+  final void Function(String customModelId) onSelect;
+
+  @override
+  State<_CustomModelInput> createState() => _CustomModelInputState();
+}
+
+class _CustomModelInputState extends State<_CustomModelInput> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onSelect() {
+    final customModelId = _controller.text.trim();
+    if (customModelId.isNotEmpty) {
+      widget.onSelect(customModelId);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Expanded(
+          child: InputWidget(
+            controller: _controller,
+            decoration: InputDecoration(
+              labelText: 'Custom model (e.g., provider/model-name)',
+              labelStyle: theme.textTheme.bodySmall,
+              border: InputBorder.none,
+              isDense: true,
+            ),
+            style: theme.textTheme.bodySmall,
+            onChanged: (_) => setState(() {}),
+            onSubmitted: (_) => _onSelect(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        ButtonWidget(
+          onPressed: _controller.text.trim().isNotEmpty ? _onSelect : null,
+          label: 'Use',
+          size: ButtonSize.small,
+        ),
+      ],
     );
   }
 }
