@@ -1,97 +1,63 @@
 # ContextChat
 
-An AI chat app with special focus on handling projects context. Manage projects with reusable context and chat with AI models using project-specific references.
+ContextChat is a powerful AI interface designed for developers and power users who need project-specific AI assistance. It streamlines your workflow by automatically injecting project context, files, and reusable prompts into your conversations.
 
-### Chat
-
-|                Light                 |                Dark                |
-| :----------------------------------: | :--------------------------------: |
+### Chat and Settings
+| Light | Dark |
+| :---: | :---: |
 | ![Home Light](assets/home-light.png) | ![Home Dark](assets/home-dark.png) |
-
-### Settings
-
-|                    Light                     |                    Dark                    |
-| :------------------------------------------: | :----------------------------------------: |
 | ![Settings Light](assets/settings-light.png) | ![Settings Dark](assets/settings-dark.png) |
 
-## What's Implemented
+---
 
-### Core Features
+## 🚀 Key Features
 
-- **Project Management**: Create, edit, and delete projects with validation and save feedback
-- **Project Context**: Store reusable base context instructions for each project
-- **File Import**: Import text files (PDFs, docs, code, etc.) directly into base context
-- **Image Support**: Import reference images (PNG, JPEG, WebP, GIF) that get attached to chat messages
-- **Chat Interface**: Full chat UI with message history and streaming responses
-- **Model Selection**: Choose AI models per project with persistence
+### 📁 Project-Based Context
+*   **Reusable Instructions**: Set base system prompts for each project.
+*   **File Knowledge**: Import text files (PDF, code, docs) directly into the AI's context.
+*   **Model Defaults**: Assign specific AI models to different projects.
+*   **Local Storage**: All project data and files stay on your machine.
 
-### AI Integration
+### 💬 Intelligent Chat
+*   **OpenRouter Integration**: Access any model from OpenAI, Anthropic, Google, and more.
+*   **Vision Support**: Drag and drop images into vision-capable models.
+*   **Real-time Streaming**: Smooth, responsive message delivery.
+*   **Context Assembly**: Automatically builds the prompt with project rules + files + history.
 
-- **OpenRouter.ai Support**: Connect to OpenRouter.ai for access to multiple AI models
-- **Streaming Responses**: Real-time message streaming with smooth scroll behavior
-- **Vision Models**: Automatic image support for vision-capable models with validation
-- **System Context Injection**: Project base context and files are injected as system messages
+### 📝 Prompt Library
+*   **Save and Reuse**: Build a library of frequently used prompts.
+*   **Variables**: Define variables in prompts for quick customization.
+*   **Quick Insert**: Access your library directly from the chat composer.
+*   **Pin and Search**: Keep your most important prompts at the top.
 
-### UI/UX
+### 🛠 UI / UX
+*   **Resizable Sidebar**: Flexible layout to suit your screen.
+*   **Keyboard First**: Use `Cmd+Enter` (macOS) or `Ctrl+Enter` to send.
+*   **Smart Scroll**: Auto-scroll that stays out of your way when you're reading.
+*   **Markdown Support**: Full rendering for code blocks and formatting.
 
-- **Resizable Sidebar**: Drag to resize the sidebar (20-40% of window width)
-- **Keyboard Shortcuts**: Cmd+Enter (macOS) or Ctrl+Enter (Windows/Linux) to send messages
-- **Copy Messages**: One-click copy any message to clipboard
-- **Settings**: Configure API base URL, API key, and view storage path
-- **Auto-scroll**: Smart auto-scroll that pauses when user scrolls up
+---
 
-### Data Storage
+## ⚙️ How Context Works
+When you send a message, ContextChat automatically assembles a rich prompt:
+1.  **System Prompt**: Your Project's base context instructions.
+2.  **Files**: The content of all text files attached to the project.
+3.  **Images**: Any images you've attached to the current message.
+4.  **History**: Your previous messages for ongoing conversation flow.
 
-- **Filesystem-based**: All data stored locally in app support directory
-- **Project Storage**:
-  - `memory/projects/<projectId>/project.json` - metadata
-  - `memory/projects/<projectId>/MEMORY.md` - base context
-  - `memory/projects/<projectId>/context/` - imported files
-- **Chat Storage**: `memory/chats/<chatId>.md` - chat messages as Markdown
+---
 
-## Roadmap
+## 📂 Data and Privacy
+*   **Local-First**: All metadata, project files, and chat histories are stored locally.
+*   **Storage Path**: Customizable via settings (`memory/` by default).
+*   **Direct API**: Connects directly to OpenRouter using your own API key.
 
-### Near-term
+## 🗺 Roadmap
+- [ ] **Search**: Full-text search across all chat histories.
+- [ ] **Message Editing**: Edit and regenerate AI responses.
+- [ ] **Multi-Provider**: Direct support for OpenAI, Anthropic, and Local (Ollama) APIs.
+- [ ] **Theme Sync**: Manual toggle for Light/Dark modes.
+- [ ] **Export**: Export conversations to Markdown or JSON.
 
-- [ ] **Chat History Search**: Search through past conversations
-- [ ] **Message Management**: Edit and delete individual messages
-- [ ] **Chat Export**: Export chats to Markdown or JSON
-- [ ] **Theme Toggle**: Manual switch between light and dark themes
-- [ ] **Code Syntax Highlighting**: Better formatting for code blocks
-
-### Medium-term
-
-- [ ] **Multi-Provider Support**: Add support for OpenAI, Anthropic, and local models
-- [ ] **Chat Organization**: Folders, tags, or favorites for organizing chats
-- [ ] **Message Feedback**: Thumbs up/down for rating responses
-- [ ] **Message Regeneration**: Regenerate AI responses with different models
-- [ ] **Full-Text Search**: Search across all projects and chat histories
-
-### Future Ideas
-
-- [ ] **Token/Cost Tracking**: Monitor API usage and estimated costs
-- [ ] **Chat Templates**: Save and reuse common chat patterns
-- [ ] **Project Templates**: Pre-configured project setups for common workflows
-- [ ] **Collaboration**: Share projects or chats with team members
-- [ ] **Mobile Support**: Responsive layout for mobile/tablet use
-- [ ] **Offline Mode**: Cache responses for offline reference
-
-## Project Setup Flow
-
-Use the Project button in the sidebar to open the full-page setup view. The form supports:
-
-- **Create mode**: name, base context, and imported files, with validation and save feedback
-- **Edit mode**: update name/context and add/remove imported files
-
-Imported files are copied into the app's project storage; removing a file deletes the stored copy.
-
-## Chat Context Assembly
-
-When sending a chat message from a project:
-
-1. The base context is injected first (if present)
-2. Imported text files are appended to the system context
-3. Imported images are attached as multipart content to the user message
-4. Chat history follows
-
-This makes project-specific references available to the model without requiring manual paste.
+---
+Built with Flutter.
