@@ -3,6 +3,7 @@ import 'package:contextchat/components/button.widget.dart';
 import 'package:contextchat/components/card.widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
+import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/no_transition_route.dart';
 import 'package:contextchat/projects/project_setup.view.dart';
 import 'package:contextchat/projects/projects.provider.dart';
@@ -159,30 +160,28 @@ class _ProjectSection extends ConsumerWidget {
                               tooltip: 'Delete chat',
                               icon: const Icon(LucideIcons.trash2, size: 10),
                               onPressed: () {
-                                showDialog(
+                                showAppDialog<bool>(
                                   context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Delete chat'),
-                                    content: const Text(
-                                      'Are you sure you want to delete this chat? This action cannot be undone.',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          ref
-                                              .read(chatsProvider.notifier)
-                                              .deleteChat(chats[index].id);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('Delete'),
-                                      ),
-                                    ],
+                                  title: const Text('Delete chat'),
+                                  content: const Text(
+                                    'Are you sure you want to delete this chat? This action cannot be undone.',
                                   ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        ref
+                                            .read(chatsProvider.notifier)
+                                            .deleteChat(chats[index].id);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
                                 );
                               },
                             ),
