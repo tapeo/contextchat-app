@@ -107,7 +107,7 @@ class _ProjectSection extends ConsumerWidget {
               children: [
                 IconButtonWidget(
                   tooltip: 'Edit project',
-                  icon: const Icon(LucideIcons.pencil),
+                  icon: Icon(LucideIcons.pencil, size: 10),
                   onPressed: () {
                     Navigator.of(context).push(
                       NoTransitionRoute(
@@ -119,7 +119,7 @@ class _ProjectSection extends ConsumerWidget {
                 ),
                 IconButtonWidget(
                   tooltip: 'Add chat',
-                  icon: const Icon(LucideIcons.plus),
+                  icon: Icon(LucideIcons.plus, size: 12),
                   onPressed: () async {
                     ref
                         .read(projectsProvider.notifier)
@@ -157,7 +157,7 @@ class _ProjectSection extends ConsumerWidget {
                             title: Text('Chat ${index + 1}'),
                             trailing: IconButtonWidget(
                               tooltip: 'Delete chat',
-                              icon: const Icon(LucideIcons.trash2, size: 16),
+                              icon: const Icon(LucideIcons.trash2, size: 10),
                               onPressed: () {
                                 showDialog(
                                   context: context,
