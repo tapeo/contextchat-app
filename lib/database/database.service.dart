@@ -9,8 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_database.service.dart';
 import 'database_filesystem.dart';
-import 'prompt_database.service.dart';
 import 'project_database.service.dart';
+import 'prompt_database.service.dart';
 
 final databaseProvider = Provider<DatabaseService>((ref) {
   throw UnimplementedError('databaseProvider');

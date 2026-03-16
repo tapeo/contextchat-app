@@ -3,6 +3,7 @@ import 'package:contextchat/components/card.widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/input.widget.dart';
 import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/file_storage/file_storage.provider.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class SettingsView extends ConsumerStatefulWidget {
 class _SettingsViewState extends ConsumerState<SettingsView> {
   late final TextEditingController _baseUrlController;
   late final TextEditingController _apiKeyController;
+  late final TextEditingController _storagePathController;
 
   @override
   void initState() {
@@ -27,12 +29,16 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     final settings = ref.read(openRouterProvider);
     _baseUrlController = TextEditingController(text: settings.baseUrl);
     _apiKeyController = TextEditingController(text: settings.apiKey ?? '');
+    _storagePathController = TextEditingController(
+      text: ref.read(databaseProvider).memoryPath,
+    );
   }
 
   @override
   void dispose() {
     _baseUrlController.dispose();
     _apiKeyController.dispose();
+    _storagePathController.dispose();
     super.dispose();
   }
 
@@ -46,13 +52,18 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               : _apiKeyController.text,
         );
     ref.read(openRouterModelsProvider.notifier).loadModels();
+
+    final newPath = _storagePathController.text;
+    if (newPath != ref.read(databaseProvider).memoryPath) {
+      ref.read(fileStorageProvider).setString('storage_path', newPath);
+    }
+
     showAppSnackBar(context, 'Settings saved');
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final memoryPath = ref.read(databaseProvider).memoryPath;
 
     return Scaffold(
       appBar: AppBar(
@@ -120,7 +131,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     IconButtonWidget(
                       icon: const Icon(LucideIcons.folderOpen),
                       onPressed: () async {
-                        final url = Uri.directory(memoryPath);
+                        final url = Uri.directory(_storagePathController.text);
                         if (await canLaunchUrl(url)) {
                           await launchUrl(url);
                         }
@@ -130,9 +141,16 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text('Storage Path:', style: theme.textTheme.labelLarge),
-                const SizedBox(height: 4),
-                SelectableText(memoryPath, style: theme.textTheme.bodySmall),
+                InputWidget(
+                  controller: _storagePathController,
+                  decoration: InputDecoration(
+                    labelText: 'Storage Path',
+                    hintText: '/path/to/storage',
+                    labelStyle: theme.textTheme.bodySmall,
+                    hintStyle: theme.textTheme.bodySmall,
+                    border: InputBorder.none,
+                  ),
+                ),
               ],
             ),
           ),

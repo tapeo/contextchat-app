@@ -27,7 +27,11 @@ Future<ProviderContainer> providerContainer() async {
   final storageRoot = debug ? Directory('${appDir.path}/debug') : appDir;
 
   await fileStorage.initialize(storageRoot);
-  await database.initialize(storageRoot);
+
+  final customPath = fileStorage.getString('storage_path');
+  final databaseRoot = customPath != null ? Directory(customPath) : storageRoot;
+
+  await database.initialize(databaseRoot);
 
   final container = ProviderContainer(
     overrides: [
