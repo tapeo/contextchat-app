@@ -239,7 +239,7 @@ class _ChatUiState extends ConsumerState<ChatUi> {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 32,
+                  height: 64,
                   child: IgnorePointer(
                     child: Container(
                       decoration: BoxDecoration(
