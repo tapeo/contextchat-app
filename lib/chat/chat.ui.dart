@@ -194,29 +194,33 @@ class _ChatUiState extends ConsumerState<ChatUi> {
             },
             child: Stack(
               children: [
-                SingleChildScrollView(
+                ListView.builder(
                   controller: _scrollController,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ...chatState.chat.messages.map(
-                        (msg) =>
-                            MessageWidget(role: msg.role, content: msg.content),
-                      ),
-                      if (chatState.accumulatedResponse != null)
-                        MessageWidget(
-                          role: MessageRole.assistant,
-                          content: chatState.accumulatedResponse!,
-                        ),
-                    ],
-                  ),
+                  padding: EdgeInsets.only(top: 16, bottom: 16),
+                  itemCount:
+                      chatState.chat.messages.length +
+                      (chatState.accumulatedResponse != null ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index < chatState.chat.messages.length) {
+                      final msg = chatState.chat.messages[index];
+                      return MessageWidget(
+                        role: msg.role,
+                        content: msg.content,
+                      );
+                    } else {
+                      return MessageWidget(
+                        role: MessageRole.assistant,
+                        content: chatState.accumulatedResponse!,
+                      );
+                    }
+                  },
                 ),
                 // Top gradient fade
                 Positioned(
                   top: 0,
                   left: 0,
                   right: 0,
-                  height: 48,
+                  height: 16,
                   child: IgnorePointer(
                     child: Container(
                       decoration: BoxDecoration(
@@ -227,8 +231,18 @@ class _ChatUiState extends ConsumerState<ChatUi> {
                             Theme.of(context).scaffoldBackgroundColor,
                             Theme.of(
                               context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0.85),
+                            Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                            Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0.1),
+                            Theme.of(
+                              context,
                             ).scaffoldBackgroundColor.withValues(alpha: 0),
                           ],
+                          stops: const [0.0, 0.3, 0.6, 0.85, 1.0],
                         ),
                       ),
                     ),
@@ -239,7 +253,7 @@ class _ChatUiState extends ConsumerState<ChatUi> {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 64,
+                  height: 16,
                   child: IgnorePointer(
                     child: Container(
                       decoration: BoxDecoration(
@@ -250,8 +264,18 @@ class _ChatUiState extends ConsumerState<ChatUi> {
                             Theme.of(context).scaffoldBackgroundColor,
                             Theme.of(
                               context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0.9),
+                            Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0.6),
+                            Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0.25),
+                            Theme.of(
+                              context,
                             ).scaffoldBackgroundColor.withValues(alpha: 0),
                           ],
+                          stops: const [0.0, 0.25, 0.55, 0.8, 1.0],
                         ),
                       ),
                     ),
