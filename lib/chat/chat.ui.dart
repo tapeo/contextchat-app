@@ -192,22 +192,72 @@ class _ChatUiState extends ConsumerState<ChatUi> {
               }
               return false;
             },
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ...chatState.chat.messages.map(
-                    (msg) =>
-                        MessageWidget(role: msg.role, content: msg.content),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ...chatState.chat.messages.map(
+                        (msg) =>
+                            MessageWidget(role: msg.role, content: msg.content),
+                      ),
+                      if (chatState.accumulatedResponse != null)
+                        MessageWidget(
+                          role: MessageRole.assistant,
+                          content: chatState.accumulatedResponse!,
+                        ),
+                    ],
                   ),
-                  if (chatState.accumulatedResponse != null)
-                    MessageWidget(
-                      role: MessageRole.assistant,
-                      content: chatState.accumulatedResponse!,
+                ),
+                // Top gradient fade
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 24,
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Theme.of(context).scaffoldBackgroundColor,
+                            Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
                     ),
-                ],
-              ),
+                  ),
+                ),
+                // Bottom gradient fade
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 32,
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Theme.of(context).scaffoldBackgroundColor,
+                            Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
