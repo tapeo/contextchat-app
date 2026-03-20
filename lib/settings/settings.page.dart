@@ -23,6 +23,7 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
   late final TextEditingController _baseUrlController;
   late final TextEditingController _apiKeyController;
   late final TextEditingController _storagePathController;
+  late bool _toolsEnabled;
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
     _storagePathController = TextEditingController(
       text: ref.read(databaseProvider).memoryPath,
     );
+    _toolsEnabled = settings.toolsEnabled;
   }
 
   @override
@@ -51,6 +53,7 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
           apiKey: _apiKeyController.text.isEmpty
               ? null
               : _apiKeyController.text,
+          toolsEnabled: _toolsEnabled,
         );
     ref.read(openRouterModelsProvider.notifier).loadModels();
 
@@ -104,6 +107,25 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
                 labelStyle: theme.textTheme.bodySmall,
                 hintStyle: theme.textTheme.bodySmall,
                 obscureText: true,
+              ),
+            ],
+          ),
+          SizedBox(height: Spacing.md),
+          Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Tool calling', style: theme.textTheme.titleMedium),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Enable tool calling'),
+                subtitle: const Text(
+                  'Allow the model to request local tools during responses.',
+                ),
+                value: _toolsEnabled,
+                onChanged: (value) {
+                  setState(() => _toolsEnabled = value);
+                },
               ),
             ],
           ),

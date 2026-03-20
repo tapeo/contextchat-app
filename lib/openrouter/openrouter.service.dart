@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +36,9 @@ class OpenRouterService {
     required String apiKey,
     required String modelId,
     required List<OpenRouterMessage> messages,
+    List<OpenRouterToolDefinition>? tools,
+    OpenRouterToolChoice? toolChoice,
+    bool? parallelToolCalls,
   }) async* {
     final client = http.Client();
     String? responseId;
@@ -48,11 +52,21 @@ class OpenRouterService {
         'Authorization': 'Bearer $apiKey',
         'Content-Type': 'application/json',
       });
-      request.body = jsonEncode({
+      final body = <String, dynamic>{
         'model': modelId,
         'messages': messages.map((e) => e.toJson()).toList(),
         'stream': true,
-      });
+      };
+      if (tools != null && tools.isNotEmpty) {
+        body['tools'] = tools.map((tool) => tool.toJson()).toList();
+      }
+      if (toolChoice != null) {
+        body['tool_choice'] = toolChoice.toJson();
+      }
+      if (parallelToolCalls != null) {
+        body['parallel_tool_calls'] = parallelToolCalls;
+      }
+      request.body = jsonEncode(body);
 
       final response = await client.send(request);
 
@@ -76,12 +90,15 @@ class OpenRouterService {
             if (createdTimestamp == null && json['created'] != null) {
               createdTimestamp = json['created'] as int;
             }
-            final delta = json['choices']?[0]?['delta']?['content'];
+            final choice = json['choices']?[0];
+            final delta = choice?['delta']?['content'];
+            final finishReason = choice?['finish_reason'] as String?;
             if (delta != null && delta.isNotEmpty) {
               yield OpenRouterStreamChunk(
                 id: responseId,
                 created: createdTimestamp,
                 content: delta,
+                finishReason: finishReason,
               );
             }
           } catch (e) {
@@ -99,29 +116,71 @@ class OpenRouterService {
     required String apiKey,
     required String modelId,
     required List<OpenRouterMessage> messages,
+    List<OpenRouterToolDefinition>? tools,
+    OpenRouterToolChoice? toolChoice,
+    bool? parallelToolCalls,
   }) async {
+    final completion = await sendNonStreamingCompletion(
+      baseUrl: baseUrl,
+      apiKey: apiKey,
+      modelId: modelId,
+      messages: messages,
+      tools: tools,
+      toolChoice: toolChoice,
+      parallelToolCalls: parallelToolCalls,
+    );
+
+    final content = completion.choices.firstOrNull?.message.content;
+    if (content != null) {
+      return content.trim();
+    }
+
+    throw Exception('Failed to get text response');
+  }
+
+  Future<OpenRouterChatCompletion> sendNonStreamingCompletion({
+    required String baseUrl,
+    required String apiKey,
+    required String modelId,
+    required List<OpenRouterMessage> messages,
+    List<OpenRouterToolDefinition>? tools,
+    OpenRouterToolChoice? toolChoice,
+    bool? parallelToolCalls,
+  }) async {
+    final body = <String, dynamic>{
+      'model': modelId,
+      'messages': messages.map((e) => e.toJson()).toList(),
+      'stream': false,
+    };
+    if (tools != null && tools.isNotEmpty) {
+      body['tools'] = tools.map((tool) => tool.toJson()).toList();
+    }
+    if (toolChoice != null) {
+      body['tool_choice'] = toolChoice.toJson();
+    }
+    if (parallelToolCalls != null) {
+      body['parallel_tool_calls'] = parallelToolCalls;
+    }
+
     final response = await http.post(
       Uri.parse('$baseUrl/chat/completions'),
       headers: {
         'Authorization': 'Bearer $apiKey',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({
-        'model': modelId,
-        'messages': messages.map((e) => e.toJson()).toList(),
-        'stream': false,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final content = data['choices']?[0]?['message']?['content'] as String?;
-      if (content != null) {
-        return content.trim();
-      }
+      return OpenRouterChatCompletion.fromJson(
+        Map<String, dynamic>.from(data as Map),
+      );
     }
 
-    throw Exception('Failed to get response: ${response.statusCode}');
+    throw Exception(
+      'Failed to get response: ${response.statusCode} ${response.body}',
+    );
   }
 
   Future<List<OpenRouterModel>> fetchModels(

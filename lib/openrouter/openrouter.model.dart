@@ -11,8 +11,130 @@ class OpenRouterStreamChunk {
   final String? id;
   final int? created;
   final String? content;
+  final String? finishReason;
 
-  OpenRouterStreamChunk({this.id, this.created, this.content});
+  OpenRouterStreamChunk({
+    this.id,
+    this.created,
+    this.content,
+    this.finishReason,
+  });
+}
+
+class OpenRouterToolFunction extends Equatable {
+  final String name;
+  final String description;
+  final Map<String, dynamic> parameters;
+
+  const OpenRouterToolFunction({
+    required this.name,
+    required this.description,
+    required this.parameters,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'description': description,
+    'parameters': parameters,
+  };
+
+  @override
+  List<Object?> get props => [name, description, parameters];
+}
+
+class OpenRouterToolDefinition extends Equatable {
+  final String type;
+  final OpenRouterToolFunction function;
+
+  const OpenRouterToolDefinition({
+    this.type = 'function',
+    required this.function,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'type': type,
+    'function': function.toJson(),
+  };
+
+  @override
+  List<Object?> get props => [type, function];
+}
+
+class OpenRouterToolChoice extends Equatable {
+  final String? mode;
+  final String? functionName;
+
+  const OpenRouterToolChoice._({this.mode, this.functionName});
+
+  const OpenRouterToolChoice.auto() : this._(mode: 'auto');
+  const OpenRouterToolChoice.none() : this._(mode: 'none');
+  const OpenRouterToolChoice.function(String name) : this._(functionName: name);
+
+  Object toJson() {
+    if (functionName != null) {
+      return {
+        'type': 'function',
+        'function': {'name': functionName},
+      };
+    }
+    return mode ?? 'auto';
+  }
+
+  @override
+  List<Object?> get props => [mode, functionName];
+}
+
+class OpenRouterToolCallFunction extends Equatable {
+  final String name;
+  final String arguments;
+
+  const OpenRouterToolCallFunction({
+    required this.name,
+    required this.arguments,
+  });
+
+  factory OpenRouterToolCallFunction.fromJson(Map<String, dynamic> json) {
+    return OpenRouterToolCallFunction(
+      name: json['name'] as String,
+      arguments: (json['arguments'] as String?) ?? '{}',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'name': name, 'arguments': arguments};
+
+  @override
+  List<Object?> get props => [name, arguments];
+}
+
+class OpenRouterToolCall extends Equatable {
+  final String id;
+  final String type;
+  final OpenRouterToolCallFunction function;
+
+  const OpenRouterToolCall({
+    required this.id,
+    this.type = 'function',
+    required this.function,
+  });
+
+  factory OpenRouterToolCall.fromJson(Map<String, dynamic> json) {
+    return OpenRouterToolCall(
+      id: json['id'] as String,
+      type: (json['type'] as String?) ?? 'function',
+      function: OpenRouterToolCallFunction.fromJson(
+        Map<String, dynamic>.from(json['function'] as Map),
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'type': type,
+    'function': function.toJson(),
+  };
+
+  @override
+  List<Object?> get props => [id, type, function];
 }
 
 class OpenRouterMessageContentPart extends Equatable {
@@ -54,26 +176,140 @@ class OpenRouterMessage extends Equatable {
   final String role;
   final String? content;
   final List<OpenRouterMessageContentPart>? contentParts;
+  final List<OpenRouterToolCall>? toolCalls;
+  final String? toolCallId;
+  final String? name;
 
-  const OpenRouterMessage({required this.role, required String this.content})
-    : contentParts = null;
+  const OpenRouterMessage({
+    required this.role,
+    this.content,
+    this.toolCalls,
+    this.toolCallId,
+    this.name,
+  }) : contentParts = null;
 
   const OpenRouterMessage.multipart({
     required this.role,
     required List<OpenRouterMessageContentPart> this.contentParts,
+    this.toolCalls,
+    this.toolCallId,
+    this.name,
   }) : content = null;
 
   Map<String, dynamic> toJson() {
-    return {
+    final payload = <String, dynamic>{
       'role': role,
       'content': contentParts != null
           ? contentParts!.map((part) => part.toJson()).toList()
           : content,
     };
+
+    if (toolCalls != null && toolCalls!.isNotEmpty) {
+      payload['tool_calls'] = toolCalls!.map((call) => call.toJson()).toList();
+    }
+    if (toolCallId != null) {
+      payload['tool_call_id'] = toolCallId;
+    }
+    if (name != null) {
+      payload['name'] = name;
+    }
+
+    return payload;
   }
 
   @override
-  List<Object?> get props => [role, content, contentParts];
+  List<Object?> get props => [
+    role,
+    content,
+    contentParts,
+    toolCalls,
+    toolCallId,
+    name,
+  ];
+}
+
+class OpenRouterCompletionMessage extends Equatable {
+  final String role;
+  final String? content;
+  final List<OpenRouterToolCall>? toolCalls;
+
+  const OpenRouterCompletionMessage({
+    required this.role,
+    required this.content,
+    this.toolCalls,
+  });
+
+  factory OpenRouterCompletionMessage.fromJson(Map<String, dynamic> json) {
+    final rawToolCalls = json['tool_calls'] as List<dynamic>?;
+    return OpenRouterCompletionMessage(
+      role: (json['role'] as String?) ?? 'assistant',
+      content: json['content'] as String?,
+      toolCalls: rawToolCalls
+          ?.map(
+            (item) => OpenRouterToolCall.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  @override
+  List<Object?> get props => [role, content, toolCalls];
+}
+
+class OpenRouterCompletionChoice extends Equatable {
+  final int index;
+  final String? finishReason;
+  final OpenRouterCompletionMessage message;
+
+  const OpenRouterCompletionChoice({
+    required this.index,
+    required this.finishReason,
+    required this.message,
+  });
+
+  factory OpenRouterCompletionChoice.fromJson(Map<String, dynamic> json) {
+    return OpenRouterCompletionChoice(
+      index: (json['index'] as int?) ?? 0,
+      finishReason: json['finish_reason'] as String?,
+      message: OpenRouterCompletionMessage.fromJson(
+        Map<String, dynamic>.from(json['message'] as Map),
+      ),
+    );
+  }
+
+  @override
+  List<Object?> get props => [index, finishReason, message];
+}
+
+class OpenRouterChatCompletion extends Equatable {
+  final String? id;
+  final int? created;
+  final List<OpenRouterCompletionChoice> choices;
+
+  const OpenRouterChatCompletion({
+    required this.id,
+    required this.created,
+    required this.choices,
+  });
+
+  factory OpenRouterChatCompletion.fromJson(Map<String, dynamic> json) {
+    return OpenRouterChatCompletion(
+      id: json['id'] as String?,
+      created: json['created'] as int?,
+      choices: (json['choices'] as List<dynamic>? ?? const [])
+          .map(
+            (item) => OpenRouterCompletionChoice.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, created, choices];
 }
 
 class Architecture {

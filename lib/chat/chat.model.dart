@@ -40,6 +40,11 @@ class Chat extends Equatable {
               'timestamp': m.timestamp,
               'content': m.content,
               'role': m.role.name,
+              'toolCallId': m.toolCallId,
+              'toolName': m.toolName,
+              'toolCallsJson': m.toolCallsJson,
+              'toolError': m.toolError,
+              'toolCallsProcessed': m.toolCallsProcessed,
             },
           )
           .toList(),
@@ -58,6 +63,11 @@ class Chat extends Equatable {
               timestamp: m['timestamp'] as String,
               content: m['content'] as String,
               role: MessageRole.values.firstWhere((r) => r.name == m['role']),
+              toolCallId: m['toolCallId'] as String?,
+              toolName: m['toolName'] as String?,
+              toolCallsJson: m['toolCallsJson'] as String?,
+              toolError: (m['toolError'] as bool?) ?? false,
+              toolCallsProcessed: (m['toolCallsProcessed'] as bool?) ?? false,
             ),
           )
           .toList(),

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 const String _apiKeyPref = 'openrouter_api_key';
 const String _baseUrlPref = 'openrouter_base_url';
 const String _modelIdPref = 'openrouter_model_id';
+const String _toolsEnabledPref = 'openrouter_tools_enabled';
 
 final openRouterProvider =
     NotifierProvider<OpenRouterNotifier, OpenRouterState>(
@@ -22,11 +23,13 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     final String? apiKey = fileStorage.getString(_apiKeyPref);
     final String? baseUrl = fileStorage.getString(_baseUrlPref);
     final String? modelId = fileStorage.getString(_modelIdPref);
+    final bool toolsEnabled = fileStorage.getBool(_toolsEnabledPref) ?? true;
 
     return OpenRouterState(
       apiKey: apiKey,
       baseUrl: baseUrl ?? 'https://openrouter.ai/api/v1',
       modelId: modelId,
+      toolsEnabled: toolsEnabled,
     );
   }
 
@@ -34,8 +37,14 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     String? apiKey,
     required String baseUrl,
     String? modelId,
+    bool? toolsEnabled,
   }) async {
-    state = state.copyWith(apiKey: apiKey, baseUrl: baseUrl, modelId: modelId);
+    state = state.copyWith(
+      apiKey: apiKey,
+      baseUrl: baseUrl,
+      modelId: modelId,
+      toolsEnabled: toolsEnabled,
+    );
 
     if (apiKey != null) {
       await fileStorage.setString(_apiKeyPref, apiKey);
@@ -50,6 +59,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     } else {
       await fileStorage.remove(_modelIdPref);
     }
+
+    await fileStorage.setBool(_toolsEnabledPref, state.toolsEnabled);
   }
 
   Future<void> logout() async {
@@ -60,6 +71,9 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
   Stream<OpenRouterStreamChunk> send({
     required List<OpenRouterMessage> messages,
     String? modelId,
+    List<OpenRouterToolDefinition>? tools,
+    OpenRouterToolChoice? toolChoice,
+    bool? parallelToolCalls,
   }) {
     final effectiveModelId = modelId ?? state.modelId;
     if (effectiveModelId == null) {
@@ -74,12 +88,18 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
       apiKey: state.apiKey!,
       modelId: effectiveModelId,
       messages: messages,
+      tools: tools,
+      toolChoice: toolChoice,
+      parallelToolCalls: parallelToolCalls,
     );
   }
 
   Future<String> sendNonStreaming({
     required List<OpenRouterMessage> messages,
     String? modelId,
+    List<OpenRouterToolDefinition>? tools,
+    OpenRouterToolChoice? toolChoice,
+    bool? parallelToolCalls,
   }) async {
     final effectiveModelId = modelId ?? state.modelId;
     if (effectiveModelId == null) {
@@ -94,6 +114,35 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
       apiKey: state.apiKey!,
       modelId: effectiveModelId,
       messages: messages,
+      tools: tools,
+      toolChoice: toolChoice,
+      parallelToolCalls: parallelToolCalls,
+    );
+  }
+
+  Future<OpenRouterChatCompletion> sendCompletionNonStreaming({
+    required List<OpenRouterMessage> messages,
+    String? modelId,
+    List<OpenRouterToolDefinition>? tools,
+    OpenRouterToolChoice? toolChoice,
+    bool? parallelToolCalls,
+  }) async {
+    final effectiveModelId = modelId ?? state.modelId;
+    if (effectiveModelId == null) {
+      throw Exception('No model selected');
+    }
+    if (state.apiKey == null) {
+      throw Exception('No API key provided');
+    }
+
+    return openRouter.sendNonStreamingCompletion(
+      baseUrl: state.baseUrl,
+      apiKey: state.apiKey!,
+      modelId: effectiveModelId,
+      messages: messages,
+      tools: tools,
+      toolChoice: toolChoice,
+      parallelToolCalls: parallelToolCalls,
     );
   }
 }

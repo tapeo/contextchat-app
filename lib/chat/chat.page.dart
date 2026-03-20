@@ -6,6 +6,7 @@ import 'package:contextchat/chat/composer.widget.dart';
 import 'package:contextchat/chat/message.model.dart';
 import 'package:contextchat/chat/message.widget.dart';
 import 'package:contextchat/components/app_dialog.dart';
+import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
@@ -210,13 +211,56 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                     if (index < chatState.chat.messages.length) {
                       final msg = chatState.chat.messages[index];
                       return MessageWidget(
-                        role: msg.role,
-                        content: msg.content,
+                        message: msg,
+                        onApproveToolCalls: (assistantMessage) async {
+                          if (chatId == null) {
+                            return;
+                          }
+
+                          try {
+                            await ref
+                                .read(chatProvider(chatId!).notifier)
+                                .approveToolCallsAndContinue(
+                                  assistantMessage.id,
+                                );
+                          } catch (error) {
+                            if (!context.mounted) {
+                              return;
+                            }
+                            showAppSnackBar(
+                              context,
+                              'Failed to approve tool call: $error',
+                            );
+                          }
+                        },
+                        onDenyToolCalls: (assistantMessage) async {
+                          if (chatId == null) {
+                            return;
+                          }
+
+                          try {
+                            await ref
+                                .read(chatProvider(chatId!).notifier)
+                                .denyToolCallsAndContinue(assistantMessage.id);
+                          } catch (error) {
+                            if (!context.mounted) {
+                              return;
+                            }
+                            showAppSnackBar(
+                              context,
+                              'Failed to deny tool call: $error',
+                            );
+                          }
+                        },
                       );
                     } else {
                       return MessageWidget(
-                        role: MessageRole.assistant,
-                        content: chatState.accumulatedResponse!,
+                        message: Message(
+                          id: 'streaming-preview',
+                          timestamp: DateTime.now().toIso8601String(),
+                          content: chatState.accumulatedResponse!,
+                          role: MessageRole.assistant,
+                        ),
                       );
                     }
                   },

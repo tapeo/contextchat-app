@@ -122,6 +122,10 @@ class ChatDatabaseService {
           role: MessageRole.values.firstWhere(
             (role) => role.value == metadata['role'],
           ),
+          toolCallId: metadata['toolCallId'] as String?,
+          toolName: metadata['toolName'] as String?,
+          toolCallsJson: metadata['toolCallsJson'] as String?,
+          toolError: (metadata['toolError'] as bool?) ?? false,
         ),
       );
     }
@@ -162,7 +166,7 @@ class ChatDatabaseService {
       buffer
         ..writeln()
         ..writeln(
-          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp})} -->',
+          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp, 'toolCallId': message.toolCallId, 'toolName': message.toolName, 'toolCallsJson': message.toolCallsJson, 'toolError': message.toolError})} -->',
         )
         ..writeln(message.content)
         ..writeln(_chatMessageEnd);
