@@ -42,7 +42,9 @@ class _MessageWidgetState extends State<MessageWidget> {
     final isTool = role == MessageRole.tool;
 
     final hasToolCalls =
-        role == MessageRole.assistant && widget.message.toolCallsJson != null;
+        role == MessageRole.assistant &&
+        widget.message.toolCallsJson != null &&
+        !widget.message.toolCallsProcessed;
 
     final toolHeader = _toolHeaderText();
 
@@ -179,7 +181,8 @@ class _MessageWidgetState extends State<MessageWidget> {
       return 'Tool $state: ${widget.message.toolName ?? 'unknown'}';
     }
     if (widget.message.role == MessageRole.assistant &&
-        widget.message.toolCallsJson != null) {
+        widget.message.toolCallsJson != null &&
+        !widget.message.toolCallsProcessed) {
       return 'Assistant requested tool call';
     }
     return null;

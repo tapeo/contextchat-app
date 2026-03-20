@@ -126,6 +126,8 @@ class ChatDatabaseService {
           toolName: metadata['toolName'] as String?,
           toolCallsJson: metadata['toolCallsJson'] as String?,
           toolError: (metadata['toolError'] as bool?) ?? false,
+          toolCallsProcessed:
+              (metadata['toolCallsProcessed'] as bool?) ?? false,
         ),
       );
     }
@@ -166,7 +168,7 @@ class ChatDatabaseService {
       buffer
         ..writeln()
         ..writeln(
-          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp, 'toolCallId': message.toolCallId, 'toolName': message.toolName, 'toolCallsJson': message.toolCallsJson, 'toolError': message.toolError})} -->',
+          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp, 'toolCallId': message.toolCallId, 'toolName': message.toolName, 'toolCallsJson': message.toolCallsJson, 'toolError': message.toolError, 'toolCallsProcessed': message.toolCallsProcessed})} -->',
         )
         ..writeln(message.content)
         ..writeln(_chatMessageEnd);
