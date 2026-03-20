@@ -10,6 +10,7 @@ import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/project_setup.view.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/sidebar/chats_list.widget.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -38,7 +39,7 @@ class ProjectsList extends ConsumerWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(8),
       itemCount: projectsState.projects.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
         final project = projectsState.projects[index];
         final isSelected = project.id == projectsState.currentProjectId;
@@ -155,7 +156,6 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
     final theme = Theme.of(context);
 
     return CardWidget(
-      borderRadius: 16,
       padding: EdgeInsets.zero,
       child: Column(
         children: [
@@ -179,10 +179,10 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
                 title: Text(widget.projectName),
                 selected: widget.isSelected,
                 style: ListTileStyle2.compact,
-                borderRadius: 16,
+                borderRadius: AppTheme.radiusMedium,
                 borderRadiusGeometry: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+                  topLeft: Radius.circular(AppTheme.radiusMedium),
+                  topRight: Radius.circular(AppTheme.radiusMedium),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,

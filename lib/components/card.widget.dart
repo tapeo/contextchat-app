@@ -1,4 +1,5 @@
 import 'package:contextchat/components/click_opacity.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
@@ -7,7 +8,6 @@ class CardWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? color;
   final Color? borderColor;
-  final double borderRadius;
 
   const CardWidget({
     super.key,
@@ -16,7 +16,6 @@ class CardWidget extends StatelessWidget {
     this.onTap,
     this.color,
     this.borderColor,
-    this.borderRadius = 12.0,
   });
 
   @override
@@ -25,7 +24,7 @@ class CardWidget extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: color ?? Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         border: Border.all(
           color: borderColor ?? Theme.of(context).dividerColor,
         ),

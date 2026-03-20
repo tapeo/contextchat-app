@@ -1,4 +1,5 @@
 import 'package:contextchat/components/click_opacity.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 
 class IconButtonStyle {
@@ -20,7 +21,7 @@ class IconButtonStyle {
 
   static const IconButtonStyle normal = IconButtonStyle(
     padding: EdgeInsets.all(8),
-    borderRadius: 12.0,
+    borderRadius: AppTheme.radiusMedium,
     iconSize: 20,
     shadowBlurRadius: 10,
     shadowOffset: Offset(0, 4),
@@ -29,7 +30,7 @@ class IconButtonStyle {
 
   static const IconButtonStyle small = IconButtonStyle(
     padding: EdgeInsets.all(6),
-    borderRadius: 8.0,
+    borderRadius: AppTheme.radiusSmall,
     iconSize: 16,
     shadowBlurRadius: 4,
     shadowOffset: Offset(0, 2),
@@ -38,7 +39,7 @@ class IconButtonStyle {
 
   static const IconButtonStyle large = IconButtonStyle(
     padding: EdgeInsets.all(12),
-    borderRadius: 16.0,
+    borderRadius: AppTheme.radiusLarge,
     iconSize: 24,
     shadowBlurRadius: 12,
     shadowOffset: Offset(0, 6),

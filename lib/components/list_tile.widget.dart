@@ -1,4 +1,5 @@
 import 'package:contextchat/components/click_opacity.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 
 class ListTileStyle2 {
@@ -74,7 +75,7 @@ class ListTileWidget extends StatelessWidget {
     this.onTap,
     this.selected = false,
     this.padding,
-    this.borderRadius = 12.0,
+    this.borderRadius = AppTheme.radiusMedium,
     this.showBorder = false,
     this.showShadow = false,
     this.borderRadiusGeometry,
@@ -92,7 +93,8 @@ class ListTileWidget extends StatelessWidget {
             ? theme.colorScheme.primary.withValues(alpha: 0.1)
             : Colors.transparent,
         borderRadius:
-            borderRadiusGeometry ?? BorderRadius.circular(borderRadius),
+            borderRadiusGeometry ??
+            BorderRadius.circular(AppTheme.radiusMedium),
         border: showBorder ? Border.all(color: theme.dividerColor) : null,
         boxShadow: showShadow
             ? [

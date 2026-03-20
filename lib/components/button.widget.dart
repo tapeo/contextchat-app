@@ -1,4 +1,5 @@
 import 'package:contextchat/components/click_opacity.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 
 enum ButtonSize { small, medium, large }
@@ -32,7 +33,7 @@ class ButtonWidget extends StatelessWidget {
     ) = switch (size) {
       ButtonSize.small => (
         EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        8.0,
+        AppTheme.radiusSmall,
         12.0,
         4.0,
         4.0,
@@ -41,7 +42,7 @@ class ButtonWidget extends StatelessWidget {
       ),
       ButtonSize.medium => (
         EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        12.0,
+        AppTheme.radiusMedium,
         13.0,
         8.0,
         10.0,
@@ -50,7 +51,7 @@ class ButtonWidget extends StatelessWidget {
       ),
       ButtonSize.large => (
         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        16.0,
+        AppTheme.radiusLarge,
         14.0,
         10.0,
         12.0,
