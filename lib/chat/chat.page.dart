@@ -228,14 +228,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final visibleMessages = chatState.chat.messages
-                      .where(
-                        (msg) =>
-                            !(msg.role == MessageRole.assistant &&
-                                msg.toolCallsJson != null &&
-                                !msg.toolCallsProcessed),
-                      )
-                      .toList();
+                  final visibleMessages = chatState.chat.messages;
 
                   if (index < visibleMessages.length) {
                     final msg = visibleMessages[index];
