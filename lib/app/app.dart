@@ -3,6 +3,7 @@ import 'package:contextchat/chat/chat.page.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/sidebar/sidebar.view.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
@@ -63,15 +64,15 @@ class _PhoneShell extends ConsumerWidget {
           );
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        showBackButton: false,
+        title: currentProject?.name ?? 'Select project',
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(LucideIcons.panelLeft),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: Text(currentProject?.name ?? 'Select project'),
-        centerTitle: false,
       ),
       drawer: Drawer(
         backgroundColor: theme.scaffoldBackgroundColor,

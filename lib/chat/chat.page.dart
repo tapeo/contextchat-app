@@ -12,7 +12,6 @@ import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:contextchat/settings/settings.page.dart';
-import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -144,15 +143,8 @@ class _ChatUiState extends ConsumerState<ChatPage> {
   @override
   Widget build(BuildContext context) {
     if (chatId == null) {
-      return Column(
-        children: [
-          Divider(height: 1, color: Theme.of(context).dividerColor),
-          Expanded(
-            child: Center(
-              child: Text('Please select or create a chat from the sidebar.'),
-            ),
-          ),
-        ],
+      return Center(
+        child: Text('Please select or create a chat from the sidebar.'),
       );
     }
 
@@ -183,11 +175,8 @@ class _ChatUiState extends ConsumerState<ChatPage> {
       return Center(child: CircularProgressIndicator());
     }
 
-    bool isPhone = Breakpoints.isPhone(context);
-
     return Column(
       children: [
-        if (isPhone) Divider(height: 1, color: Theme.of(context).dividerColor),
         Expanded(
           child: NotificationListener<ScrollNotification>(
             onNotification: (notification) {
@@ -346,6 +335,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
             ),
           ),
         ),
+        Divider(height: 1, color: Theme.of(context).dividerColor),
         Padding(
           padding: const EdgeInsets.all(8),
           child: ComposerWidget(

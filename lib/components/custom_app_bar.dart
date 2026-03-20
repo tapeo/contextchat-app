@@ -23,7 +23,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.centerTitle = false,
   });
 
-  final double height = 36;
+  final double height = 48;
 
   @override
   Size get preferredSize => Size.fromHeight(height);

@@ -1,3 +1,4 @@
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/no_transition_route.dart';
 import 'package:contextchat/projects/project_setup.page.dart';
@@ -21,22 +22,37 @@ class SidebarView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'ContextChat',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 8),
-          Divider(height: 1, color: theme.dividerColor),
+          _SidebarHeader(title: 'ContextChat'),
           const Expanded(child: ProjectsList()),
           Divider(height: 1, color: theme.dividerColor),
           const _SidebarFooter(),
         ],
+      ),
+    );
+  }
+}
+
+class _SidebarHeader extends StatelessWidget {
+  const _SidebarHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      height: CustomAppBar().preferredSize.height,
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: theme.dividerColor)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title,
+        style:
+            theme.appBarTheme.titleTextStyle ??
+            theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
