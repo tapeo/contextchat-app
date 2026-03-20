@@ -7,6 +7,7 @@ import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/list_tile.dart';
@@ -432,16 +433,16 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupPage> {
   Widget build(BuildContext context) {
     if (_projectMissing) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Project Setup')),
-        body: const Center(child: Text('Project not found.')),
+        appBar: CustomAppBar(title: 'Project Setup'),
+        body: const Center(child: Text('Project not found')),
       );
     }
 
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit' : 'New'),
+      appBar: CustomAppBar(
+        title: _isEditMode ? 'Edit' : 'New',
         actions: [
           if (_isEditMode)
             IconButtonWidget(

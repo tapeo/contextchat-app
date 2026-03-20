@@ -3,6 +3,7 @@ import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/resizable_text_area.dart';
@@ -247,15 +248,12 @@ class _PromptEditPageState extends ConsumerState<PromptEditPage> {
         }();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(selectedPrompt?.name ?? 'Edit Prompt'),
-          leading: IconButtonWidget(
-            icon: const Icon(LucideIcons.arrowLeft),
-            onPressed: () async {
-              if (!await _confirmDiscardIfDirty() || !mounted) return;
-              Navigator.of(context).pop();
-            },
-          ),
+        appBar: CustomAppBar(
+          title: selectedPrompt?.name ?? 'Edit Prompt',
+          onBackPressed: () async {
+            if (!await _confirmDiscardIfDirty() || !mounted) return;
+            Navigator.of(context).pop();
+          },
           actions: [
             IconButtonWidget(
               tooltip: selectedPrompt?.pinned == true ? 'Unpin' : 'Pin',

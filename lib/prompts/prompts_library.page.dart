@@ -3,6 +3,7 @@ import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/expanded.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
@@ -376,7 +377,7 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryPage> {
 
     if (widget.pickMode) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Select prompt')),
+        appBar: CustomAppBar(title: 'Select prompt'),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: CardWidget(
@@ -440,8 +441,8 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryPage> {
         }();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Prompts'),
+        appBar: CustomAppBar(
+          title: 'Prompts',
           actions: [
             IconButtonWidget(
               tooltip: 'New prompt',

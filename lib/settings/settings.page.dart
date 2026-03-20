@@ -1,4 +1,5 @@
 import 'package:contextchat/components/app_snackbar.dart';
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/database/database.service.dart';
@@ -68,8 +69,8 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
     final padding = isPhone ? Spacing.sm : Spacing.md;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
+      appBar: CustomAppBar(
+        title: 'Settings',
         actions: [
           IconButtonWidget(
             icon: const Icon(LucideIcons.save),
