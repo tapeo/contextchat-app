@@ -216,14 +216,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                 controller: _scrollController,
                 padding: EdgeInsets.only(top: 16, bottom: 16),
                 itemCount:
-                    chatState.chat.messages
-                        .where(
-                          (msg) =>
-                              !(msg.role == MessageRole.assistant &&
-                                  msg.toolCallsJson != null &&
-                                  !msg.toolCallsProcessed),
-                        )
-                        .length +
+                    chatState.chat.messages.length +
                     (chatState.accumulatedResponse != null ? 1 : 0),
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 12),
