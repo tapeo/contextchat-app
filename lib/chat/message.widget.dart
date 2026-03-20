@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/chat/message.style.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,6 @@ class _MessageWidgetState extends State<MessageWidget> {
     final role = widget.message.role;
     final content = widget.message.content;
 
-    final isUser = role == MessageRole.user;
     final isTool = role == MessageRole.tool;
 
     final hasToolCalls =
@@ -49,43 +49,32 @@ class _MessageWidgetState extends State<MessageWidget> {
     final contentLength = content.length;
     final shouldTruncate = isTool && contentLength > 100 && !_expanded;
 
-    final alignment = (isUser || isTool)
-        ? Alignment.centerRight
-        : Alignment.centerLeft;
-    final crossAxisAlignment = (isUser || isTool)
-        ? CrossAxisAlignment.end
-        : CrossAxisAlignment.start;
-    final horizontalMargin = (isUser || isTool) ? 16.0 : 0.0;
-    final backgroundColor = (isUser || isTool) ? colorScheme.primary : null;
-    final bottomLeftRadius = (isUser || isTool) ? 16.0 : 4.0;
-    final bottomRightRadius = (isUser || isTool) ? 4.0 : 16.0;
-    final selectionColor = (isUser || isTool)
-        ? colorScheme.onPrimary.withValues(alpha: 0.3)
-        : colorScheme.primary.withValues(alpha: 0.2);
+    final style = MessageStyle.fromRole(role);
+    final colors = style.colors(colorScheme);
 
     return Align(
-      alignment: alignment,
+      alignment: style.alignment,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: crossAxisAlignment,
+        crossAxisAlignment: style.crossAxisAlignment,
         children: [
           Container(
             margin: EdgeInsets.only(
-              left: horizontalMargin,
-              right: horizontalMargin,
+              left: style.horizontalMargin,
+              right: style.horizontalMargin,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: backgroundColor,
+              color: colors.backgroundColor,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(16),
                 topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(bottomLeftRadius),
-                bottomRight: Radius.circular(bottomRightRadius),
+                bottomLeft: Radius.circular(style.bottomLeftRadius),
+                bottomRight: Radius.circular(style.bottomRightRadius),
               ),
             ),
             child: DefaultSelectionStyle(
-              selectionColor: selectionColor,
+              selectionColor: colors.selectionColor,
               child: SelectionArea(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,45 +85,30 @@ class _MessageWidgetState extends State<MessageWidget> {
                         child: Text(
                           toolHeader,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: (isUser || isTool)
-                                ? colorScheme.onPrimary
-                                : isTool
+                            color: isTool
                                 ? (widget.message.toolError
-                                      ? colorScheme.error
-                                      : colorScheme.primary)
-                                : colorScheme.primary,
+                                      ? colors.errorOnColor
+                                      : colors.toolHeaderColor)
+                                : colors.onColor,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                    if (shouldTruncate)
-                      MarkdownBody(
-                        data: '${content.substring(0, 100)}...',
-                        styleSheet: _markdownStyleSheet(context),
-                        onTapLink: (text, href, title) {
-                          if (href != null) {
-                            launchUrlString(
-                              href,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          }
-                        },
-                      )
-                    else
-                      MarkdownBody(
-                        data: hasToolCalls
-                            ? _formatToolCallsSummary()
-                            : content,
-                        styleSheet: _markdownStyleSheet(context),
-                        onTapLink: (text, href, title) {
-                          if (href != null) {
-                            launchUrlString(
-                              href,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          }
-                        },
-                      ),
+                    MarkdownBody(
+                      data: shouldTruncate
+                          ? '${content.substring(0, 100)}...'
+                          : (hasToolCalls
+                                ? _formatToolCallsSummary()
+                                : content),
+                      onTapLink: (text, href, title) {
+                        if (href != null) {
+                          launchUrlString(
+                            href,
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      },
+                    ),
                     if (isTool && contentLength > 100)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
@@ -144,9 +118,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                             _expanded ? 'Show less' : 'Show more',
                             style: TextStyle(
                               fontSize: 12,
-                              color: colorScheme.onPrimary.withValues(
-                                alpha: 0.7,
-                              ),
+                              color: colors.onColor.withValues(alpha: 0.7),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -197,75 +169,6 @@ class _MessageWidgetState extends State<MessageWidget> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  MarkdownStyleSheet _markdownStyleSheet(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isUser = widget.message.role == MessageRole.user;
-    return MarkdownStyleSheet(
-      p: TextStyle(
-        fontSize: 13,
-        color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-        height: 1.4,
-      ),
-      code: TextStyle(
-        fontSize: 12,
-        color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-        backgroundColor: isUser
-            ? colorScheme.primary.withValues(alpha: 0.3)
-            : colorScheme.surfaceContainerHighest,
-      ),
-      codeblockDecoration: BoxDecoration(
-        color: isUser
-            ? colorScheme.primary.withValues(alpha: 0.2)
-            : colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      codeblockPadding: const EdgeInsets.all(12),
-      blockquote: TextStyle(
-        fontSize: 13,
-        color: isUser
-            ? colorScheme.onPrimary.withValues(alpha: 0.8)
-            : colorScheme.onSurface.withValues(alpha: 0.8),
-        fontStyle: FontStyle.italic,
-      ),
-      blockquoteDecoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(
-            color: isUser
-                ? colorScheme.onPrimary.withValues(alpha: 0.5)
-                : colorScheme.primary,
-            width: 4,
-          ),
-        ),
-      ),
-      h1: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-      ),
-      h2: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-      ),
-      h3: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-      ),
-      listBullet: TextStyle(
-        fontSize: 13,
-        color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-      ),
-      a: TextStyle(
-        fontSize: 13,
-        color: isUser
-            ? colorScheme.onPrimary.withValues(alpha: 0.9)
-            : colorScheme.primary,
-        decoration: TextDecoration.underline,
       ),
     );
   }

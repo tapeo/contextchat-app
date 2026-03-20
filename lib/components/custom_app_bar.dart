@@ -30,6 +30,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final canPop = Navigator.of(context).canPop();
     final showBack = showBackButton && canPop && leading == null;
 
@@ -49,6 +50,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       automaticallyImplyLeading: false,
       actions: actions,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(height: 1, color: theme.dividerColor),
+      ),
       flexibleSpace: showBack
           ? SafeArea(
               child: Padding(

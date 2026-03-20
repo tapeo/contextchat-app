@@ -31,6 +31,8 @@ class SidebarView extends ConsumerWidget {
               ),
             ),
           ),
+          SizedBox(height: 8),
+          Divider(height: 1, color: theme.dividerColor),
           const Expanded(child: ProjectsList()),
           Divider(height: 1, color: theme.dividerColor),
           const _SidebarFooter(),
