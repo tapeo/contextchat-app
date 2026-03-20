@@ -36,7 +36,7 @@ class ProjectsList extends ConsumerWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
+      padding: const EdgeInsets.all(8),
       itemCount: projectsState.projects.length,
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {

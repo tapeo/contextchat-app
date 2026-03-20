@@ -36,19 +36,28 @@ class _AppState extends ConsumerState<App> {
         builder: (context, constraints) {
           final sidebarWidth = constraints.maxWidth * _sidebarFraction;
 
-          return Row(
+          return Stack(
             children: [
-              SizedBox(width: sidebarWidth, child: const SidebarView()),
-              _ResizeHandle(
-                onDragUpdate: (delta) {
-                  setState(() {
-                    _sidebarFraction =
-                        (_sidebarFraction + (delta / constraints.maxWidth))
-                            .clamp(_minSidebarFraction, _maxSidebarFraction);
-                  });
-                },
+              Row(
+                children: [
+                  SizedBox(width: sidebarWidth, child: const SidebarView()),
+                  const Expanded(child: ChatUi()),
+                ],
               ),
-              const Expanded(child: ChatUi()),
+              Positioned(
+                left: sidebarWidth - 8,
+                top: 0,
+                bottom: 0,
+                child: _ResizeHandle(
+                  onDragUpdate: (delta) {
+                    setState(() {
+                      _sidebarFraction =
+                          (_sidebarFraction + (delta / constraints.maxWidth))
+                              .clamp(_minSidebarFraction, _maxSidebarFraction);
+                    });
+                  },
+                ),
+              ),
             ],
           );
         },
@@ -76,7 +85,7 @@ class _ResizeHandle extends StatelessWidget {
           alignment: Alignment.center,
           child: Container(
             width: 1,
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.dividerColor,
               borderRadius: BorderRadius.circular(999),
