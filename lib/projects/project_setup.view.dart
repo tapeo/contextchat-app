@@ -13,10 +13,12 @@ import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/resizable_text_area.widget.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/database/project_database.service.dart';
+import 'package:contextchat/projects/import_url_button.widget.dart';
 import 'package:contextchat/projects/project_file_types.dart';
 import 'package:contextchat/projects/project_text_import.service.dart';
 import 'package:contextchat/projects/projects.model.dart';
 import 'package:contextchat/projects/projects.provider.dart';
+import 'package:contextchat/projects/url_import.provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -360,6 +362,20 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
     );
   }
 
+  void _handleUrlImported(String text, String source) {
+    final merged = _mergeImportedTextIntoBaseContext(
+      _baseContextController.text,
+      [ImportedProjectText(fileName: source, text: text)],
+    );
+
+    _baseContextController.value = TextEditingValue(
+      text: merged,
+      selection: TextSelection.collapsed(offset: merged.length),
+    );
+
+    showAppSnackBar(context, 'Imported text from URL into Base Context');
+  }
+
   Future<void> _removeFile(ProjectFile file) async {
     try {
       if (_isEditMode) {
@@ -485,8 +501,19 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
                       icon: const Icon(LucideIcons.notebook),
                       label: 'Import text files',
                     ),
+                    const SizedBox(width: 12),
+                    ImportUrlButton(
+                      onImported: (text, source) {
+                        _handleUrlImported(text, source);
+                      },
+                    ),
                   ],
                 ),
+                if (ref.watch(urlImportProvider).isLoading)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: LinearProgressIndicator(),
+                  ),
               ],
             ),
           ),
