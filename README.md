@@ -2,7 +2,7 @@
 
 ContextChat is a powerful AI interface designed for developers and power users who need project-specific AI assistance. It streamlines your workflow by automatically injecting project context, files, and reusable prompts into your conversations.
 
-### Chat and Settings
+### Chat and settings
 | Light | Dark |
 | :---: | :---: |
 | ![Home Light](assets/home-light.png) | ![Home Dark](assets/home-dark.png) |
@@ -10,35 +10,29 @@ ContextChat is a powerful AI interface designed for developers and power users w
 
 ---
 
-## 🚀 Key Features
+## Key features
 
-### 📁 Project-Based Context
-*   **Reusable Instructions**: Set base system prompts for each project.
-*   **File Knowledge**: Import text files (PDF, code, docs) directly into the AI's context.
-*   **Model Defaults**: Assign specific AI models to different projects.
-*   **Local Storage**: All project data and files stay on your machine.
-
-### 💬 Intelligent Chat
-*   **OpenRouter Integration**: Access any model from OpenAI, Anthropic, Google, and more.
-*   **Vision Support**: Drag and drop images into vision-capable models.
-*   **Real-time Streaming**: Smooth, responsive message delivery.
-*   **Context Assembly**: Automatically builds the prompt with project rules + files + history.
-
-### 📝 Prompt Library
-*   **Save and Reuse**: Build a library of frequently used prompts.
-*   **Variables**: Define variables in prompts for quick customization.
-*   **Quick Insert**: Access your library directly from the chat composer.
-*   **Pin and Search**: Keep your most important prompts at the top.
-
-### 🛠 UI / UX
-*   **Resizable Sidebar**: Flexible layout to suit your screen.
-*   **Keyboard First**: Use `Cmd+Enter` (macOS) or `Ctrl+Enter` to send.
-*   **Smart Scroll**: Auto-scroll that stays out of your way when you're reading.
-*   **Markdown Support**: Full rendering for code blocks and formatting.
+- Reusable instructions: Set base system prompts for each project.
+- File knowledge: Import text files (PDF, code, docs) directly into the AI's context.
+- Import from URL: Paste any URL to extract and import its content for AI context.
+- Model defaults: Assign specific AI models to different projects.
+- Local storage: All project data and files stay on your machine.
+- OpenRouter integration: Access any model from OpenAI, Anthropic, Google, and more.
+- Vision support: Drag and drop images into vision-capable models.
+- Real-time streaming: Smooth, responsive message delivery.
+- Context assembly: Automatically builds the prompt with project rules + files + history.
+- Save and reuse: Build a library of frequently used prompts.
+- Variables: Define variables in prompts for quick customization.
+- Quick insert: Access your library directly from the chat composer.
+- Pin and search: Keep your most important prompts at the top.
+- Resizable sidebar: Flexible layout to suit your screen.
+- Keyboard first: Use `Cmd+Enter` (macOS) or `Ctrl+Enter` to send.
+- Smart scroll: Auto-scroll that stays out of your way when you're reading.
+- Markdown support: Full rendering for code blocks and formatting.
 
 ---
 
-## ⚙️ How Context Works
+## How context works
 When you send a message, ContextChat automatically assembles a rich prompt:
 1.  **System Prompt**: Your Project's base context instructions.
 2.  **Files**: The content of all text files attached to the project.
@@ -47,12 +41,19 @@ When you send a message, ContextChat automatically assembles a rich prompt:
 
 ---
 
-## 📂 Data and Privacy
-*   **Local-First**: All metadata, project files, and chat histories are stored locally.
-*   **Storage Path**: Customizable via settings (`memory/` by default).
-*   **Direct API**: Connects directly to OpenRouter using your own API key.
+## Local storage structure
 
-## 🗺 Roadmap
+ContextChat stores all data locally on your machine in a customizable directory (default: `memory/`). The storage structure is organized as follows:
+
+- `memory/projects/` contains project configurations, system prompts, and model preferences.
+- `memory/context/` stores imported files, URLs, and other context attached to projects.
+- `memory/chats/` holds conversation histories organized by project.
+- `memory/prompts/` saves your reusable prompt library.
+- `memory/settings/` preserves your application preferences.
+
+All data is stored as plain JSON files, making it easy to backup, sync with git, or migrate between machines.
+
+## Roadmap
 - [ ] **Search**: Full-text search across all chat histories.
 - [ ] **Message Editing**: Edit and regenerate AI responses.
 - [ ] **Multi-Provider**: Direct support for OpenAI, Anthropic, and Local (Ollama) APIs.
