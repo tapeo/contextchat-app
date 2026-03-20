@@ -1,12 +1,18 @@
 import 'package:collection/collection.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
+import 'package:contextchat/components/button.widget.dart';
 import 'package:contextchat/components/card.widget.dart';
+import 'package:contextchat/components/expanded_widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/input.widget.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/resizable_text_area.widget.dart';
+import 'package:contextchat/components/row_column.widget.dart';
+import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/prompts/prompt_edit_page.view.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -138,11 +144,11 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
         'You have unsaved changes. Discard them and continue?',
       ),
       actions: [
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(false),
           child: const Text('Cancel'),
         ),
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(true),
           child: const Text('Discard'),
         ),
@@ -154,8 +160,25 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
 
   Future<void> _selectPrompt(String id) async {
     if (!await _confirmDiscardIfDirty() || !mounted) return;
+
+    final isPhone = Breakpoints.isPhone(context);
     ref.read(promptsProvider.notifier).selectPrompt(id);
     _syncFromSelection();
+
+    if (isPhone) {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const PromptEditPage()));
+    }
+  }
+
+  Future<void> _openEditor() async {
+    final isPhone = Breakpoints.isPhone(context);
+    if (isPhone) {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const PromptEditPage()));
+    }
   }
 
   Future<void> _createPrompt() async {
@@ -260,16 +283,16 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
         'Are you sure you want to delete this prompt? This action cannot be undone.',
       ),
       actions: [
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(false),
           child: const Text('Cancel'),
         ),
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(true),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.error,
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
-          child: const Text('Delete'),
         ),
       ],
     );
@@ -362,13 +385,10 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
               children: [
                 InputWidget(
                   controller: _searchController,
-                  decoration: InputDecoration(
-                    labelText: 'Search',
-                    hintText: 'Filter prompts…',
-                    labelStyle: theme.textTheme.bodySmall,
-                    hintStyle: theme.textTheme.bodySmall,
-                    border: InputBorder.none,
-                  ),
+                  labelText: 'Search',
+                  hintText: 'Filter prompts…',
+                  labelStyle: theme.textTheme.bodySmall,
+                  hintStyle: theme.textTheme.bodySmall,
                   onChanged: (_) => setState(() {}),
                 ),
                 const SizedBox(height: 8),
@@ -407,6 +427,8 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
       );
     }
 
+    bool isPhone = Breakpoints.isPhone(context);
+
     return PopScope(
       canPop: !_isDirty,
       onPopInvokedWithResult: (didPop, result) {
@@ -424,7 +446,13 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
             IconButtonWidget(
               tooltip: 'New prompt',
               icon: const Icon(LucideIcons.plus),
-              onPressed: _isSaving ? null : _createPrompt,
+              onPressed: _isSaving
+                  ? null
+                  : () async {
+                      if (!await _confirmDiscardIfDirty() || !mounted) return;
+                      await _createPrompt();
+                      if (mounted) _openEditor();
+                    },
             ),
             IconButtonWidget(
               tooltip: 'Copy prompt',
@@ -458,161 +486,153 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-          child: Row(
+          child: RowColumn(
+            type: isPhone ? RowColumnType.column : RowColumnType.row,
             children: [
               SizedBox(
-                width: 340,
-                child: CardWidget(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    children: [
-                      InputWidget(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          labelText: 'Search',
-                          hintText: 'Filter prompts…',
-                          labelStyle: theme.textTheme.bodySmall,
-                          hintStyle: theme.textTheme.bodySmall,
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (_) => setState(() {}),
-                      ),
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: prompts.isEmpty
-                            ? const Center(child: Text('No prompts'))
-                            : ListView.separated(
-                                itemCount: prompts.length,
-                                separatorBuilder: (_, _) =>
-                                    const SizedBox(height: 8),
-                                itemBuilder: (context, index) {
-                                  final prompt = prompts[index];
-                                  final isSelected = prompt.id == selectedId;
-                                  return ListTileWidget(
-                                    selected: isSelected,
-                                    style: ListTileStyle2.dense,
-                                    leading: Icon(
-                                      prompt.pinned
-                                          ? LucideIcons.pin
-                                          : LucideIcons.fileText,
-                                    ),
-                                    title: Text(prompt.name),
-                                    subtitle: prompt.description.trim().isEmpty
-                                        ? Text(
-                                            '${prompt.variables.length} variable(s)',
-                                          )
-                                        : Text(prompt.description),
-                                    onTap: () => _selectPrompt(prompt.id),
-                                  );
-                                },
-                              ),
-                      ),
-                    ],
-                  ),
+                width: isPhone ? double.infinity : 340,
+                child: Column(
+                  children: [
+                    InputWidget(
+                      controller: _searchController,
+                      labelText: 'Search',
+                      hintText: 'Filter prompts…',
+                      labelStyle: theme.textTheme.bodySmall,
+                      hintStyle: theme.textTheme.bodySmall,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    ExpandedWidget(
+                      expand: !isPhone,
+                      child: prompts.isEmpty
+                          ? const Center(child: Text('No prompts'))
+                          : ListView.separated(
+                              itemCount: prompts.length,
+                              shrinkWrap: isPhone,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 8),
+                              itemBuilder: (context, index) {
+                                final prompt = prompts[index];
+                                final isSelected =
+                                    !isPhone && prompt.id == selectedId;
+
+                                return ListTileWidget(
+                                  selected: isSelected,
+                                  style: ListTileStyle2.dense,
+                                  leading: Icon(
+                                    prompt.pinned
+                                        ? LucideIcons.pin
+                                        : LucideIcons.fileText,
+                                  ),
+                                  title: Text(prompt.name),
+                                  subtitle: prompt.description.trim().isEmpty
+                                      ? Text(
+                                          '${prompt.variables.length} variable(s)',
+                                        )
+                                      : Text(prompt.description),
+                                  onTap: () => _selectPrompt(prompt.id),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: selectedPrompt == null
-                    ? const Center(child: Text('Select a prompt to edit'))
-                    : CardWidget(
-                        padding: const EdgeInsets.all(16),
-                        child: ListView(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: InputWidget(
-                                    controller: _nameController,
-                                    decoration: InputDecoration(
+              if (!isPhone) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: selectedPrompt == null
+                      ? const Center(child: Text('Select a prompt to edit'))
+                      : CardWidget(
+                          padding: const EdgeInsets.all(16),
+                          child: ListView(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: InputWidget(
+                                      controller: _nameController,
                                       labelText: 'Name',
                                       hintText: 'Prompt name',
                                       labelStyle: theme.textTheme.bodySmall,
                                       hintStyle: theme.textTheme.bodySmall,
-                                      border: InputBorder.none,
                                       errorText: _showValidation && !_isValid
                                           ? 'Name is required'
                                           : null,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                IconButtonWidget(
-                                  tooltip: selectedPrompt.pinned
-                                      ? 'Unpin'
-                                      : 'Pin',
-                                  icon: Icon(
-                                    selectedPrompt.pinned
-                                        ? LucideIcons.pinOff
-                                        : LucideIcons.pin,
+                                  const SizedBox(width: 12),
+                                  IconButtonWidget(
+                                    tooltip: selectedPrompt.pinned
+                                        ? 'Unpin'
+                                        : 'Pin',
+                                    icon: Icon(
+                                      selectedPrompt.pinned
+                                          ? LucideIcons.pinOff
+                                          : LucideIcons.pin,
+                                    ),
+                                    onPressed: _isSaving ? null : _togglePinned,
                                   ),
-                                  onPressed: _isSaving ? null : _togglePinned,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            InputWidget(
-                              controller: _descriptionController,
-                              decoration: InputDecoration(
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              InputWidget(
+                                controller: _descriptionController,
                                 labelText: 'Description',
                                 hintText: 'What is this prompt for?',
                                 labelStyle: theme.textTheme.bodySmall,
                                 hintStyle: theme.textTheme.bodySmall,
-                                border: InputBorder.none,
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            InputWidget(
-                              controller: _variablesController,
-                              decoration: InputDecoration(
+                              const SizedBox(height: 12),
+                              InputWidget(
+                                controller: _variablesController,
                                 labelText: 'Variables',
                                 hintText: 'comma,separated,variables',
                                 labelStyle: theme.textTheme.bodySmall,
                                 hintStyle: theme.textTheme.bodySmall,
-                                border: InputBorder.none,
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text('Prompt', style: theme.textTheme.titleSmall),
-                            const SizedBox(height: 8),
-                            ResizableTextArea(
-                              controller: _promptTextController,
-                              hintText: 'Write your prompt here…',
-                              initialHeight: 220,
-                              maxHeight: 800,
-                              minHeight: 140,
-                              textStyle: theme.textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Text(
-                                  _isDirty ? 'Unsaved changes' : 'Saved',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: _isDirty
-                                        ? theme.colorScheme.tertiary
-                                        : theme.colorScheme.onSurface
-                                              .withValues(alpha: 0.6),
+                              const SizedBox(height: 12),
+                              Text('Prompt', style: theme.textTheme.titleSmall),
+                              const SizedBox(height: 8),
+                              ResizableTextArea(
+                                controller: _promptTextController,
+                                hintText: 'Write your prompt here…',
+                                initialHeight: 220,
+                                maxHeight: 800,
+                                minHeight: 140,
+                                textStyle: theme.textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Text(
+                                    _isDirty ? 'Unsaved changes' : 'Saved',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: _isDirty
+                                          ? theme.colorScheme.tertiary
+                                          : theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.6),
+                                    ),
                                   ),
-                                ),
-                                const Spacer(),
-                                TextButton(
-                                  onPressed: _isSaving
-                                      ? null
-                                      : () => _syncFromSelection(),
-                                  child: const Text('Reset'),
-                                ),
-                                const SizedBox(width: 8),
-                                FilledButton(
-                                  onPressed: _isSaving ? null : _save,
-                                  child: const Text('Save'),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const Spacer(),
+                                  TextButtonWidget(
+                                    onPressed: _isSaving
+                                        ? null
+                                        : () => _syncFromSelection(),
+                                    child: const Text('Reset'),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ButtonWidget(
+                                    onPressed: _isSaving ? null : _save,
+                                    child: const Text('Save'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-              ),
+                ),
+              ],
             ],
           ),
         ),

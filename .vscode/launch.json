@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (macOS)",
+      "type": "dart",
+      "request": "launch",
+      "deviceId": "macos"
+    },
+    {
+      "name": "Flutter (iPhone)",
+      "type": "dart",
+      "request": "launch",
+      "deviceId": "00008110-001159DA2E3A401E"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Flutter (All Devices)",
+      "configurations": ["Flutter (macOS)", "Flutter (iPhone)"]
+    }
+  ]
+}

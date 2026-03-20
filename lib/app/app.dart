@@ -1,10 +1,16 @@
 import 'package:contextchat/chat/chat.ui.dart';
 import 'package:contextchat/chat/chats.provider.dart';
+import 'package:contextchat/components/icon_button.widget.dart';
+import 'package:contextchat/components/mobile_selector_sheet.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
+import 'package:contextchat/prompts/prompts_library.view.dart';
+import 'package:contextchat/settings/settings.view.dart';
 import 'package:contextchat/sidebar/sidebar.view.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -14,9 +20,6 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
-  static const double _minSidebarFraction = 0.2;
-  static const double _maxSidebarFraction = 0.4;
-
   double _sidebarFraction = 0.25;
 
   @override
@@ -31,36 +34,120 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final sidebarWidth = constraints.maxWidth * _sidebarFraction;
+    final isPhone = Breakpoints.isPhone(context);
 
-          return Stack(
-            children: [
-              Row(
+    if (isPhone) {
+      return _PhoneShell();
+    }
+
+    return _DesktopShell(
+      sidebarFraction: _sidebarFraction,
+      onSidebarFractionChanged: (value) {
+        setState(() {
+          _sidebarFraction = value;
+        });
+      },
+    );
+  }
+}
+
+class _PhoneShell extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                border: Border(bottom: BorderSide(color: theme.dividerColor)),
+              ),
+              child: Row(
+                spacing: 8,
                 children: [
-                  SizedBox(width: sidebarWidth, child: const SidebarView()),
-                  const Expanded(child: ChatUi()),
+                  Expanded(child: const MobileSelectorSheet()),
+                  IconButtonWidget(
+                    tooltip: 'Prompts',
+                    icon: const Icon(LucideIcons.bookText, size: 20),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const PromptsLibraryView(),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButtonWidget(
+                    tooltip: 'Settings',
+                    icon: const Icon(LucideIcons.settings, size: 20),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsView(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
-              Positioned(
-                left: sidebarWidth - 8,
-                top: 0,
-                bottom: 0,
-                child: _ResizeHandle(
-                  onDragUpdate: (delta) {
-                    setState(() {
-                      _sidebarFraction =
-                          (_sidebarFraction + (delta / constraints.maxWidth))
-                              .clamp(_minSidebarFraction, _maxSidebarFraction);
-                    });
-                  },
+            ),
+            const Expanded(child: ChatUi()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DesktopShell extends StatelessWidget {
+  const _DesktopShell({
+    required this.sidebarFraction,
+    required this.onSidebarFractionChanged,
+  });
+
+  static const double _minSidebarFraction = 0.2;
+  static const double _maxSidebarFraction = 0.4;
+
+  final double sidebarFraction;
+  final ValueChanged<double> onSidebarFractionChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final sidebarWidth = constraints.maxWidth * sidebarFraction;
+
+            return Stack(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(width: sidebarWidth, child: const SidebarView()),
+                    const Expanded(child: ChatUi()),
+                  ],
                 ),
-              ),
-            ],
-          );
-        },
+                Positioned(
+                  left: sidebarWidth - 8,
+                  top: 0,
+                  bottom: 0,
+                  child: _ResizeHandle(
+                    onDragUpdate: (delta) {
+                      onSidebarFractionChanged(
+                        (sidebarFraction + (delta / constraints.maxWidth))
+                            .clamp(_minSidebarFraction, _maxSidebarFraction),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

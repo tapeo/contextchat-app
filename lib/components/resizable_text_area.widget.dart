@@ -7,7 +7,6 @@ class ResizableTextArea extends StatefulWidget {
   final String? labelText;
   final bool enabled;
   final ValueChanged<String>? onChanged;
-  final InputDecoration? decoration;
   final double minHeight;
   final double maxHeight;
   final double initialHeight;
@@ -22,7 +21,6 @@ class ResizableTextArea extends StatefulWidget {
     this.labelText,
     this.enabled = true,
     this.onChanged,
-    this.decoration,
     this.minHeight = 100,
     this.maxHeight = 500,
     this.initialHeight = 150,
@@ -75,15 +73,13 @@ class _ResizableTextAreaState extends State<ResizableTextArea> {
                 keyboardType: TextInputType.multiline,
                 onChanged: widget.onChanged,
                 style: widget.textStyle,
-                decoration:
-                    widget.decoration ??
-                    InputDecoration(
-                      labelText: widget.labelText,
-                      hintText: widget.hintText,
-                      border: InputBorder.none,
-                      hintStyle: theme.textTheme.bodySmall,
-                      labelStyle: theme.textTheme.bodySmall,
-                    ),
+                decoration: InputDecoration(
+                  labelText: widget.labelText,
+                  hintText: widget.hintText,
+                  border: InputBorder.none,
+                  hintStyle: theme.textTheme.bodySmall,
+                  labelStyle: theme.textTheme.bodySmall,
+                ),
               ),
         ),
         GestureDetector(

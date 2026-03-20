@@ -79,6 +79,7 @@ class MessageWidget extends StatelessWidget {
                           : colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    codeblockPadding: const EdgeInsets.all(12),
                     blockquote: TextStyle(
                       fontSize: 13,
                       color: isUser

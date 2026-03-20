@@ -1,6 +1,7 @@
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
+import 'package:contextchat/components/text_button.widget.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/projects.provider.dart';
@@ -38,16 +39,19 @@ class _ChatsListState extends ConsumerState<ChatsList> {
         'Are you sure you want to delete this chat? This action cannot be undone.',
       ),
       actions: [
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        TextButton(
+        TextButtonWidget(
           onPressed: () {
             ref.read(chatsProvider.notifier).deleteChat(chatId);
             Navigator.of(context).pop();
           },
-          child: const Text('Delete'),
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
       ],
     );
@@ -66,8 +70,10 @@ class _ChatsListState extends ConsumerState<ChatsList> {
                 label: 'Open in file explorer',
                 onPressed: () async {
                   _contextMenuController.remove();
-                  final file =
-                      ref.read(chatDatabaseProvider).getChatFile(chatId);
+                  final file = ref
+                      .read(chatDatabaseProvider)
+                      .getChatFile(chatId);
+
                   await FileUtils.revealInFileManager(file.path);
                 },
               ),

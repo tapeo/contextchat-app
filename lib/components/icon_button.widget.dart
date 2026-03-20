@@ -30,7 +30,7 @@ class IconButtonStyle {
 
   static const IconButtonStyle small = IconButtonStyle(
     padding: EdgeInsets.all(6),
-    borderRadius: AppTheme.radiusSmall,
+    borderRadius: AppTheme.radiusMedium,
     iconSize: 16,
     shadowBlurRadius: 4,
     shadowOffset: Offset(0, 2),
@@ -39,7 +39,7 @@ class IconButtonStyle {
 
   static const IconButtonStyle large = IconButtonStyle(
     padding: EdgeInsets.all(12),
-    borderRadius: AppTheme.radiusLarge,
+    borderRadius: AppTheme.radiusMedium,
     iconSize: 24,
     shadowBlurRadius: 12,
     shadowOffset: Offset(0, 6),

@@ -33,7 +33,7 @@ class ButtonWidget extends StatelessWidget {
     ) = switch (size) {
       ButtonSize.small => (
         EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        AppTheme.radiusSmall,
+        AppTheme.radiusMedium,
         12.0,
         4.0,
         4.0,
@@ -51,7 +51,7 @@ class ButtonWidget extends StatelessWidget {
       ),
       ButtonSize.large => (
         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        AppTheme.radiusLarge,
+        AppTheme.radiusMedium,
         14.0,
         10.0,
         12.0,
@@ -95,17 +95,21 @@ class ButtonWidget extends StatelessWidget {
               SizedBox(width: iconSpacing),
             ],
             if (label != null)
-              Text(
-                label!,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w500,
-                  color: onPressed == null
-                      ? Theme.of(context).disabledColor
-                      : Theme.of(context).colorScheme.onSurface,
+              Flexible(
+                child: Text(
+                  label!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w500,
+                    color: onPressed == null
+                        ? Theme.of(context).disabledColor
+                        : Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ),
-            if (child != null) child!,
+            ?child,
           ],
         ),
       ),

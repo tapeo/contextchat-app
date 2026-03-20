@@ -1,11 +1,11 @@
 import 'package:contextchat/components/app_snackbar.dart';
-import 'package:contextchat/components/card.widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/input.widget.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_storage/file_storage.provider.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -64,6 +64,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isPhone = Breakpoints.isPhone(context);
+    final padding = isPhone ? Spacing.sm : Spacing.md;
 
     return Scaffold(
       appBar: AppBar(
@@ -77,82 +79,66 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(padding),
         children: [
-          CardWidget(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AI Provider Configuration',
-                  style: theme.textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
-                InputWidget(
-                  controller: _baseUrlController,
-                  decoration: InputDecoration(
-                    labelText: 'Base URL',
-                    hintText: 'https://openrouter.ai/api/v1',
-                    labelStyle: theme.textTheme.bodySmall,
-                    hintStyle: theme.textTheme.bodySmall,
-                    border: InputBorder.none,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                InputWidget(
-                  controller: _apiKeyController,
-                  decoration: InputDecoration(
-                    labelText: 'API Key',
-                    hintText: 'sk-or-v1-...',
-                    labelStyle: theme.textTheme.bodySmall,
-                    hintStyle: theme.textTheme.bodySmall,
-                    border: InputBorder.none,
-                  ),
-                  obscureText: true,
-                ),
-              ],
-            ),
+          Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'AI Provider Configuration',
+                style: theme.textTheme.titleMedium,
+              ),
+              InputWidget(
+                controller: _baseUrlController,
+                labelText: 'Base URL',
+                hintText: 'https://openrouter.ai/api/v1',
+                labelStyle: theme.textTheme.bodySmall,
+                hintStyle: theme.textTheme.bodySmall,
+              ),
+              InputWidget(
+                controller: _apiKeyController,
+                labelText: 'API Key',
+                hintText: 'sk-or-v1-...',
+                labelStyle: theme.textTheme.bodySmall,
+                hintStyle: theme.textTheme.bodySmall,
+                obscureText: true,
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          CardWidget(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Database Configuration',
-                        style: theme.textTheme.titleMedium,
-                      ),
+          SizedBox(height: Spacing.md),
+          Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Database Configuration',
+                      style: theme.textTheme.titleMedium,
                     ),
-                    IconButtonWidget(
-                      icon: const Icon(LucideIcons.folderOpen),
-                      onPressed: () async {
-                        final url = Uri.directory(_storagePathController.text);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url);
-                        }
-                      },
-                      tooltip: 'Open database folder',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                InputWidget(
-                  controller: _storagePathController,
-                  decoration: InputDecoration(
-                    labelText: 'Storage Path',
-                    hintText: '/path/to/storage',
-                    labelStyle: theme.textTheme.bodySmall,
-                    hintStyle: theme.textTheme.bodySmall,
-                    border: InputBorder.none,
                   ),
-                ),
-              ],
-            ),
+                  IconButtonWidget(
+                    icon: const Icon(LucideIcons.folderOpen),
+                    onPressed: () async {
+                      final url = Uri.directory(_storagePathController.text);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                    tooltip: 'Open database folder',
+                  ),
+                ],
+              ),
+              InputWidget(
+                controller: _storagePathController,
+                labelText: 'Storage Path',
+                hintText: '/path/to/storage',
+                labelStyle: theme.textTheme.bodySmall,
+                hintStyle: theme.textTheme.bodySmall,
+              ),
+            ],
           ),
         ],
       ),

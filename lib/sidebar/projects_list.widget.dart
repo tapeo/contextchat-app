@@ -5,6 +5,7 @@ import 'package:contextchat/components/card.widget.dart';
 import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/components/text_button.widget.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/project_setup.view.dart';
@@ -96,16 +97,19 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
         'Are you sure you want to delete this project? All associated chats and data will be permanently removed.',
       ),
       actions: [
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        TextButton(
+        TextButtonWidget(
           onPressed: () {
             ref.read(projectsProvider.notifier).deleteProject(widget.projectId);
             Navigator.of(context).pop();
           },
-          child: const Text('Delete'),
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
       ],
     );

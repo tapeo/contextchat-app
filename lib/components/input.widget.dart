@@ -13,10 +13,15 @@ class InputWidget extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final TextAlignVertical? textAlignVertical;
-  final InputDecoration? decoration;
   final TextStyle? style;
   final bool? obscureText;
   final Widget? trailing;
+  final EdgeInsetsGeometry? padding;
+  final String? labelText;
+  final TextStyle? labelStyle;
+  final Widget? prefixIcon;
+  final String? errorText;
+  final TextStyle? hintStyle;
 
   const InputWidget({
     super.key,
@@ -31,18 +36,23 @@ class InputWidget extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.textAlignVertical,
-    this.decoration,
     this.style,
     this.obscureText,
     this.trailing,
+    this.padding,
+    this.labelText,
+    this.labelStyle,
+    this.prefixIcon,
+    this.errorText,
+    this.hintStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 12),
+      constraints: BoxConstraints(minHeight: labelText != null ? 50 : 32),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
@@ -68,16 +78,29 @@ class InputWidget extends StatelessWidget {
               onSubmitted: onSubmitted,
               textAlignVertical: textAlignVertical,
               obscureText: obscureText ?? false,
-              decoration:
-                  decoration ??
-                  InputDecoration.collapsed(
-                    hintText: hintText,
-                    hintStyle: Theme.of(context).textTheme.bodySmall,
-                  ),
+              decoration: InputDecoration(
+                hintText: hintText,
+                labelText: labelText,
+                labelStyle: labelStyle,
+                isDense: true,
+                prefixIcon: prefixIcon,
+                errorText: errorText,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+                hintStyle:
+                    hintStyle ??
+                    TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+              ),
               style: style ?? const TextStyle(fontSize: 14),
             ),
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );

@@ -6,7 +6,8 @@ import 'package:contextchat/chat/composer.widget.dart';
 import 'package:contextchat/chat/message.model.dart';
 import 'package:contextchat/chat/message_widget.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/components/button.widget.dart';
+import 'package:contextchat/components/text_button.widget.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:contextchat/settings/settings.view.dart';
@@ -121,15 +122,15 @@ class _ChatUiState extends ConsumerState<ChatUi> {
         'You need to configure your OpenRouter API key before sending messages. Please go to Settings to set it up.',
       ),
       actions: [
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        FilledButton(
+        ButtonWidget(
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).push(
-              NoTransitionRoute(builder: (context) => const SettingsView()),
+              MaterialPageRoute(builder: (context) => const SettingsView()),
             );
           },
           child: const Text('Go to Settings'),

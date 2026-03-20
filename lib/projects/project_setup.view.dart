@@ -11,6 +11,7 @@ import 'package:contextchat/components/icon_button.widget.dart';
 import 'package:contextchat/components/input.widget.dart';
 import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/resizable_text_area.widget.dart';
+import 'package:contextchat/components/text_button.widget.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/database/project_database.service.dart';
 import 'package:contextchat/projects/import_url_button.widget.dart';
@@ -19,6 +20,7 @@ import 'package:contextchat/projects/project_text_import.service.dart';
 import 'package:contextchat/projects/projects.model.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/projects/url_import.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -126,16 +128,16 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
         'Are you sure you want to delete this project? This action cannot be undone.',
       ),
       actions: [
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(false),
           child: const Text('Cancel'),
         ),
-        TextButton(
+        TextButtonWidget(
           onPressed: () => Navigator.of(context).pop(true),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.error,
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
-          child: const Text('Delete'),
         ),
       ],
     );
@@ -439,7 +441,7 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit Project' : 'New Project'),
+        title: Text(_isEditMode ? 'Edit' : 'New'),
         actions: [
           if (_isEditMode)
             IconButtonWidget(
@@ -456,27 +458,24 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(Spacing.sm),
         children: [
           CardWidget(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(Spacing.sm),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Project Details', style: theme.textTheme.titleMedium),
-                const SizedBox(height: 16),
+                SizedBox(height: Spacing.sm),
                 InputWidget(
                   controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Project Name',
-                    labelStyle: theme.textTheme.bodySmall,
-                    border: InputBorder.none,
-                    errorText: _showValidation && !_isValid
-                        ? 'Project name is required'
-                        : null,
-                  ),
+                  labelText: 'Project Name',
+                  labelStyle: theme.textTheme.bodySmall,
+                  errorText: _showValidation && !_isValid
+                      ? 'Project name is required'
+                      : null,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: Spacing.sm),
                 ResizableTextArea(
                   controller: _baseContextController,
                   labelText: 'Base Context',
@@ -486,22 +485,21 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
                   maxHeight: 500,
                   textStyle: theme.textTheme.bodySmall,
                 ),
-                const SizedBox(height: 12),
-                Row(
+                SizedBox(height: Spacing.sm),
+                Text(
+                  'Import PDFs, docs, code, and other readable text files directly into Base Context.',
+                  style: theme.textTheme.bodySmall,
+                ),
+                SizedBox(height: Spacing.xs),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'Import PDFs, docs, code, and other readable text files directly into Base Context.',
-                        style: theme.textTheme.bodySmall,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
                     ButtonWidget(
                       onPressed: _isSaving ? null : _importTextFiles,
                       icon: const Icon(LucideIcons.notebook),
                       label: 'Import text files',
                     ),
-                    const SizedBox(width: 12),
                     ImportUrlButton(
                       onImported: (text, source) {
                         _handleUrlImported(text, source);
@@ -517,9 +515,9 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: Spacing.sm),
           CardWidget(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(Spacing.sm),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -538,12 +536,12 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: Spacing.xs),
                 Text(
                   'Supported: PNG, JPEG, WebP, GIF',
                   style: theme.textTheme.bodySmall,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: Spacing.sm),
                 if (_files.isEmpty)
                   const Text('No images imported yet.')
                 else
@@ -568,7 +566,7 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: Spacing.sm),
           if (_isDirty)
             Text(
               _isSaving ? 'Saving...' : 'Unsaved changes',

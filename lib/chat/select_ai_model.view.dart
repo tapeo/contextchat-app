@@ -8,12 +8,13 @@ import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/text_button.widget.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class SelectAiModelView extends ConsumerStatefulWidget {
-  const SelectAiModelView({super.key});
+class SelectAiModelDialog extends ConsumerStatefulWidget {
+  const SelectAiModelDialog({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -21,7 +22,7 @@ class SelectAiModelView extends ConsumerStatefulWidget {
   }
 }
 
-class _SelectAiModelViewState extends ConsumerState<SelectAiModelView> {
+class _SelectAiModelViewState extends ConsumerState<SelectAiModelDialog> {
   String formatContextLength(int length) {
     if (length >= 1000) {
       double k = length / 1000.0;
@@ -209,29 +210,26 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final filteredModels = _filteredModels;
+    final isPhone = Breakpoints.isPhone(context);
 
-    return SizedBox(
-      width: 520,
-      height: 420,
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: isPhone ? MediaQuery.sizeOf(context).height * 0.7 : 420,
+      ),
       child: Column(
+        spacing: 8,
         children: [
           _CustomModelInput(
             onSelect: (customModelId) =>
                 Navigator.of(context).pop(customModelId),
           ),
-          SizedBox(height: 8),
           InputWidget(
             controller: _searchController,
             onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: 'Search models',
-              labelStyle: theme.textTheme.bodySmall,
-              border: InputBorder.none,
-              isDense: true,
-            ),
+            labelText: 'Search models',
+            labelStyle: theme.textTheme.bodySmall,
             style: theme.textTheme.bodySmall,
           ),
-          const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -241,16 +239,19 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
               _buildSortButton('created', 'Created'),
             ],
           ),
-          const SizedBox(height: 4),
           Expanded(
             child: filteredModels.isEmpty
                 ? const Center(child: Text('No models match your search.'))
-                : ListView.builder(
+                : ListView.separated(
                     itemCount: filteredModels.length,
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 16),
                     itemBuilder: (context, index) {
                       final model = filteredModels[index];
+
                       return ListTileWidget(
                         selected: model.id == widget.selectedModelId,
+                        padding: EdgeInsets.zero,
                         title: Row(
                           children: [
                             Tooltip(
@@ -294,32 +295,16 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                                           ),
                                     ),
                                   ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'In: ${widget.formatPrice(model.pricing.prompt)}  Out: ${widget.formatPrice(model.pricing.completion)}  •  ${widget.formatContextLength(model.contextLength)}',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.textTheme.bodySmall?.color
+                                          ?.withAlpha(128),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'In: ${widget.formatPrice(model.pricing.prompt)}',
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                                Text(
-                                  'Out: ${widget.formatPrice(model.pricing.completion)}',
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 16),
-                            Text(
-                              widget.formatContextLength(model.contextLength),
-                              style: theme.textTheme.bodySmall,
                             ),
                           ],
                         ),
@@ -374,12 +359,8 @@ class _CustomModelInputState extends State<_CustomModelInput> {
         Expanded(
           child: InputWidget(
             controller: _controller,
-            decoration: InputDecoration(
-              labelText: 'Custom model (e.g., provider/model-name)',
-              labelStyle: theme.textTheme.bodySmall,
-              border: InputBorder.none,
-              isDense: true,
-            ),
+            labelText: 'Custom model (e.g., provider/model-name)',
+            labelStyle: theme.textTheme.bodySmall,
             style: theme.textTheme.bodySmall,
             onChanged: (_) => setState(() {}),
             onSubmitted: (_) => _onSelect(),

@@ -6,6 +6,7 @@ import 'package:contextchat/components/list_tile.widget.dart';
 import 'package:contextchat/components/text_button.widget.dart';
 import 'package:contextchat/prompts/prompt.model.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -49,6 +50,7 @@ class _SelectPromptViewState extends ConsumerState<SelectPromptView> {
   @override
   Widget build(BuildContext context) {
     final promptsState = ref.watch(promptsProvider);
+
     return ButtonWidget(
       onPressed: promptsState.prompts.isEmpty
           ? null
@@ -102,21 +104,20 @@ class _PromptPickerDialogState extends State<_PromptPickerDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final filteredPrompts = _filteredPrompts;
+    final isPhone = Breakpoints.isPhone(context);
 
-    return SizedBox(
-      width: 520,
-      height: 420,
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: isPhone ? MediaQuery.sizeOf(context).height * 0.7 : 420,
+      ),
       child: Column(
         children: [
           InputWidget(
             controller: _searchController,
             onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: 'Search prompts',
-              labelStyle: theme.textTheme.bodySmall,
-              prefixIcon: const Icon(LucideIcons.search),
-              border: InputBorder.none,
-            ),
+            labelText: 'Search prompts',
+            labelStyle: theme.textTheme.bodySmall,
+            prefixIcon: const Icon(LucideIcons.search),
           ),
           const SizedBox(height: 8),
           Expanded(
@@ -138,13 +139,16 @@ class _PromptPickerDialogState extends State<_PromptPickerDialog> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        subtitle: prompt.description.trim().isEmpty
-                            ? Text('${prompt.variables.length} variable(s)')
-                            : Text(
-                                prompt.description,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                        subtitle: Text(
+                          prompt.description.trim().isEmpty
+                              ? '${prompt.variables.length} variable(s)'
+                              : '${prompt.description}${prompt.variables.isNotEmpty ? ' • ${prompt.variables.length} variable(s)' : ''}',
+                          maxLines: isPhone ? 2 : 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        style: isPhone
+                            ? ListTileStyle2.compact
+                            : ListTileStyle2.normal,
                         onTap: () => Navigator.of(context).pop(prompt.id),
                       );
                     },

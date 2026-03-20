@@ -1,10 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+class Breakpoints {
+  static const double phone = 600;
+  static const double tablet = 900;
+  static const double desktop = 1200;
+
+  static bool isPhone(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < phone;
+
+  static bool isTablet(BuildContext context) =>
+      MediaQuery.sizeOf(context).width >= phone &&
+      MediaQuery.sizeOf(context).width < tablet;
+
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.sizeOf(context).width >= desktop;
+
+  static bool isWideScreen(BuildContext context) =>
+      MediaQuery.sizeOf(context).width >= tablet;
+}
+
+class Spacing {
+  static const double xxs = 4;
+  static const double xs = 8;
+  static const double sm = 12;
+  static const double md = 16;
+  static const double lg = 24;
+  static const double xl = 32;
+  static const double xxl = 48;
+
+  static const double phonePaddingHorizontal = 16;
+  static const double phonePaddingVertical = 12;
+
+  static EdgeInsets phonePadding(BuildContext context) => EdgeInsets.symmetric(
+    horizontal: phonePaddingHorizontal,
+    vertical: phonePaddingVertical,
+  );
+}
+
+class ContentWidths {
+  static const double narrow = 400;
+  static const double medium = 520;
+  static const double wide = 680;
+  static const double full = 900;
+
+  static double dialog(BuildContext context) =>
+      Breakpoints.isPhone(context) ? double.infinity : medium;
+
+  static double message(BuildContext context) => Breakpoints.isPhone(context)
+      ? double.infinity
+      : MediaQuery.sizeOf(context).width * 0.7;
+}
+
 class AppTheme {
-  static const double radiusSmall = 6;
-  static const double radiusMedium = 10;
-  static const double radiusLarge = 14;
+  static const double radiusMedium = 8;
 
   static const Color _systemBlue = Color(0xFF0A84FF);
 
@@ -122,6 +171,15 @@ class AppTheme {
       }),
     ),
     dialogTheme: DialogThemeData(backgroundColor: _lightSurface),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+      },
+    ),
   );
 
   static final ThemeData dark = ThemeData(
@@ -230,5 +288,14 @@ class AppTheme {
       }),
     ),
     dialogTheme: DialogThemeData(backgroundColor: _darkSurface),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+      },
+    ),
   );
 }
