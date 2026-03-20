@@ -71,6 +71,7 @@ class ProjectSection extends ConsumerStatefulWidget {
 
 class _ProjectSectionState extends ConsumerState<ProjectSection> {
   final ContextMenuController _contextMenuController = ContextMenuController();
+  DateTime _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   void dispose() {
@@ -161,39 +162,52 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
           GestureDetector(
             onSecondaryTapUp: (details) =>
                 _showProjectContextMenu(details.globalPosition),
-            child: ListTileWidget(
-              leading: Icon(LucideIcons.folder, size: 12),
-              title: Text(widget.projectName),
-              selected: widget.isSelected,
-              style: ListTileStyle2.compact,
-              borderRadius: 16,
-              borderRadiusGeometry: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButtonWidget(
-                    tooltip: 'New chat',
-                    icon: const Icon(LucideIcons.plus, size: 12),
-                    onPressed: () async {
-                      ref
-                          .read(projectsProvider.notifier)
-                          .selectProject(widget.projectId);
-                      final chatId = await ref
-                          .read(chatsProvider.notifier)
-                          .createChat(widget.projectId);
-                      ref.read(chatsProvider.notifier).selectChat(chatId);
-                    },
-                  ),
-                ],
-              ),
-              onTap: () {
-                ref
-                    .read(projectsProvider.notifier)
-                    .selectProject(widget.projectId);
+            child: Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (event) {
+                final now = DateTime.now();
+                final diff = now.difference(_lastTapTime);
+                if (diff < const Duration(milliseconds: 300)) {
+                  _editProject();
+                  _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
+                } else {
+                  _lastTapTime = now;
+                }
               },
+              child: ListTileWidget(
+                leading: Icon(LucideIcons.folder, size: 12),
+                title: Text(widget.projectName),
+                selected: widget.isSelected,
+                style: ListTileStyle2.compact,
+                borderRadius: 16,
+                borderRadiusGeometry: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButtonWidget(
+                      tooltip: 'New chat',
+                      icon: const Icon(LucideIcons.plus, size: 12),
+                      onPressed: () async {
+                        ref
+                            .read(projectsProvider.notifier)
+                            .selectProject(widget.projectId);
+                        final chatId = await ref
+                            .read(chatsProvider.notifier)
+                            .createChat(widget.projectId);
+                        ref.read(chatsProvider.notifier).selectChat(chatId);
+                      },
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  ref
+                      .read(projectsProvider.notifier)
+                      .selectProject(widget.projectId);
+                },
+              ),
             ),
           ),
           if (widget.isSelected) Divider(height: 1, color: theme.dividerColor),
