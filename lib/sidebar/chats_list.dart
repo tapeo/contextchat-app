@@ -5,6 +5,7 @@ import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/projects.provider.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -117,25 +118,44 @@ class _ChatsListState extends ConsumerState<ChatsList> {
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final chat = chats[index];
-        return GestureDetector(
-          onSecondaryTapUp: (details) =>
-              _showChatContextMenu(details.globalPosition, chat.id),
-          child: ListTileWidget(
-            key: ValueKey(chat.id),
-            selected: chat.id == selectedChatId,
-            style: ListTileStyle2.compact,
-            title: Text(
-              _formatChatTitle(chat.title) ?? 'Chat ${index + 1}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+        return Dismissible(
+          key: ValueKey(chat.id),
+          direction: DismissDirection.endToStart,
+          confirmDismiss: (direction) async {
+            _deleteChat(chat.id);
+            return false;
+          },
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.error,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
             ),
-            onTap: () {
-              ref
-                  .read(projectsProvider.notifier)
-                  .selectProject(widget.projectId);
-              ref.read(chatsProvider.notifier).selectChat(chat.id);
-              Scaffold.maybeOf(context)?.closeDrawer();
-            },
+            child: Icon(
+              Icons.delete_outline,
+              color: Theme.of(context).colorScheme.onError,
+            ),
+          ),
+          child: GestureDetector(
+            onSecondaryTapUp: (details) =>
+                _showChatContextMenu(details.globalPosition, chat.id),
+            child: ListTileWidget(
+              selected: chat.id == selectedChatId,
+              style: ListTileStyle2.compact,
+              title: Text(
+                _formatChatTitle(chat.title) ?? 'Chat ${index + 1}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () {
+                ref
+                    .read(projectsProvider.notifier)
+                    .selectProject(widget.projectId);
+                ref.read(chatsProvider.notifier).selectChat(chat.id);
+                Scaffold.maybeOf(context)?.closeDrawer();
+              },
+            ),
           ),
         );
       },
