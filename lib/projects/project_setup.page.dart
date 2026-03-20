@@ -6,7 +6,6 @@ import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
-import 'package:contextchat/components/card.dart';
 import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
@@ -461,111 +460,103 @@ class _ProjectSetupViewState extends ConsumerState<ProjectSetupPage> {
       body: ListView(
         padding: EdgeInsets.all(Spacing.sm),
         children: [
-          CardWidget(
-            padding: EdgeInsets.all(Spacing.sm),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Project Details', style: theme.textTheme.titleMedium),
-                SizedBox(height: Spacing.sm),
-                InputWidget(
-                  controller: _nameController,
-                  labelText: 'Project Name',
-                  labelStyle: theme.textTheme.bodySmall,
-                  errorText: _showValidation && !_isValid
-                      ? 'Project name is required'
-                      : null,
-                ),
-                SizedBox(height: Spacing.sm),
-                ResizableTextArea(
-                  controller: _baseContextController,
-                  labelText: 'Base Context',
-                  hintText: 'Add reusable instructions or context...',
-                  initialHeight: 150,
-                  minHeight: 100,
-                  maxHeight: 500,
-                  textStyle: theme.textTheme.bodySmall,
-                ),
-                SizedBox(height: Spacing.sm),
-                Text(
-                  'Import PDFs, docs, code, and other readable text files directly into Base Context.',
-                  style: theme.textTheme.bodySmall,
-                ),
-                SizedBox(height: Spacing.xs),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ButtonWidget(
-                      onPressed: _isSaving ? null : _importTextFiles,
-                      icon: const Icon(LucideIcons.notebook),
-                      label: 'Import text files',
-                    ),
-                    ImportUrlButton(
-                      onImported: (text, source) {
-                        _handleUrlImported(text, source);
-                      },
-                    ),
-                  ],
-                ),
-                if (ref.watch(urlImportProvider).isLoading)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: LinearProgressIndicator(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Project Details', style: theme.textTheme.titleMedium),
+              SizedBox(height: Spacing.sm),
+              InputWidget(
+                controller: _nameController,
+                labelText: 'Project Name',
+                labelStyle: theme.textTheme.bodySmall,
+                errorText: _showValidation && !_isValid
+                    ? 'Project name is required'
+                    : null,
+              ),
+              SizedBox(height: Spacing.sm),
+              ResizableTextArea(
+                controller: _baseContextController,
+                labelText: 'Base Context',
+                hintText: 'Add reusable instructions or context...',
+                initialHeight: 150,
+                minHeight: 100,
+                maxHeight: 500,
+                textStyle: theme.textTheme.bodySmall,
+              ),
+              SizedBox(height: Spacing.sm),
+              Text(
+                'Import PDFs, docs, code, and other readable text files directly into Base Context.',
+                style: theme.textTheme.bodySmall,
+              ),
+              SizedBox(height: Spacing.xs),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ButtonWidget(
+                    onPressed: _isSaving ? null : _importTextFiles,
+                    icon: const Icon(LucideIcons.notebook),
+                    label: 'Import text files',
                   ),
-              ],
-            ),
+                  ImportUrlButton(
+                    onImported: (text, source) {
+                      _handleUrlImported(text, source);
+                    },
+                  ),
+                ],
+              ),
+              if (ref.watch(urlImportProvider).isLoading)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: LinearProgressIndicator(),
+                ),
+            ],
           ),
-          SizedBox(height: Spacing.sm),
-          CardWidget(
-            padding: EdgeInsets.all(Spacing.sm),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          Divider(height: 32, color: theme.dividerColor),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Reference Images',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                  ButtonWidget(
+                    onPressed: _isSaving ? null : _addFiles,
+                    icon: const Icon(LucideIcons.file),
+                    label: 'Add images',
+                  ),
+                ],
+              ),
+              SizedBox(height: Spacing.xs),
+              Text(
+                'Supported: PNG, JPEG, WebP, GIF',
+                style: theme.textTheme.bodySmall,
+              ),
+              SizedBox(height: Spacing.sm),
+              if (_files.isEmpty)
+                const Text('No images imported yet.')
+              else
+                Column(
                   children: [
-                    Expanded(
-                      child: Text(
-                        'Reference Images',
-                        style: theme.textTheme.titleMedium,
+                    for (final file in _files)
+                      ListTileWidget(
+                        padding: EdgeInsets.zero,
+                        leading: const Icon(LucideIcons.image, size: 32),
+                        title: Text(file.name),
+                        subtitle: Text('${file.sizeBytes} bytes'),
+                        trailing: IconButtonWidget(
+                          tooltip: 'Remove',
+                          icon: const Icon(LucideIcons.delete),
+                          onPressed: _isSaving ? null : () => _removeFile(file),
+                        ),
                       ),
-                    ),
-                    ButtonWidget(
-                      onPressed: _isSaving ? null : _addFiles,
-                      icon: const Icon(LucideIcons.file),
-                      label: 'Add images',
-                    ),
                   ],
                 ),
-                SizedBox(height: Spacing.xs),
-                Text(
-                  'Supported: PNG, JPEG, WebP, GIF',
-                  style: theme.textTheme.bodySmall,
-                ),
-                SizedBox(height: Spacing.sm),
-                if (_files.isEmpty)
-                  const Text('No images imported yet.')
-                else
-                  Column(
-                    children: [
-                      for (final file in _files)
-                        ListTileWidget(
-                          padding: EdgeInsets.zero,
-                          leading: const Icon(LucideIcons.image, size: 32),
-                          title: Text(file.name),
-                          subtitle: Text('${file.sizeBytes} bytes'),
-                          trailing: IconButtonWidget(
-                            tooltip: 'Remove',
-                            icon: const Icon(LucideIcons.delete),
-                            onPressed: _isSaving
-                                ? null
-                                : () => _removeFile(file),
-                          ),
-                        ),
-                    ],
-                  ),
-              ],
-            ),
+            ],
           ),
           SizedBox(height: Spacing.sm),
           if (_isDirty)
