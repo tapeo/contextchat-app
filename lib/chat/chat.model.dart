@@ -6,12 +6,14 @@ class Chat extends Equatable {
   final String? projectId;
   final String? title;
   final List<Message> messages;
+  final DateTime? updatedAt;
 
   const Chat({
     required this.id,
     this.projectId,
     this.title,
     required this.messages,
+    this.updatedAt,
   });
 
   Chat copyWith({
@@ -19,12 +21,14 @@ class Chat extends Equatable {
     String? projectId,
     String? title,
     List<Message>? messages,
+    DateTime? updatedAt,
   }) {
     return Chat(
       id: id ?? this.id,
       projectId: projectId ?? this.projectId,
       title: title ?? this.title,
       messages: messages ?? this.messages,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -48,6 +52,7 @@ class Chat extends Equatable {
             },
           )
           .toList(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
@@ -71,9 +76,12 @@ class Chat extends Equatable {
             ),
           )
           .toList(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'] as String)
+          : null,
     );
   }
 
   @override
-  List<Object?> get props => [id, projectId, title, messages];
+  List<Object?> get props => [id, projectId, title, messages, updatedAt];
 }

@@ -202,6 +202,9 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
                             .read(chatsProvider.notifier)
                             .createChat(widget.projectId);
                         ref.read(chatsProvider.notifier).selectChat(chatId);
+                        if (context.mounted) {
+                          Scaffold.of(context).closeDrawer();
+                        }
                       },
                     ),
                   ],

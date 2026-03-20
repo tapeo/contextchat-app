@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/database/project_database.service.dart';
+import 'package:contextchat/file_storage/file_storage.provider.dart';
 import 'package:contextchat/projects/projects.model.dart';
 import 'package:contextchat/projects/projects.state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+const _currentProjectIdKey = 'current_project_id';
 
 final projectsProvider = NotifierProvider<ProjectsNotifier, ProjectsState>(
   () => ProjectsNotifier(),
@@ -15,6 +18,8 @@ class ProjectsNotifier extends Notifier<ProjectsState> {
   ProjectDatabaseService get databaseService =>
       ref.watch(projectDatabaseProvider);
 
+  FileStorage get _fileStorage => ref.watch(fileStorageProvider);
+
   @override
   ProjectsState build() {
     return ProjectsState(projects: []);
@@ -22,7 +27,20 @@ class ProjectsNotifier extends Notifier<ProjectsState> {
 
   Future<void> initialize() async {
     final projects = await databaseService.getAllProjects();
-    state = ProjectsState(projects: projects);
+    final savedProjectId = _fileStorage.getString(_currentProjectIdKey);
+
+    String? currentProjectId;
+
+    if (savedProjectId != null && projects.any((p) => p.id == savedProjectId)) {
+      currentProjectId = savedProjectId;
+    } else if (projects.isNotEmpty) {
+      currentProjectId = projects.first.id;
+    }
+
+    state = ProjectsState(
+      projects: projects,
+      currentProjectId: currentProjectId,
+    );
   }
 
   Future<void> createProject(String name, String baseContext) async {
@@ -144,6 +162,7 @@ class ProjectsNotifier extends Notifier<ProjectsState> {
 
   Future<void> selectProject(String id) async {
     state = state.copyWith(currentProjectId: id);
+    await _fileStorage.setString(_currentProjectIdKey, id);
   }
 
   Future<void> setProjectDefaultModel(String projectId, String? modelId) async {

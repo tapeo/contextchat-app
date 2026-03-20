@@ -5,11 +5,13 @@ import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/list_view_gradient_overlay.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -62,6 +64,8 @@ class _SelectAiModelViewState extends ConsumerState<SelectAiModelDialog> {
     List<OpenRouterModel> models,
     String? selectedModelId,
   ) async {
+    HapticFeedback.lightImpact();
+
     final pickedModelId = await showAppDialog<String>(
       context: context,
       title: const Text('Select model'),
@@ -242,48 +246,64 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
           Expanded(
             child: filteredModels.isEmpty
                 ? const Center(child: Text('No models match your search.'))
-                : ListView.separated(
-                    itemCount: filteredModels.length,
-                    separatorBuilder: (context, index) =>
-                        const Divider(height: 16),
-                    itemBuilder: (context, index) {
-                      final model = filteredModels[index];
+                : ListViewGradientOverlay(
+                    showTop: true,
+                    child: ListView.separated(
+                      itemCount: filteredModels.length,
+                      separatorBuilder: (context, index) =>
+                          const Divider(height: 16),
+                      itemBuilder: (context, index) {
+                        final model = filteredModels[index];
 
-                      return ListTileWidget(
-                        selected: model.id == widget.selectedModelId,
-                        padding: EdgeInsets.zero,
-                        title: Row(
-                          children: [
-                            Tooltip(
-                              richMessage: WidgetSpan(
-                                child: SizedBox(
-                                  width: 300,
-                                  child: Text(model.description),
+                        return ListTileWidget(
+                          selected: model.id == widget.selectedModelId,
+                          padding: EdgeInsets.zero,
+                          title: Row(
+                            children: [
+                              Tooltip(
+                                richMessage: WidgetSpan(
+                                  child: SizedBox(
+                                    width: 300,
+                                    child: Text(model.description),
+                                  ),
+                                ),
+                                child: Icon(
+                                  LucideIcons.info,
+                                  size: 14,
+                                  color: theme.iconTheme.color?.withAlpha(128),
                                 ),
                               ),
-                              child: Icon(
-                                LucideIcons.info,
-                                size: 14,
-                                color: theme.iconTheme.color?.withAlpha(128),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    model.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  SelectionArea(
-                                    child: Text(
-                                      model.id,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      model.name,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    SelectionArea(
+                                      child: Text(
+                                        model.id,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: theme
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.color
+                                                  ?.withAlpha(128),
+                                              fontFamily: 'monospace',
+                                            ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'In: ${widget.formatPrice(model.pricing.prompt)} • Out: ${widget.formatPrice(model.pricing.completion)} • ${widget.formatContextLength(model.contextLength)}',
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             color: theme
@@ -291,26 +311,17 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                                                 .bodySmall
                                                 ?.color
                                                 ?.withAlpha(128),
-                                            fontFamily: 'monospace',
                                           ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'In: ${widget.formatPrice(model.pricing.prompt)}  Out: ${widget.formatPrice(model.pricing.completion)}  •  ${widget.formatContextLength(model.contextLength)}',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.textTheme.bodySmall?.color
-                                          ?.withAlpha(128),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        onTap: () => Navigator.of(context).pop(model.id),
-                      );
-                    },
+                            ],
+                          ),
+                          onTap: () => Navigator.of(context).pop(model.id),
+                        );
+                      },
+                    ),
                   ),
           ),
         ],

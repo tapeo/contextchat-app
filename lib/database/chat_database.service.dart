@@ -42,6 +42,12 @@ class ChatDatabaseService {
       }
     }
 
+    chats.sort((a, b) {
+      final aTime = a.updatedAt ?? DateTime(1970);
+      final bTime = b.updatedAt ?? DateTime(1970);
+      return bTime.compareTo(aTime);
+    });
+
     return chats;
   }
 
@@ -137,6 +143,9 @@ class ChatDatabaseService {
       projectId: frontmatter['projectId'] as String?,
       title: frontmatter['title'] as String?,
       messages: messages,
+      updatedAt: frontmatter['updatedAt'] != null
+          ? DateTime.tryParse(frontmatter['updatedAt'] as String)
+          : null,
     );
   }
 

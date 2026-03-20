@@ -36,6 +36,12 @@ class ProjectDatabaseService {
       }
     }
 
+    projects.sort((a, b) {
+      final aTime = a.updatedAt ?? DateTime(1970);
+      final bTime = b.updatedAt ?? DateTime(1970);
+      return bTime.compareTo(aTime);
+    });
+
     return projects;
   }
 
@@ -48,8 +54,12 @@ class ProjectDatabaseService {
     await directory.create(recursive: true);
     await contextDirectory.create(recursive: true);
 
-    await _filesystem.writeJsonAtomic(metadataFile, project.toMetadataMap());
-    await _filesystem.writeStringAtomic(memoryFile, project.baseContext);
+    final updatedProject = project.copyWith(updatedAt: DateTime.now());
+    await _filesystem.writeJsonAtomic(
+      metadataFile,
+      updatedProject.toMetadataMap(),
+    );
+    await _filesystem.writeStringAtomic(memoryFile, updatedProject.baseContext);
   }
 
   Future<void> deleteProject(String id) async {
@@ -149,12 +159,22 @@ class ProjectDatabaseService {
       }
     }
 
+    DateTime? updatedAt;
+    if (metadata['updatedAt'] != null) {
+      updatedAt = DateTime.tryParse(metadata['updatedAt'] as String);
+    }
+    if (updatedAt == null) {
+      final stat = await metadataFile.stat();
+      updatedAt = stat.modified;
+    }
+
     return Project(
       id: metadata['id'] as String,
       name: metadata['name'] as String,
       baseContext: baseContext,
       files: files,
       defaultModelId: metadata['defaultModelId'] as String?,
+      updatedAt: updatedAt,
     );
   }
 

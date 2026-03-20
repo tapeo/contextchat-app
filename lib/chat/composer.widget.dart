@@ -44,6 +44,7 @@ class ComposerWidget extends StatelessWidget {
           _SendMessageIntent: CallbackAction<_SendMessageIntent>(
             onInvoke: (_) {
               if (canSend) {
+                HapticFeedback.lightImpact();
                 onSubmit();
               }
               return null;
@@ -71,7 +72,12 @@ class ComposerWidget extends StatelessWidget {
                   ),
                   if (isPhone)
                     IconButtonWidget(
-                      onPressed: canSend ? onSubmit : null,
+                      onPressed: canSend
+                          ? () {
+                              HapticFeedback.lightImpact();
+                              onSubmit();
+                            }
+                          : null,
                       icon: const Icon(LucideIcons.send),
                     ),
                 ],
@@ -102,7 +108,12 @@ class ComposerWidget extends StatelessWidget {
                     ),
                   if (!isPhone)
                     IconButtonWidget(
-                      onPressed: canSend ? onSubmit : null,
+                      onPressed: canSend
+                          ? () {
+                              HapticFeedback.lightImpact();
+                              onSubmit();
+                            }
+                          : null,
                       icon: const Icon(LucideIcons.send),
                     ),
                 ],

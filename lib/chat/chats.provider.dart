@@ -2,7 +2,10 @@ import 'package:contextchat/chat/chat.model.dart';
 import 'package:contextchat/chat/chats.state.dart';
 import 'package:contextchat/database/chat_database.service.dart';
 import 'package:contextchat/database/database.service.dart';
+import 'package:contextchat/file_storage/file_storage.provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+const _selectedChatIdKey = 'selected_chat_id';
 
 final chatsProvider = NotifierProvider<ChatsNotifier, ChatsState>(
   () => ChatsNotifier(),
@@ -11,6 +14,8 @@ final chatsProvider = NotifierProvider<ChatsNotifier, ChatsState>(
 class ChatsNotifier extends Notifier<ChatsState> {
   ChatDatabaseService get databaseService => ref.watch(chatDatabaseProvider);
 
+  FileStorage get _fileStorage => ref.watch(fileStorageProvider);
+
   @override
   ChatsState build() {
     return ChatsState(chats: []);
@@ -18,7 +23,21 @@ class ChatsNotifier extends Notifier<ChatsState> {
 
   Future<void> initialize() async {
     final chats = await databaseService.getAllChats();
-    state = ChatsState(chats: chats);
+    final savedChatId = _fileStorage.getString(_selectedChatIdKey);
+
+    String? selectedChatId;
+
+    if (savedChatId != null && chats.any((c) => c.id == savedChatId)) {
+      selectedChatId = savedChatId;
+    } else if (chats.isNotEmpty) {
+      selectedChatId = chats.first.id;
+    }
+
+    state = ChatsState(
+      chats: chats,
+      selectedChatId: selectedChatId,
+      loading: false,
+    );
   }
 
   Future<String> createChat(String? projectId) async {
@@ -57,6 +76,7 @@ class ChatsNotifier extends Notifier<ChatsState> {
 
   void selectChat(String id) {
     state = state.copyWith(selectedChatId: id);
+    _fileStorage.setString(_selectedChatIdKey, id);
   }
 
   void updateChat(Chat updatedChat) {

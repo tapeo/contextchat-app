@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chat.page.dart';
 import 'package:contextchat/chat/chats.provider.dart';
+import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
-import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/sidebar/sidebar.view.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +78,7 @@ class _PhoneShell extends ConsumerWidget {
         backgroundColor: theme.scaffoldBackgroundColor,
         child: SafeArea(child: SidebarView()),
       ),
-      body: const ChatPage(),
+      body: SafeArea(child: const ChatPage()),
     );
   }
 }

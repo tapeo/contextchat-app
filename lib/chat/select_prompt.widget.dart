@@ -8,6 +8,7 @@ import 'package:contextchat/prompts/prompt.model.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -22,6 +23,7 @@ class SelectPromptWidget extends ConsumerStatefulWidget {
 
 class _SelectPromptViewState extends ConsumerState<SelectPromptWidget> {
   Future<void> _openPromptPicker(BuildContext context) async {
+    HapticFeedback.lightImpact();
     final promptsState = ref.read(promptsProvider);
     final pickedPromptId = await showAppDialog<String>(
       context: context,

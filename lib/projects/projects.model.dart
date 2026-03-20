@@ -6,6 +6,7 @@ class Project extends Equatable {
   final String baseContext;
   final List<ProjectFile> files;
   final String? defaultModelId;
+  final DateTime? updatedAt;
 
   const Project({
     required this.id,
@@ -13,6 +14,7 @@ class Project extends Equatable {
     required this.baseContext,
     this.files = const [],
     this.defaultModelId,
+    this.updatedAt,
   });
 
   Project copyWith({
@@ -21,6 +23,7 @@ class Project extends Equatable {
     String? baseContext,
     List<ProjectFile>? files,
     String? defaultModelId,
+    DateTime? updatedAt,
   }) {
     return Project(
       id: id ?? this.id,
@@ -28,6 +31,7 @@ class Project extends Equatable {
       baseContext: baseContext ?? this.baseContext,
       files: files ?? this.files,
       defaultModelId: defaultModelId ?? this.defaultModelId,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -38,6 +42,7 @@ class Project extends Equatable {
       'baseContext': baseContext,
       'files': files.map((file) => file.toJson()).toList(),
       'defaultModelId': defaultModelId,
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
@@ -47,6 +52,7 @@ class Project extends Equatable {
       'name': name,
       'files': files.map((file) => file.toJson()).toList(),
       'defaultModelId': defaultModelId,
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
@@ -66,11 +72,21 @@ class Project extends Equatable {
       baseContext: (json['baseContext'] as String?) ?? '',
       files: files,
       defaultModelId: json['defaultModelId'] as String?,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'] as String)
+          : null,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, baseContext, files, defaultModelId];
+  List<Object?> get props => [
+    id,
+    name,
+    baseContext,
+    files,
+    defaultModelId,
+    updatedAt,
+  ];
 }
 
 class ProjectFile extends Equatable {

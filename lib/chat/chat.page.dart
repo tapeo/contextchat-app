@@ -8,6 +8,7 @@ import 'package:contextchat/chat/message.widget.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/list_view_gradient_overlay.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
@@ -197,141 +198,68 @@ class _ChatUiState extends ConsumerState<ChatPage> {
               }
               return false;
             },
-            child: Stack(
-              children: [
-                ListView.separated(
-                  controller: _scrollController,
-                  padding: EdgeInsets.only(top: 16, bottom: 16),
-                  itemCount:
-                      chatState.chat.messages.length +
-                      (chatState.accumulatedResponse != null ? 1 : 0),
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    if (index < chatState.chat.messages.length) {
-                      final msg = chatState.chat.messages[index];
-                      return MessageWidget(
-                        message: msg,
-                        onApproveToolCalls: (assistantMessage) async {
-                          if (chatId == null) {
+            child: ListViewGradientOverlay(
+              child: ListView.separated(
+                controller: _scrollController,
+                padding: EdgeInsets.only(top: 16, bottom: 16),
+                itemCount:
+                    chatState.chat.messages
+                        .where(
+                          (msg) =>
+                              !(msg.role == MessageRole.assistant &&
+                                  msg.toolCallsJson != null &&
+                                  !msg.toolCallsProcessed),
+                        )
+                        .length +
+                    (chatState.accumulatedResponse != null ? 1 : 0),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final visibleMessages = chatState.chat.messages
+                      .where(
+                        (msg) =>
+                            !(msg.role == MessageRole.assistant &&
+                                msg.toolCallsJson != null &&
+                                !msg.toolCallsProcessed),
+                      )
+                      .toList();
+
+                  if (index < visibleMessages.length) {
+                    final msg = visibleMessages[index];
+                    return MessageWidget(
+                      message: msg,
+                      onApproveToolCalls: (assistantMessage) async {
+                        if (chatId == null) {
+                          return;
+                        }
+
+                        try {
+                          await ref
+                              .read(chatProvider(chatId!).notifier)
+                              .approveToolCallsAndContinue(assistantMessage.id);
+                        } catch (error) {
+                          if (!context.mounted) {
                             return;
                           }
-
-                          try {
-                            await ref
-                                .read(chatProvider(chatId!).notifier)
-                                .approveToolCallsAndContinue(
-                                  assistantMessage.id,
-                                );
-                          } catch (error) {
-                            if (!context.mounted) {
-                              return;
-                            }
-                            showAppSnackBar(
-                              context,
-                              'Failed to approve tool call: $error',
-                            );
-                          }
-                        },
-                        onDenyToolCalls: (assistantMessage) async {
-                          if (chatId == null) {
-                            return;
-                          }
-
-                          try {
-                            await ref
-                                .read(chatProvider(chatId!).notifier)
-                                .denyToolCallsAndContinue(assistantMessage.id);
-                          } catch (error) {
-                            if (!context.mounted) {
-                              return;
-                            }
-                            showAppSnackBar(
-                              context,
-                              'Failed to deny tool call: $error',
-                            );
-                          }
-                        },
-                      );
-                    } else {
-                      return MessageWidget(
-                        message: Message(
-                          id: 'streaming-preview',
-                          timestamp: DateTime.now().toIso8601String(),
-                          content: chatState.accumulatedResponse!,
-                          role: MessageRole.assistant,
-                        ),
-                      );
-                    }
-                  },
-                ),
-                // Top gradient fade
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 16,
-                  child: IgnorePointer(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Theme.of(context).scaffoldBackgroundColor,
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.85),
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.5),
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.1),
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0),
-                          ],
-                          stops: const [0.0, 0.3, 0.6, 0.85, 1.0],
-                        ),
+                          showAppSnackBar(
+                            context,
+                            'Failed to approve tool call: $error',
+                          );
+                        }
+                      },
+                    );
+                  } else {
+                    return MessageWidget(
+                      message: Message(
+                        id: 'streaming-preview',
+                        timestamp: DateTime.now().toIso8601String(),
+                        content: chatState.accumulatedResponse!,
+                        role: MessageRole.assistant,
                       ),
-                    ),
-                  ),
-                ),
-                // Bottom gradient fade
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 16,
-                  child: IgnorePointer(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Theme.of(context).scaffoldBackgroundColor,
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.9),
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.6),
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.25),
-                            Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0),
-                          ],
-                          stops: const [0.0, 0.25, 0.55, 0.8, 1.0],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                    );
+                  }
+                },
+              ),
             ),
           ),
         ),
