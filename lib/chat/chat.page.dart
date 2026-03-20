@@ -6,7 +6,6 @@ import 'package:contextchat/chat/composer.widget.dart';
 import 'package:contextchat/chat/message.model.dart';
 import 'package:contextchat/chat/message.widget.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/list_view_gradient_overlay.dart';
 import 'package:contextchat/components/text_button.dart';
@@ -141,6 +140,20 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     );
   }
 
+  void _showOpenRouterErrorDialog(Object error) {
+    showAppDialog(
+      context: context,
+      title: const Text('OpenRouter Error'),
+      content: Text(error.toString()),
+      actions: [
+        TextButtonWidget(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (chatId == null) {
@@ -241,10 +254,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                           if (!context.mounted) {
                             return;
                           }
-                          showAppSnackBar(
-                            context,
-                            'Failed to approve tool call: $error',
-                          );
+                          _showOpenRouterErrorDialog(error);
                         }
                       },
                     );
@@ -299,7 +309,9 @@ class _ChatUiState extends ConsumerState<ChatPage> {
       _textController.selection = TextSelection.fromPosition(
         TextPosition(offset: _textController.text.length),
       );
-      rethrow;
+      if (mounted) {
+        _showOpenRouterErrorDialog(e);
+      }
     }
   }
 }
