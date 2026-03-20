@@ -4,6 +4,8 @@ import 'package:contextchat/database/project_database.service.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:contextchat/projects/project_file_types.dart';
 import 'package:contextchat/projects/projects.model.dart';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 
 class OpenRouterToolSpec {
   final OpenRouterToolDefinition definition;
@@ -194,6 +196,144 @@ OpenRouterToolRegistry buildGlobalToolRegistry({
               'content': contents,
             }),
           );
+        },
+      ),
+      OpenRouterRegisteredTool(
+        spec: OpenRouterToolSpec(
+          definition: OpenRouterToolDefinition(
+            function: OpenRouterToolFunction(
+              name: 'search_web',
+              description:
+                  'Searches the web using DuckDuckGo and returns a list of search results with titles, URLs, and snippets.',
+              parameters: const {
+                'type': 'object',
+                'properties': {
+                  'query': {
+                    'type': 'string',
+                    'description': 'The search query string.',
+                  },
+                },
+                'required': ['query'],
+              },
+            ),
+          ),
+          sensitive: false,
+        ),
+        execute: (args) async {
+          final query = (args['query'] as String?)?.trim();
+
+          if (query == null || query.isEmpty) {
+            return const OpenRouterToolExecutionResult(
+              content: '{"error":"Missing required argument: query"}',
+              isError: true,
+            );
+          }
+
+          try {
+            final searchUrl = Uri.parse(
+              'https://html.duckduckgo.com/html/?q=${Uri.encodeComponent(query)}',
+            );
+
+            final response = await http.get(searchUrl);
+
+            if (response.statusCode != 200) {
+              return OpenRouterToolExecutionResult(
+                content: jsonEncode({
+                  'error':
+                      'Search failed with status code: ${response.statusCode}',
+                }),
+                isError: true,
+              );
+            }
+
+            final document = parse(response.body);
+            final results = <Map<String, String>>[];
+
+            for (final result in document.querySelectorAll('.result')) {
+              final titleElement = result.querySelector('.result__title a');
+              final snippetElement = result.querySelector('.result__snippet');
+              if (titleElement != null) {
+                results.add({
+                  'title': titleElement.text.trim(),
+                  'url': titleElement.attributes['href'] ?? '',
+                  'snippet': snippetElement?.text.trim() ?? '',
+                });
+              }
+            }
+
+            return OpenRouterToolExecutionResult(
+              content: jsonEncode({'results': results}),
+            );
+          } catch (error) {
+            return OpenRouterToolExecutionResult(
+              content: jsonEncode({'error': 'Search failed: $error'}),
+              isError: true,
+            );
+          }
+        },
+      ),
+      OpenRouterRegisteredTool(
+        spec: OpenRouterToolSpec(
+          definition: OpenRouterToolDefinition(
+            function: OpenRouterToolFunction(
+              name: 'open_url',
+              description:
+                  'Opens a URL and returns the complete HTML content once fully loaded.',
+              parameters: const {
+                'type': 'object',
+                'properties': {
+                  'url': {'type': 'string', 'description': 'The URL to fetch.'},
+                },
+                'required': ['url'],
+              },
+            ),
+          ),
+          sensitive: false,
+        ),
+        execute: (args) async {
+          final urlString = (args['url'] as String?)?.trim();
+
+          if (urlString == null || urlString.isEmpty) {
+            return const OpenRouterToolExecutionResult(
+              content: '{"error":"Missing required argument: url"}',
+              isError: true,
+            );
+          }
+
+          try {
+            final uri = Uri.parse(urlString);
+
+            if (!uri.hasScheme || !uri.hasAuthority) {
+              return const OpenRouterToolExecutionResult(
+                content: '{"error":"Invalid URL format"}',
+                isError: true,
+              );
+            }
+
+            final response = await http.get(uri);
+
+            if (response.statusCode != 200) {
+              return OpenRouterToolExecutionResult(
+                content: jsonEncode({
+                  'error': 'Failed to fetch URL: ${response.statusCode}',
+                }),
+                isError: true,
+              );
+            }
+
+            return OpenRouterToolExecutionResult(
+              content: jsonEncode({
+                'url': urlString,
+                'html': response.body,
+                'statusCode': response.statusCode,
+              }),
+            );
+          } catch (error) {
+            return OpenRouterToolExecutionResult(
+              content: jsonEncode({'error': 'Failed to fetch URL: $error'}),
+              isError: true,
+            );
+          }
         },
       ),
     ],
