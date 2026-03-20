@@ -19,7 +19,18 @@ class SidebarView extends ConsumerWidget {
     return Container(
       color: theme.colorScheme.surfaceContainerLowest,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'ContextChat',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           const Expanded(child: ProjectsList()),
           Divider(height: 1, color: theme.dividerColor),
           const _SidebarFooter(),
