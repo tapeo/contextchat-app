@@ -288,7 +288,7 @@ class _ChatUiState extends ConsumerState<ChatUi> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+          padding: const EdgeInsets.all(8),
           child: Composer(
             controller: _textController,
             onChanged: (value) =>
