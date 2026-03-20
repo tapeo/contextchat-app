@@ -1,11 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chat.model.dart';
 import 'package:contextchat/chat/chats.provider.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/card.widget.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
-import 'package:contextchat/components/list_tile.widget.dart';
-import 'package:contextchat/projects/project_setup.view.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/projects/project_setup.page.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +93,7 @@ class _MobileSelectorContent extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text('Projects & Chats', style: theme.textTheme.titleMedium),
+                Text('Projects', style: theme.textTheme.titleMedium),
                 const Spacer(),
                 IconButtonWidget(
                   tooltip: 'New project',
@@ -102,7 +102,7 @@ class _MobileSelectorContent extends ConsumerWidget {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ProjectSetupView(),
+                        builder: (context) => const ProjectSetupPage(),
                       ),
                     );
                   },
@@ -131,7 +131,7 @@ class _MobileSelectorContent extends ConsumerWidget {
                             Navigator.of(context).pop();
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const ProjectSetupView(),
+                                builder: (context) => const ProjectSetupPage(),
                               ),
                             );
                           },

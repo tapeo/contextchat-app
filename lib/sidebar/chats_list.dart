@@ -1,7 +1,7 @@
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/list_tile.widget.dart';
-import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
 import 'package:contextchat/projects/projects.provider.dart';

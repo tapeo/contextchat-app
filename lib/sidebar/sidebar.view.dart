@@ -1,10 +1,10 @@
-import 'package:contextchat/components/icon_button.widget.dart';
+import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/no_transition_route.dart';
-import 'package:contextchat/projects/project_setup.view.dart';
+import 'package:contextchat/projects/project_setup.page.dart';
 import 'package:contextchat/projects/projects.provider.dart';
-import 'package:contextchat/prompts/prompts_library.view.dart';
-import 'package:contextchat/settings/settings.view.dart';
-import 'package:contextchat/sidebar/projects_list.widget.dart';
+import 'package:contextchat/prompts/prompts_library.page.dart';
+import 'package:contextchat/settings/settings.page.dart';
+import 'package:contextchat/sidebar/projects_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -20,9 +20,7 @@ class SidebarView extends ConsumerWidget {
       color: theme.colorScheme.surfaceContainerLowest,
       child: Column(
         children: [
-          const Expanded(
-            child: ProjectsList(),
-          ),
+          const Expanded(child: ProjectsList()),
           Divider(height: 1, color: theme.dividerColor),
           const _SidebarFooter(),
         ],
@@ -51,7 +49,7 @@ class _SidebarFooter extends ConsumerWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   NoTransitionRoute(
-                    builder: (context) => const ProjectSetupView(),
+                    builder: (context) => const ProjectSetupPage(),
                   ),
                 );
               },
@@ -62,7 +60,7 @@ class _SidebarFooter extends ConsumerWidget {
             onPressed: () {
               Navigator.of(context).push(
                 NoTransitionRoute(
-                  builder: (context) => const PromptsLibraryView(),
+                  builder: (context) => const PromptsLibraryPage(),
                 ),
               );
             },
@@ -72,7 +70,7 @@ class _SidebarFooter extends ConsumerWidget {
             icon: const Icon(LucideIcons.settings),
             onPressed: () {
               Navigator.of(context).push(
-                NoTransitionRoute(builder: (context) => const SettingsView()),
+                NoTransitionRoute(builder: (context) => const SettingsPage()),
               );
             },
           ),

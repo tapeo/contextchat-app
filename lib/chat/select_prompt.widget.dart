@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/input.widget.dart';
-import 'package:contextchat/components/list_tile.widget.dart';
-import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/input.dart';
+import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/prompts/prompt.model.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
 import 'package:contextchat/theme.dart';
@@ -11,16 +11,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class SelectPromptView extends ConsumerStatefulWidget {
-  const SelectPromptView({super.key, required this.onPicked});
+class SelectPromptWidget extends ConsumerStatefulWidget {
+  const SelectPromptWidget({super.key, required this.onPicked});
 
   final ValueChanged<String> onPicked;
 
   @override
-  ConsumerState<SelectPromptView> createState() => _SelectPromptViewState();
+  ConsumerState<SelectPromptWidget> createState() => _SelectPromptViewState();
 }
 
-class _SelectPromptViewState extends ConsumerState<SelectPromptView> {
+class _SelectPromptViewState extends ConsumerState<SelectPromptWidget> {
   Future<void> _openPromptPicker(BuildContext context) async {
     final promptsState = ref.read(promptsProvider);
     final pickedPromptId = await showAppDialog<String>(

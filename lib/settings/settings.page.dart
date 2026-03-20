@@ -1,6 +1,6 @@
 import 'package:contextchat/components/app_snackbar.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
-import 'package:contextchat/components/input.widget.dart';
+import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/input.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_storage/file_storage.provider.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
@@ -11,14 +11,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsView extends ConsumerStatefulWidget {
-  const SettingsView({super.key});
+class SettingsPage extends ConsumerStatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  ConsumerState<SettingsView> createState() => _SettingsViewState();
+  ConsumerState<SettingsPage> createState() => _SettingsViewState();
 }
 
-class _SettingsViewState extends ConsumerState<SettingsView> {
+class _SettingsViewState extends ConsumerState<SettingsPage> {
   late final TextEditingController _baseUrlController;
   late final TextEditingController _apiKeyController;
   late final TextEditingController _storagePathController;

@@ -1,14 +1,14 @@
-import 'package:contextchat/chat/select_ai_model.view.dart';
-import 'package:contextchat/chat/select_prompt.view.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
-import 'package:contextchat/components/input.widget.dart';
+import 'package:contextchat/chat/select_ai_model.dialog.dart';
+import 'package:contextchat/chat/select_prompt.widget.dart';
+import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/input.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class Composer extends StatelessWidget {
-  const Composer({
+class ComposerWidget extends StatelessWidget {
+  const ComposerWidget({
     super.key,
     required this.controller,
     required this.onChanged,
@@ -89,7 +89,7 @@ class Composer extends StatelessWidget {
                       ),
                     ),
                   Expanded(
-                    child: SelectPromptView(
+                    child: SelectPromptWidget(
                       onPicked: (promptText) => onInsertPrompt(promptText),
                     ),
                   ),

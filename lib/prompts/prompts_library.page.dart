@@ -1,16 +1,16 @@
 import 'package:collection/collection.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/card.widget.dart';
-import 'package:contextchat/components/expanded_widget.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
-import 'package:contextchat/components/input.widget.dart';
-import 'package:contextchat/components/list_tile.widget.dart';
-import 'package:contextchat/components/resizable_text_area.widget.dart';
-import 'package:contextchat/components/row_column.widget.dart';
-import 'package:contextchat/components/text_button.widget.dart';
-import 'package:contextchat/prompts/prompt_edit_page.view.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/expanded.dart';
+import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/input.dart';
+import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/resizable_text_area.dart';
+import 'package:contextchat/components/row_column.dart';
+import 'package:contextchat/components/text_button.dart';
+import 'package:contextchat/prompts/prompt_edit_page.page.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
@@ -18,16 +18,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class PromptsLibraryView extends ConsumerStatefulWidget {
-  const PromptsLibraryView({super.key, this.pickMode = false});
+class PromptsLibraryPage extends ConsumerStatefulWidget {
+  const PromptsLibraryPage({super.key, this.pickMode = false});
 
   final bool pickMode;
 
   @override
-  ConsumerState<PromptsLibraryView> createState() => _PromptsLibraryViewState();
+  ConsumerState<PromptsLibraryPage> createState() => _PromptsLibraryViewState();
 }
 
-class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryView> {
+class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryPage> {
   late final TextEditingController _searchController;
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;

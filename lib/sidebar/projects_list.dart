@@ -1,16 +1,16 @@
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/card.widget.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
-import 'package:contextchat/components/list_tile.widget.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/list_tile.dart';
 import 'package:contextchat/components/no_transition_route.dart';
-import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
-import 'package:contextchat/projects/project_setup.view.dart';
+import 'package:contextchat/projects/project_setup.page.dart';
 import 'package:contextchat/projects/projects.provider.dart';
-import 'package:contextchat/sidebar/chats_list.widget.dart';
+import 'package:contextchat/sidebar/chats_list.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +28,7 @@ class ProjectsList extends ConsumerWidget {
         child: ButtonWidget(
           onPressed: () {
             Navigator.of(context).push(
-              NoTransitionRoute(builder: (context) => const ProjectSetupView()),
+              NoTransitionRoute(builder: (context) => const ProjectSetupPage()),
             );
           },
           icon: const Icon(Icons.create_new_folder_outlined),
@@ -84,7 +84,7 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
   void _editProject() {
     Navigator.of(context).push(
       NoTransitionRoute(
-        builder: (context) => ProjectSetupView(projectId: widget.projectId),
+        builder: (context) => ProjectSetupPage(projectId: widget.projectId),
       ),
     );
   }

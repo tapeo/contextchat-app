@@ -5,16 +5,16 @@ import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/card.widget.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
-import 'package:contextchat/components/input.widget.dart';
-import 'package:contextchat/components/list_tile.widget.dart';
-import 'package:contextchat/components/resizable_text_area.widget.dart';
-import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/card.dart';
+import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/input.dart';
+import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/resizable_text_area.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/database/project_database.service.dart';
-import 'package:contextchat/projects/import_url_button.widget.dart';
+import 'package:contextchat/projects/import_url_button.dart';
 import 'package:contextchat/projects/project_file_types.dart';
 import 'package:contextchat/projects/project_text_import.service.dart';
 import 'package:contextchat/projects/projects.model.dart';
@@ -27,16 +27,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class ProjectSetupView extends ConsumerStatefulWidget {
-  const ProjectSetupView({super.key, this.projectId});
+class ProjectSetupPage extends ConsumerStatefulWidget {
+  const ProjectSetupPage({super.key, this.projectId});
 
   final String? projectId;
 
   @override
-  ConsumerState<ProjectSetupView> createState() => _ProjectSetupViewState();
+  ConsumerState<ProjectSetupPage> createState() => _ProjectSetupViewState();
 }
 
-class _ProjectSetupViewState extends ConsumerState<ProjectSetupView> {
+class _ProjectSetupViewState extends ConsumerState<ProjectSetupPage> {
   late final TextEditingController _nameController;
   late final TextEditingController _baseContextController;
   late final String _projectId;

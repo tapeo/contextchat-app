@@ -4,24 +4,24 @@ import 'package:contextchat/chat/chat_draft.provider.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/chat/composer.widget.dart';
 import 'package:contextchat/chat/message.model.dart';
-import 'package:contextchat/chat/message_widget.dart';
+import 'package:contextchat/chat/message.widget.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
-import 'package:contextchat/settings/settings.view.dart';
+import 'package:contextchat/settings/settings.page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatUi extends ConsumerStatefulWidget {
-  const ChatUi({super.key});
+class ChatPage extends ConsumerStatefulWidget {
+  const ChatPage({super.key});
 
   @override
-  ConsumerState<ChatUi> createState() => _ChatUiState();
+  ConsumerState<ChatPage> createState() => _ChatUiState();
 }
 
-class _ChatUiState extends ConsumerState<ChatUi> {
+class _ChatUiState extends ConsumerState<ChatPage> {
   static const double _bottomTolerancePx = 48.0;
 
   final TextEditingController _textController = TextEditingController();
@@ -130,7 +130,7 @@ class _ChatUiState extends ConsumerState<ChatUi> {
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SettingsView()),
+              MaterialPageRoute(builder: (context) => const SettingsPage()),
             );
           },
           child: const Text('Go to Settings'),
@@ -293,7 +293,7 @@ class _ChatUiState extends ConsumerState<ChatUi> {
         ),
         Padding(
           padding: const EdgeInsets.all(8),
-          child: Composer(
+          child: ComposerWidget(
             controller: _textController,
             onChanged: (value) =>
                 ref.read(chatDraftProvider(chatId!).notifier).setDraft(value),

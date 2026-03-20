@@ -1,8 +1,8 @@
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
-import 'package:contextchat/components/button.widget.dart';
-import 'package:contextchat/components/input.widget.dart';
-import 'package:contextchat/components/text_button.widget.dart';
+import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/input.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/projects/url_import.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

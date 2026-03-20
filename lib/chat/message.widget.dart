@@ -1,5 +1,5 @@
 import 'package:contextchat/chat/message.model.dart';
-import 'package:contextchat/components/icon_button.widget.dart';
+import 'package:contextchat/components/icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
