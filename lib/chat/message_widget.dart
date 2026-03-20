@@ -23,7 +23,6 @@ class MessageWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isUser = role == MessageRole.user;
-    final isSystem = role == MessageRole.system;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -34,27 +33,16 @@ class MessageWidget extends StatelessWidget {
             : CrossAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.fromLTRB(0, 8, 12, 0),
+            margin: const EdgeInsets.symmetric(horizontal: 12),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: isUser
-                  ? colorScheme.primary
-                  : isSystem
-                  ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                  : colorScheme.surface,
+              color: isUser ? colorScheme.primary : null,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(16),
                 topRight: const Radius.circular(16),
                 bottomLeft: Radius.circular(isUser ? 16 : 4),
                 bottomRight: Radius.circular(isUser ? 4 : 16),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -156,7 +144,7 @@ class MessageWidget extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 2, 12, 0),
+            padding: const EdgeInsets.fromLTRB(16, 2, 12, 0),
             child: IconButtonWidget(
               onPressed:
                   onCopy ??

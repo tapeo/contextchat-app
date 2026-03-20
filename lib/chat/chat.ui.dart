@@ -194,12 +194,14 @@ class _ChatUiState extends ConsumerState<ChatUi> {
             },
             child: Stack(
               children: [
-                ListView.builder(
+                ListView.separated(
                   controller: _scrollController,
                   padding: EdgeInsets.only(top: 16, bottom: 16),
                   itemCount:
                       chatState.chat.messages.length +
                       (chatState.accumulatedResponse != null ? 1 : 0),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     if (index < chatState.chat.messages.length) {
                       final msg = chatState.chat.messages[index];
