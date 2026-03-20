@@ -1,11 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chat.page.dart';
 import 'package:contextchat/chat/chats.provider.dart';
-import 'package:contextchat/components/icon_button.dart';
-import 'package:contextchat/components/mobile_selector_sheet.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/prompts/prompts.provider.dart';
-import 'package:contextchat/prompts/prompts_library.page.dart';
-import 'package:contextchat/settings/settings.page.dart';
 import 'package:contextchat/sidebar/sidebar.view.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
@@ -52,53 +49,35 @@ class _AppState extends ConsumerState<App> {
 }
 
 class _PhoneShell extends ConsumerWidget {
+  const _PhoneShell();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final projectsState = ref.watch(projectsProvider);
+    final currentProjectId = projectsState.currentProjectId;
+    final currentProject = currentProjectId == null
+        ? null
+        : projectsState.projects.firstWhereOrNull(
+            (p) => p.id == currentProjectId,
+          );
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                border: Border(bottom: BorderSide(color: theme.dividerColor)),
-              ),
-              child: Row(
-                spacing: 8,
-                children: [
-                  Expanded(child: const MobileSelectorSheet()),
-                  IconButtonWidget(
-                    tooltip: 'Prompts',
-                    icon: const Icon(LucideIcons.bookText, size: 20),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const PromptsLibraryPage(),
-                        ),
-                      );
-                    },
-                  ),
-                  IconButtonWidget(
-                    tooltip: 'Settings',
-                    icon: const Icon(LucideIcons.settings, size: 20),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const SettingsPage(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const Expanded(child: ChatPage()),
-          ],
+      appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(LucideIcons.panelLeft),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
         ),
+        title: Text(currentProject?.name ?? 'Select project'),
+        centerTitle: false,
       ),
+      drawer: Drawer(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        child: SafeArea(child: SidebarView()),
+      ),
+      body: const ChatPage(),
     );
   }
 }

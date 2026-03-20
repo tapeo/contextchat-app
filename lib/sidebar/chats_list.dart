@@ -134,6 +134,7 @@ class _ChatsListState extends ConsumerState<ChatsList> {
                   .read(projectsProvider.notifier)
                   .selectProject(widget.projectId);
               ref.read(chatsProvider.notifier).selectChat(chat.id);
+              Scaffold.maybeOf(context)?.closeDrawer();
             },
           ),
         );
