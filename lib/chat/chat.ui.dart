@@ -187,6 +187,9 @@ class _ChatUiState extends ConsumerState<ChatUi> {
               if (notification is ScrollUpdateNotification ||
                   notification is UserScrollNotification ||
                   notification is ScrollEndNotification) {
+                if (userInitiated) {
+                  FocusScope.of(context).unfocus();
+                }
                 _setAutoScrollEnabledFromScrollPosition(
                   userInitiated: userInitiated,
                 );

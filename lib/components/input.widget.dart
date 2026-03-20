@@ -51,7 +51,7 @@ class InputWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 12),
-      constraints: BoxConstraints(minHeight: labelText != null ? 50 : 32),
+      constraints: BoxConstraints(minHeight: labelText != null ? 50 : 36),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         border: Border.all(color: Theme.of(context).dividerColor),
