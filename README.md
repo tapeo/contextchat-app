@@ -25,19 +25,7 @@ ContextChat is a powerful AI interface designed for developers and power users w
 - Variables: Define variables in prompts for quick customization.
 - Quick insert: Access your library directly from the chat composer.
 - Pin and search: Keep your most important prompts at the top.
-- Resizable sidebar: Flexible layout to suit your screen.
-- Keyboard first: Use `Cmd+Enter` (macOS) or `Ctrl+Enter` to send.
-- Smart scroll: Auto-scroll that stays out of your way when you're reading.
 - Markdown support: Full rendering for code blocks and formatting.
-
----
-
-## How context works
-When you send a message, ContextChat automatically assembles a rich prompt:
-1.  **System Prompt**: Your Project's base context instructions.
-2.  **Files**: The content of all text files attached to the project.
-3.  **Images**: Any images you've attached to the current message.
-4.  **History**: Your previous messages for ongoing conversation flow.
 
 ---
 
@@ -53,12 +41,25 @@ ContextChat stores all data locally on your machine in a customizable directory 
 
 All data is stored as plain JSON files, making it easy to backup, sync with git, or migrate between machines.
 
+---
+
+## How context works
+When you send a message, ContextChat automatically assembles a rich prompt:
+1.  **System Prompt**: Your Project's base context instructions.
+2.  **Files**: The content of all text files attached to the project.
+3.  **Images**: Any images you've attached to the current message.
+4.  **History**: Your previous messages for ongoing conversation flow.
+
+---
+
 ## Roadmap
 - [ ] **Search**: Full-text search across all chat histories.
 - [ ] **Message Editing**: Edit and regenerate AI responses.
 - [ ] **Multi-Provider**: Direct support for OpenAI, Anthropic, and Local (Ollama) APIs.
 - [ ] **Theme Sync**: Manual toggle for Light/Dark modes.
 - [ ] **Export**: Export conversations to Markdown or JSON.
+- [ ] **Multi-platform**: Android, iOS, Linux, and Windows support.
+- [ ] **Sync**: Sync projects and chats with cloud storage (iCloud, Google Drive, Dropbox).
 
 ---
 Built with Flutter.
