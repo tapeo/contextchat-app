@@ -111,23 +111,16 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
             ],
           ),
           SizedBox(height: Spacing.md),
-          Column(
-            spacing: 8,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Tool calling', style: theme.textTheme.titleMedium),
-              SwitchListTile.adaptive(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Enable tool calling'),
-                subtitle: const Text(
-                  'Allow the model to request local tools during responses.',
-                ),
-                value: _toolsEnabled,
-                onChanged: (value) {
-                  setState(() => _toolsEnabled = value);
-                },
-              ),
-            ],
+          SwitchListTile.adaptive(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Enable tool calling'),
+            subtitle: const Text(
+              'Allow the model to request local tools during responses.',
+            ),
+            value: _toolsEnabled,
+            onChanged: (value) {
+              setState(() => _toolsEnabled = value);
+            },
           ),
           SizedBox(height: Spacing.md),
           Column(
