@@ -112,6 +112,7 @@ class Chat extends Equatable {
                         )
                         .toList()
                   : null,
+              model: message['model'] as String?,
             ),
           )
           .toList(),

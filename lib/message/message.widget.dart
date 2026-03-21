@@ -218,7 +218,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                         // show raw response json in a dialog
                         showAppDialog(
                           context: context,
-                          title: const Text('Raw Message Data'),
+                          title: const Text('Raw message data'),
                           content: SingleChildScrollView(
                             child: SelectableText(
                               const JsonEncoder.withIndent(

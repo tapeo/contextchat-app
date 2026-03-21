@@ -321,6 +321,7 @@ class ChatNotifier extends Notifier<ChatState> {
       timestamp: DateTime.now().toString(),
       role: MessageRole.assistant,
       images: accumulatedImages.isNotEmpty ? accumulatedImages : null,
+      model: modelId,
     );
 
     return state.chat.copyWith(
@@ -363,6 +364,7 @@ class ChatNotifier extends Notifier<ChatState> {
         timestamp: DateTime.now().toString(),
         role: MessageRole.assistant,
         images: assistantMessage.images,
+        model: completion.model,
       );
       _appendLocalMessage(finalMessage);
       return state.chat;
@@ -377,6 +379,7 @@ class ChatNotifier extends Notifier<ChatState> {
         toolCalls.map((tool) => tool.toJson()).toList(),
       ),
       images: assistantMessage.images,
+      model: completion.model,
     );
     _appendLocalMessage(toolCallRecord);
     return state.chat;

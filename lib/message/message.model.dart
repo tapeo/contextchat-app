@@ -22,6 +22,7 @@ class Message extends Equatable {
   final bool toolError;
   final bool toolCallsProcessed;
   final List<AssistantImage>? images;
+  final String? model;
 
   const Message({
     required this.id,
@@ -34,6 +35,7 @@ class Message extends Equatable {
     this.toolError = false,
     this.toolCallsProcessed = false,
     this.images,
+    this.model,
   });
 
   @override
@@ -48,6 +50,7 @@ class Message extends Equatable {
     toolError,
     toolCallsProcessed,
     images,
+    model,
   ];
 
   Message copyWith({
@@ -61,6 +64,7 @@ class Message extends Equatable {
     bool? toolError,
     bool? toolCallsProcessed,
     List<AssistantImage>? images,
+    String? model,
   }) {
     return Message(
       id: id ?? this.id,
@@ -73,6 +77,7 @@ class Message extends Equatable {
       toolError: toolError ?? this.toolError,
       toolCallsProcessed: toolCallsProcessed ?? this.toolCallsProcessed,
       images: images ?? this.images,
+      model: model ?? this.model,
     );
   }
 
@@ -95,6 +100,7 @@ class Message extends Equatable {
                 )
                 .toList()
           : null,
+      model: json['model'] as String?,
     );
   }
 
@@ -110,6 +116,7 @@ class Message extends Equatable {
       'toolError': toolError,
       'toolCallsProcessed': toolCallsProcessed,
       'images': images?.map((image) => image.toJson()).toList(),
+      'model': model,
     };
   }
 }

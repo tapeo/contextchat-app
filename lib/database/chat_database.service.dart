@@ -144,6 +144,7 @@ class ChatDatabaseService {
                     )
                     .toList()
               : null,
+          model: metadata['model'] as String?,
         ),
       );
     }

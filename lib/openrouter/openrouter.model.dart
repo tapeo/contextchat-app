@@ -409,11 +409,13 @@ class OpenRouterCompletionChoice extends Equatable {
 class OpenRouterChatCompletion extends Equatable {
   final String? id;
   final int? created;
+  final String? model;
   final List<OpenRouterCompletionChoice> choices;
 
   const OpenRouterChatCompletion({
     required this.id,
     required this.created,
+    this.model,
     required this.choices,
   });
 
@@ -421,6 +423,7 @@ class OpenRouterChatCompletion extends Equatable {
     return OpenRouterChatCompletion(
       id: json['id'] as String?,
       created: json['created'] as int?,
+      model: json['model'] as String?,
       choices: (json['choices'] as List<dynamic>? ?? const [])
           .map(
             (item) => OpenRouterCompletionChoice.fromJson(
@@ -432,7 +435,7 @@ class OpenRouterChatCompletion extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, created, choices];
+  List<Object?> get props => [id, created, model, choices];
 }
 
 class Architecture {
