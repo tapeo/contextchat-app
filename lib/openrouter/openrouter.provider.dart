@@ -6,8 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const String _apiKeyPref = 'openrouter_api_key';
 const String _baseUrlPref = 'openrouter_base_url';
-const String _modelIdPref = 'openrouter_model_id';
-const String _toolsEnabledPref = 'openrouter_tools_enabled';
 
 final openRouterProvider =
     NotifierProvider<OpenRouterNotifier, OpenRouterState>(
@@ -22,29 +20,15 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
   OpenRouterState build() {
     final String? apiKey = fileStorage.getString(_apiKeyPref);
     final String? baseUrl = fileStorage.getString(_baseUrlPref);
-    final String? modelId = fileStorage.getString(_modelIdPref);
-    final bool toolsEnabled = fileStorage.getBool(_toolsEnabledPref) ?? true;
 
     return OpenRouterState(
       apiKey: apiKey,
       baseUrl: baseUrl ?? 'https://openrouter.ai/api/v1',
-      modelId: modelId,
-      toolsEnabled: toolsEnabled,
     );
   }
 
-  Future<void> setSettings({
-    String? apiKey,
-    required String baseUrl,
-    String? modelId,
-    bool? toolsEnabled,
-  }) async {
-    state = state.copyWith(
-      apiKey: apiKey,
-      baseUrl: baseUrl,
-      modelId: modelId,
-      toolsEnabled: toolsEnabled,
-    );
+  Future<void> setSettings({String? apiKey, required String baseUrl}) async {
+    state = state.copyWith(apiKey: apiKey, baseUrl: baseUrl);
 
     if (apiKey != null) {
       await fileStorage.setString(_apiKeyPref, apiKey);
@@ -53,14 +37,6 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     }
 
     await fileStorage.setString(_baseUrlPref, baseUrl);
-
-    if (modelId != null) {
-      await fileStorage.setString(_modelIdPref, modelId);
-    } else {
-      await fileStorage.remove(_modelIdPref);
-    }
-
-    await fileStorage.setBool(_toolsEnabledPref, state.toolsEnabled);
   }
 
   Future<void> logout() async {
@@ -77,8 +53,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     ImageModalities? modalities,
     ImageConfig? imageConfig,
   }) {
-    final effectiveModelId = modelId ?? state.modelId;
-    if (effectiveModelId == null) {
+    if (modelId == null || modelId.isEmpty) {
       throw Exception('No model selected');
     }
     if (state.apiKey == null) {
@@ -88,7 +63,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     return openRouter.send(
       baseUrl: state.baseUrl,
       apiKey: state.apiKey!,
-      modelId: effectiveModelId,
+      modelId: modelId,
       messages: messages,
       tools: tools,
       toolChoice: toolChoice,
@@ -107,8 +82,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     ImageModalities? modalities,
     ImageConfig? imageConfig,
   }) async {
-    final effectiveModelId = modelId ?? state.modelId;
-    if (effectiveModelId == null) {
+    if (modelId == null || modelId.isEmpty) {
       throw Exception('No model selected');
     }
     if (state.apiKey == null) {
@@ -118,7 +92,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     return openRouter.sendNonStreaming(
       baseUrl: state.baseUrl,
       apiKey: state.apiKey!,
-      modelId: effectiveModelId,
+      modelId: modelId,
       messages: messages,
       tools: tools,
       toolChoice: toolChoice,
@@ -137,8 +111,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     ImageModalities? modalities,
     ImageConfig? imageConfig,
   }) async {
-    final effectiveModelId = modelId ?? state.modelId;
-    if (effectiveModelId == null) {
+    if (modelId == null || modelId.isEmpty) {
       throw Exception('No model selected');
     }
     if (state.apiKey == null) {
@@ -148,7 +121,7 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     return openRouter.sendNonStreamingCompletion(
       baseUrl: state.baseUrl,
       apiKey: state.apiKey!,
-      modelId: effectiveModelId,
+      modelId: modelId,
       messages: messages,
       tools: tools,
       toolChoice: toolChoice,

@@ -96,8 +96,7 @@ class ChatNotifier extends Notifier<ChatState> {
           ? const _ProjectContextPayload.empty()
           : await _buildProjectContext(project);
 
-      final effectiveModelId =
-          state.selectedModelId ?? ref.read(openRouterProvider).modelId;
+      final effectiveModelId = state.selectedModelId;
       final selectedModel = ref
           .read(openRouterModelsProvider)
           .models
@@ -147,6 +146,7 @@ class ChatNotifier extends Notifier<ChatState> {
 
       if (updatedChat.title == null && currentMessages.isEmpty) {
         try {
+          const titleModelId = 'openrouter/free';
           final title = await openRouter.sendNonStreaming(
             messages: [
               OpenRouterMessage(
@@ -156,7 +156,7 @@ class ChatNotifier extends Notifier<ChatState> {
               ),
               OpenRouterMessage(role: 'user', content: text),
             ],
-            modelId: state.selectedModelId,
+            modelId: titleModelId,
           );
           updatedChat = updatedChat.copyWith(
             title: title.replaceAll('"', '').replaceAll("'", ''),
