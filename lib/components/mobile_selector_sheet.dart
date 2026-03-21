@@ -5,6 +5,7 @@ import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/card.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/route_transitions.dart';
 import 'package:contextchat/projects/project_setup.page.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +102,7 @@ class _MobileSelectorContent extends ConsumerWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
-                      MaterialPageRoute(
+                      ThemeTransitionRoute(
                         builder: (context) => const ProjectSetupPage(),
                       ),
                     );
@@ -130,7 +131,7 @@ class _MobileSelectorContent extends ConsumerWidget {
                           onPressed: () {
                             Navigator.of(context).pop();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
+                              ThemeTransitionRoute(
                                 builder: (context) => const ProjectSetupPage(),
                               ),
                             );

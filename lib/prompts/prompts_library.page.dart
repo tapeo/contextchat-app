@@ -9,6 +9,7 @@ import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/list_tile.dart';
 import 'package:contextchat/components/resizable_text_area.dart';
+import 'package:contextchat/components/route_transitions.dart';
 import 'package:contextchat/components/row_column.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/prompts/prompt_edit_page.page.dart';
@@ -167,18 +168,18 @@ class _PromptsLibraryViewState extends ConsumerState<PromptsLibraryPage> {
     _syncFromSelection();
 
     if (isPhone) {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => const PromptEditPage()));
+      Navigator.of(context).push(
+        ThemeTransitionRoute(builder: (context) => const PromptEditPage()),
+      );
     }
   }
 
   Future<void> _openEditor() async {
     final isPhone = Breakpoints.isPhone(context);
     if (isPhone) {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => const PromptEditPage()));
+      Navigator.of(context).push(
+        ThemeTransitionRoute(builder: (context) => const PromptEditPage()),
+      );
     }
   }
 

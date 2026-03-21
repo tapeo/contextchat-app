@@ -1,6 +1,6 @@
 import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
-import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/components/route_transitions.dart';
 import 'package:contextchat/projects/project_setup.page.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/prompts/prompts_library.page.dart';
@@ -77,7 +77,7 @@ class _SidebarFooter extends ConsumerWidget {
               icon: const Icon(Icons.create_new_folder_outlined),
               onPressed: () {
                 Navigator.of(context).push(
-                  NoTransitionRoute(
+                  ThemeTransitionRoute(
                     builder: (context) => const ProjectSetupPage(),
                   ),
                 );
@@ -88,7 +88,7 @@ class _SidebarFooter extends ConsumerWidget {
             icon: const Icon(LucideIcons.bookText),
             onPressed: () {
               Navigator.of(context).push(
-                NoTransitionRoute(
+                ThemeTransitionRoute(
                   builder: (context) => const PromptsLibraryPage(),
                 ),
               );
@@ -99,7 +99,9 @@ class _SidebarFooter extends ConsumerWidget {
             icon: const Icon(LucideIcons.settings),
             onPressed: () {
               Navigator.of(context).push(
-                NoTransitionRoute(builder: (context) => const SettingsPage()),
+                ThemeTransitionRoute(
+                  builder: (context) => const SettingsPage(),
+                ),
               );
             },
           ),

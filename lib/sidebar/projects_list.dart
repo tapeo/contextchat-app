@@ -4,7 +4,7 @@ import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/card.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/list_tile.dart';
-import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/components/route_transitions.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
@@ -28,7 +28,9 @@ class ProjectsList extends ConsumerWidget {
         child: ButtonWidget(
           onPressed: () {
             Navigator.of(context).push(
-              NoTransitionRoute(builder: (context) => const ProjectSetupPage()),
+              ThemeTransitionRoute(
+                builder: (context) => const ProjectSetupPage(),
+              ),
             );
           },
           icon: const Icon(Icons.create_new_folder_outlined),
@@ -83,7 +85,7 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
 
   void _editProject() {
     Navigator.of(context).push(
-      NoTransitionRoute(
+      ThemeTransitionRoute(
         builder: (context) => ProjectSetupPage(projectId: widget.projectId),
       ),
     );

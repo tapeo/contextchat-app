@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.dart';
-import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/components/route_transitions.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/image/image_viewer.page.dart';
 import 'package:contextchat/message/message.model.dart';
@@ -14,6 +14,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:gal/gal.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -331,7 +332,7 @@ class _MessageWidgetState extends State<MessageWidget> {
             child: InkWell(
               onTap: () {
                 Navigator.of(context).push(
-                  NoTransitionRoute(
+                  ThemeTransitionRoute(
                     builder: (context) => ImageViewerPage(
                       base64Data: image.base64Data,
                       mimeType: image.mimeType,
@@ -368,30 +369,43 @@ class _MessageWidgetState extends State<MessageWidget> {
     final images = widget.message.images ?? [];
     if (images.isEmpty) return;
 
-    final status = await Permission.photosAddOnly.request();
-    if (!status.isGranted) {
-      if (context.mounted) {
-        showAppSnackBar(context, 'Permission denied');
-      }
-      return;
-    }
-
-    for (int i = 0; i < images.length; i++) {
-      final bytes = _getDecodedImageBytes(images[i].base64Data);
-      if (bytes == null) continue;
-
-      final result = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save image ${i + 1}',
-        fileName: 'image_$i.png',
-      );
-
-      if (result != null) {
-        final file = File(result);
-        await file.writeAsBytes(bytes);
+    if (Platform.isIOS) {
+      final status = await Permission.photosAddOnly.request();
+      if (!status.isGranted) {
+        if (context.mounted) {
+          showAppSnackBar(context, 'Permission denied');
+        }
+        return;
       }
 
-      if (context.mounted && i == images.length - 1) {
-        showAppSnackBar(context, 'Images downloaded');
+      for (int i = 0; i < images.length; i++) {
+        final bytes = _getDecodedImageBytes(images[i].base64Data);
+        if (bytes == null) continue;
+
+        await Gal.putImageBytes(bytes, album: 'Contextchat');
+
+        if (context.mounted && i == images.length - 1) {
+          showAppSnackBar(context, 'Images saved to gallery');
+        }
+      }
+    } else if (Platform.isMacOS) {
+      for (int i = 0; i < images.length; i++) {
+        final bytes = _getDecodedImageBytes(images[i].base64Data);
+        if (bytes == null) continue;
+
+        final result = await FilePicker.platform.saveFile(
+          dialogTitle: 'Save image ${i + 1}',
+          fileName: 'image_$i.png',
+        );
+
+        if (result != null) {
+          final file = File(result);
+          await file.writeAsBytes(bytes);
+        }
+
+        if (context.mounted && i == images.length - 1) {
+          showAppSnackBar(context, 'Images downloaded');
+        }
       }
     }
   }

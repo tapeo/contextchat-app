@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'components/route_transitions.dart';
+
 class Breakpoints {
   static const double phone = 600;
   static const double tablet = 900;
@@ -175,13 +177,13 @@ class AppTheme {
       }),
     ),
     dialogTheme: DialogThemeData(backgroundColor: _lightSurface),
-    pageTransitionsTheme: const PageTransitionsTheme(
+    pageTransitionsTheme: PageTransitionsTheme(
       builders: {
         TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
-        TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.macOS: NoAnimationPageTransitionsBuilder(),
+        TargetPlatform.linux: NoAnimationPageTransitionsBuilder(),
+        TargetPlatform.windows: NoAnimationPageTransitionsBuilder(),
       },
     ),
   );
@@ -296,13 +298,13 @@ class AppTheme {
       }),
     ),
     dialogTheme: DialogThemeData(backgroundColor: _darkSurface),
-    pageTransitionsTheme: const PageTransitionsTheme(
+    pageTransitionsTheme: PageTransitionsTheme(
       builders: {
         TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
-        TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.macOS: NoAnimationPageTransitionsBuilder(),
+        TargetPlatform.linux: NoAnimationPageTransitionsBuilder(),
+        TargetPlatform.windows: NoAnimationPageTransitionsBuilder(),
       },
     ),
   );
