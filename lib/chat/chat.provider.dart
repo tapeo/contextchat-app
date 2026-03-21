@@ -63,7 +63,10 @@ class ChatNotifier extends Notifier<ChatState> {
     await chatsDatabase.saveChat(state.chat);
   }
 
-  Future<void> sendMessage(String text) async {
+  Future<void> sendMessage(
+    String text, {
+    OpenRouterImageGenerationOptions? imageGeneration,
+  }) async {
     try {
       List<Message> currentMessages = List.from(state.chat.messages);
 
@@ -103,6 +106,14 @@ class ChatNotifier extends Notifier<ChatState> {
         );
       }
 
+      if (imageGeneration != null &&
+          selectedModel != null &&
+          !selectedModel.supportsImageOutput) {
+        throw Exception(
+          'The selected model does not support image output. Choose an image-capable model.',
+        );
+      }
+
       final settings = ref.read(openRouterProvider);
       final initialMessages = _buildOpenRouterMessages(
         sourceMessages: state.chat.messages,
@@ -110,23 +121,25 @@ class ChatNotifier extends Notifier<ChatState> {
         currentUserMessageId: message.id,
       );
 
-      final registry = buildGlobalToolRegistry(
-        project: project,
-        projectsDatabase: projectsDatabase,
-      );
-
       Chat updatedChat;
-      if (settings.toolsEnabled) {
+
+      if (state.toolsEnabled) {
+        final registry = buildGlobalToolRegistry(
+          project: project,
+          projectsDatabase: projectsDatabase,
+        );
         updatedChat = await _sendMessageWithTools(
           initialMessages: initialMessages,
           registry: registry,
           modelId: state.selectedModelId,
           settings: settings,
+          imageGeneration: imageGeneration,
         );
       } else {
         updatedChat = await _sendMessageStreaming(
           initialMessages: initialMessages,
           modelId: state.selectedModelId,
+          imageGeneration: imageGeneration,
         );
       }
 
@@ -174,6 +187,26 @@ class ChatNotifier extends Notifier<ChatState> {
     if (projectId != null && id.isNotEmpty) {
       ref.read(projectsProvider.notifier).setProjectDefaultModel(projectId, id);
     }
+  }
+
+  void setImageOutputEnabled(bool enabled) {
+    state = state.copyWith(imageOutputEnabled: enabled);
+  }
+
+  void setImageModalities(ImageModalities modalities) {
+    state = state.copyWith(imageModalities: modalities);
+  }
+
+  void setImageAspectRatio(String aspectRatio) {
+    state = state.copyWith(imageAspectRatio: aspectRatio);
+  }
+
+  void setImageSize(String imageSize) {
+    state = state.copyWith(imageSize: imageSize);
+  }
+
+  void setToolsEnabled(bool enabled) {
+    state = state.copyWith(toolsEnabled: enabled);
   }
 
   List<OpenRouterMessage> _buildOpenRouterMessages({
@@ -233,16 +266,27 @@ class ChatNotifier extends Notifier<ChatState> {
   Future<Chat> _sendMessageStreaming({
     required List<OpenRouterMessage> initialMessages,
     required String? modelId,
+    OpenRouterImageGenerationOptions? imageGeneration,
   }) async {
-    final stream = openRouter.send(messages: initialMessages, modelId: modelId);
+    final stream = openRouter.send(
+      messages: initialMessages,
+      modelId: modelId,
+      modalities: imageGeneration?.modalities,
+      imageConfig: imageGeneration?.imageConfig,
+    );
 
     String accumulatedResponse = '';
+    final accumulatedImages = <AssistantImage>[];
+
     await for (final chunk in stream) {
       if (chunk.content != null) {
         accumulatedResponse += chunk.content!;
         state = state.copyWith(
           accumulatedResponse: Nullable(accumulatedResponse),
         );
+      }
+      if (chunk.imageDeltas != null && chunk.imageDeltas!.isNotEmpty) {
+        accumulatedImages.addAll(chunk.imageDeltas!);
       }
     }
 
@@ -251,6 +295,7 @@ class ChatNotifier extends Notifier<ChatState> {
       content: accumulatedResponse,
       timestamp: DateTime.now().toString(),
       role: MessageRole.assistant,
+      images: accumulatedImages.isNotEmpty ? accumulatedImages : null,
     );
 
     return state.chat.copyWith(
@@ -263,6 +308,7 @@ class ChatNotifier extends Notifier<ChatState> {
     required OpenRouterToolRegistry registry,
     required String? modelId,
     required OpenRouterState settings,
+    OpenRouterImageGenerationOptions? imageGeneration,
   }) async {
     final completion = await openRouter.sendCompletionNonStreaming(
       messages: initialMessages,
@@ -270,6 +316,8 @@ class ChatNotifier extends Notifier<ChatState> {
       tools: registry.definitions,
       toolChoice: const OpenRouterToolChoice.auto(),
       parallelToolCalls: false,
+      modalities: imageGeneration?.modalities,
+      imageConfig: imageGeneration?.imageConfig,
     );
 
     final choice = completion.choices.firstOrNull;
@@ -289,6 +337,7 @@ class ChatNotifier extends Notifier<ChatState> {
         content: content,
         timestamp: DateTime.now().toString(),
         role: MessageRole.assistant,
+        images: assistantMessage.images,
       );
       _appendLocalMessage(finalMessage);
       return state.chat;
@@ -302,6 +351,7 @@ class ChatNotifier extends Notifier<ChatState> {
       toolCallsJson: jsonEncode(
         toolCalls.map((tool) => tool.toJson()).toList(),
       ),
+      images: assistantMessage.images,
     );
     _appendLocalMessage(toolCallRecord);
     return state.chat;

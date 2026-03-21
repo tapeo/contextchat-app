@@ -39,6 +39,8 @@ class OpenRouterService {
     List<OpenRouterToolDefinition>? tools,
     OpenRouterToolChoice? toolChoice,
     bool? parallelToolCalls,
+    ImageModalities? modalities,
+    ImageConfig? imageConfig,
   }) async* {
     final client = http.Client();
     String? responseId;
@@ -66,6 +68,13 @@ class OpenRouterService {
       if (parallelToolCalls != null) {
         body['parallel_tool_calls'] = parallelToolCalls;
       }
+      if (modalities != null) {
+        body['modalities'] = modalities.modalities;
+      }
+      if (imageConfig != null) {
+        body['image_config'] = imageConfig.toJson();
+      }
+
       request.body = jsonEncode(body);
 
       final response = await client.send(request);
@@ -92,13 +101,20 @@ class OpenRouterService {
             }
             final choice = json['choices']?[0];
             final delta = choice?['delta']?['content'];
+            final rawImages = choice?['delta']?['images'] as List<dynamic>?;
+            final imageDeltas = rawImages
+                ?.map(AssistantImage.tryFromOpenRouterJson)
+                .whereType<AssistantImage>()
+                .toList();
             final finishReason = choice?['finish_reason'] as String?;
-            if (delta != null && delta.isNotEmpty) {
+            if ((delta != null && delta.isNotEmpty) ||
+                (imageDeltas != null && imageDeltas.isNotEmpty)) {
               yield OpenRouterStreamChunk(
                 id: responseId,
                 created: createdTimestamp,
                 content: delta,
                 finishReason: finishReason,
+                imageDeltas: imageDeltas,
               );
             }
           } catch (e) {
@@ -119,6 +135,8 @@ class OpenRouterService {
     List<OpenRouterToolDefinition>? tools,
     OpenRouterToolChoice? toolChoice,
     bool? parallelToolCalls,
+    ImageModalities? modalities,
+    ImageConfig? imageConfig,
   }) async {
     final completion = await sendNonStreamingCompletion(
       baseUrl: baseUrl,
@@ -128,6 +146,8 @@ class OpenRouterService {
       tools: tools,
       toolChoice: toolChoice,
       parallelToolCalls: parallelToolCalls,
+      modalities: modalities,
+      imageConfig: imageConfig,
     );
 
     final content = completion.choices.firstOrNull?.message.content;
@@ -146,6 +166,8 @@ class OpenRouterService {
     List<OpenRouterToolDefinition>? tools,
     OpenRouterToolChoice? toolChoice,
     bool? parallelToolCalls,
+    ImageModalities? modalities,
+    ImageConfig? imageConfig,
   }) async {
     final body = <String, dynamic>{
       'model': modelId,
@@ -160,6 +182,12 @@ class OpenRouterService {
     }
     if (parallelToolCalls != null) {
       body['parallel_tool_calls'] = parallelToolCalls;
+    }
+    if (modalities != null) {
+      body['modalities'] = modalities.modalities;
+    }
+    if (imageConfig != null) {
+      body['image_config'] = imageConfig.toJson();
     }
 
     final response = await http.post(

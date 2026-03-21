@@ -74,6 +74,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     List<OpenRouterToolDefinition>? tools,
     OpenRouterToolChoice? toolChoice,
     bool? parallelToolCalls,
+    ImageModalities? modalities,
+    ImageConfig? imageConfig,
   }) {
     final effectiveModelId = modelId ?? state.modelId;
     if (effectiveModelId == null) {
@@ -91,6 +93,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
       tools: tools,
       toolChoice: toolChoice,
       parallelToolCalls: parallelToolCalls,
+      modalities: modalities,
+      imageConfig: imageConfig,
     );
   }
 
@@ -100,6 +104,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     List<OpenRouterToolDefinition>? tools,
     OpenRouterToolChoice? toolChoice,
     bool? parallelToolCalls,
+    ImageModalities? modalities,
+    ImageConfig? imageConfig,
   }) async {
     final effectiveModelId = modelId ?? state.modelId;
     if (effectiveModelId == null) {
@@ -117,6 +123,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
       tools: tools,
       toolChoice: toolChoice,
       parallelToolCalls: parallelToolCalls,
+      modalities: modalities,
+      imageConfig: imageConfig,
     );
   }
 
@@ -126,6 +134,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
     List<OpenRouterToolDefinition>? tools,
     OpenRouterToolChoice? toolChoice,
     bool? parallelToolCalls,
+    ImageModalities? modalities,
+    ImageConfig? imageConfig,
   }) async {
     final effectiveModelId = modelId ?? state.modelId;
     if (effectiveModelId == null) {
@@ -143,6 +153,8 @@ class OpenRouterNotifier extends Notifier<OpenRouterState> {
       tools: tools,
       toolChoice: toolChoice,
       parallelToolCalls: parallelToolCalls,
+      modalities: modalities,
+      imageConfig: imageConfig,
     );
   }
 }

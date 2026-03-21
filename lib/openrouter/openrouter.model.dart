@@ -1,5 +1,91 @@
 import 'package:equatable/equatable.dart';
 
+enum ImageModalities {
+  textOnly(['text']),
+  imageOnly(['image']),
+  imagePlusText(['image', 'text']);
+
+  final List<String> modalities;
+  const ImageModalities(this.modalities);
+}
+
+class AssistantImage extends Equatable {
+  final String base64Data;
+  final String mimeType;
+
+  const AssistantImage({required this.base64Data, required this.mimeType});
+
+  factory AssistantImage.fromJson(Map<String, dynamic> json) {
+    return AssistantImage(
+      base64Data: json['data'] as String,
+      mimeType: json['mimeType'] as String? ?? 'image/png',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'data': base64Data, 'mimeType': mimeType};
+
+  String toDataUrl() => 'data:$mimeType;base64,$base64Data';
+
+  factory AssistantImage.fromDataUrl(String dataUrl) {
+    final matches = RegExp(r'^data:([^;]+);base64,(.+)$').firstMatch(dataUrl);
+    if (matches == null) {
+      throw const FormatException('Invalid data URL image payload');
+    }
+
+    return AssistantImage(
+      mimeType: matches.group(1) ?? 'image/png',
+      base64Data: matches.group(2) ?? '',
+    );
+  }
+
+  static AssistantImage? tryFromOpenRouterJson(dynamic rawImageEntry) {
+    if (rawImageEntry is! Map) {
+      return null;
+    }
+
+    final imageUrl = rawImageEntry['image_url'];
+    if (imageUrl is! Map) {
+      return null;
+    }
+
+    final url = imageUrl['url'];
+    if (url is! String || url.isEmpty) {
+      return null;
+    }
+
+    try {
+      return AssistantImage.fromDataUrl(url);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  List<Object?> get props => [base64Data, mimeType];
+}
+
+class ImageConfig {
+  final String aspectRatio;
+  final String imageSize;
+
+  const ImageConfig({required this.aspectRatio, required this.imageSize});
+
+  Map<String, dynamic> toJson() => {
+    'aspect_ratio': aspectRatio,
+    'image_size': imageSize,
+  };
+}
+
+class OpenRouterImageGenerationOptions {
+  final ImageModalities modalities;
+  final ImageConfig imageConfig;
+
+  const OpenRouterImageGenerationOptions({
+    required this.modalities,
+    required this.imageConfig,
+  });
+}
+
 class OpenRouterResponse {
   final String response;
   final int tokens;
@@ -12,12 +98,14 @@ class OpenRouterStreamChunk {
   final int? created;
   final String? content;
   final String? finishReason;
+  final List<AssistantImage>? imageDeltas;
 
   OpenRouterStreamChunk({
     this.id,
     this.created,
     this.content,
     this.finishReason,
+    this.imageDeltas,
   });
 }
 
@@ -232,15 +320,19 @@ class OpenRouterCompletionMessage extends Equatable {
   final String role;
   final String? content;
   final List<OpenRouterToolCall>? toolCalls;
+  final List<AssistantImage>? images;
 
   const OpenRouterCompletionMessage({
     required this.role,
     required this.content,
     this.toolCalls,
+    this.images,
   });
 
   factory OpenRouterCompletionMessage.fromJson(Map<String, dynamic> json) {
     final rawToolCalls = json['tool_calls'] as List<dynamic>?;
+    final rawImages = json['images'] as List<dynamic>?;
+
     return OpenRouterCompletionMessage(
       role: (json['role'] as String?) ?? 'assistant',
       content: json['content'] as String?,
@@ -251,11 +343,15 @@ class OpenRouterCompletionMessage extends Equatable {
             ),
           )
           .toList(),
+      images: rawImages
+          ?.map(AssistantImage.tryFromOpenRouterJson)
+          .whereType<AssistantImage>()
+          .toList(),
     );
   }
 
   @override
-  List<Object?> get props => [role, content, toolCalls];
+  List<Object?> get props => [role, content, toolCalls, images];
 }
 
 class OpenRouterCompletionChoice extends Equatable {
@@ -443,6 +539,10 @@ class OpenRouterModel {
   }
 
   bool get supportsImageInput => architecture.inputModalities.any(
+    (modality) => modality.toLowerCase() == 'image',
+  );
+
+  bool get supportsImageOutput => architecture.outputModalities.any(
     (modality) => modality.toLowerCase() == 'image',
   );
 }

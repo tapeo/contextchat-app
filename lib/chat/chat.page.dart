@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chat.provider.dart';
 import 'package:contextchat/chat/chat.state.dart';
 import 'package:contextchat/chat/chat_draft.provider.dart';
@@ -9,6 +10,7 @@ import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/list_view_gradient_overlay.dart';
 import 'package:contextchat/components/text_button.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
 import 'package:contextchat/settings/settings.page.dart';
@@ -102,7 +104,10 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     });
   }
 
-  Future<void> _submitCurrentMessage(String? selectedModelId) async {
+  Future<void> _submitCurrentMessage({
+    required String? selectedModelId,
+    required ChatState chatState,
+  }) async {
     final text = _textController.text.trim();
     if (text.isEmpty || selectedModelId == null) return;
 
@@ -112,7 +117,48 @@ class _ChatUiState extends ConsumerState<ChatPage> {
       return;
     }
 
-    await send(text, selectedModelId);
+    final openRouterModelsState = ref.read(openRouterModelsProvider);
+    final selectedModel = openRouterModelsState.models.firstWhereOrNull(
+      (model) => model.id == selectedModelId,
+    );
+
+    await send(
+      text,
+      selectedModelId,
+      imageGeneration: _buildImageGenerationOptions(
+        chatState: chatState,
+        selectedModel: selectedModel,
+      ),
+    );
+  }
+
+  OpenRouterImageGenerationOptions? _buildImageGenerationOptions({
+    required ChatState chatState,
+    required OpenRouterModel? selectedModel,
+  }) {
+    if (!chatState.imageOutputEnabled) {
+      return null;
+    }
+
+    if (selectedModel == null || !selectedModel.supportsImageOutput) {
+      return null;
+    }
+
+    final supportsTextOutput = selectedModel.architecture.outputModalities.any(
+      (modality) => modality.toLowerCase() == 'text',
+    );
+
+    final selectedModalities = supportsTextOutput
+        ? chatState.imageModalities
+        : ImageModalities.imageOnly;
+
+    return OpenRouterImageGenerationOptions(
+      modalities: selectedModalities,
+      imageConfig: ImageConfig(
+        aspectRatio: chatState.imageAspectRatio,
+        imageSize: chatState.imageSize,
+      ),
+    );
   }
 
   void _showSetupRequiredDialog() {
@@ -274,20 +320,30 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                   .read(chatDraftProvider(chatId!).notifier)
                   .insert(promptText, replace: false);
             },
-            onSubmit: () => _submitCurrentMessage(selectedModelId),
+            onSubmit: () => _submitCurrentMessage(
+              selectedModelId: selectedModelId,
+              chatState: chatState,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Future<void> send(String text, String? modelId) async {
+  Future<void> send(
+    String text,
+    String? modelId, {
+    OpenRouterImageGenerationOptions? imageGeneration,
+  }) async {
     if (text.isEmpty || modelId == null || chatId == null) return;
 
     String temporaryText = text;
 
     try {
-      await ref.read(chatProvider(chatId!).notifier).sendMessage(text);
+      await ref
+          .read(chatProvider(chatId!).notifier)
+          .sendMessage(text, imageGeneration: imageGeneration);
+
       _textController.clear();
       ref.read(chatDraftProvider(chatId!).notifier).clear();
     } catch (e) {

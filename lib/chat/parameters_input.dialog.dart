@@ -88,6 +88,11 @@ class _ParametersContent extends ConsumerWidget {
         runSpacing: 16,
         children: [
           SwitchWidget(
+            value: chatState.toolsEnabled,
+            onChanged: (value) => notifier.setToolsEnabled(value),
+            label: 'Tool calling',
+          ),
+          SwitchWidget(
             value: chatState.imageOutputEnabled,
             onChanged: (value) => notifier.setImageOutputEnabled(value),
             label: 'Image output',

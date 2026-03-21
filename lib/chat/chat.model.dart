@@ -1,4 +1,5 @@
 import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:equatable/equatable.dart';
 
 class Chat extends Equatable {
@@ -39,16 +40,17 @@ class Chat extends Equatable {
       'title': title,
       'messages': messages
           .map(
-            (m) => {
-              'id': m.id,
-              'timestamp': m.timestamp,
-              'content': m.content,
-              'role': m.role.name,
-              'toolCallId': m.toolCallId,
-              'toolName': m.toolName,
-              'toolCallsJson': m.toolCallsJson,
-              'toolError': m.toolError,
-              'toolCallsProcessed': m.toolCallsProcessed,
+            (message) => {
+              'id': message.id,
+              'timestamp': message.timestamp,
+              'content': message.content,
+              'role': message.role.name,
+              'toolCallId': message.toolCallId,
+              'toolName': message.toolName,
+              'toolCallsJson': message.toolCallsJson,
+              'toolError': message.toolError,
+              'toolCallsProcessed': message.toolCallsProcessed,
+              'images': message.images?.map((image) => image.toJson()).toList(),
             },
           )
           .toList(),
@@ -63,16 +65,28 @@ class Chat extends Equatable {
       title: json['title'] as String?,
       messages: (json['messages'] as List<dynamic>)
           .map(
-            (m) => Message(
-              id: m['id'] as String,
-              timestamp: m['timestamp'] as String,
-              content: m['content'] as String,
-              role: MessageRole.values.firstWhere((r) => r.name == m['role']),
-              toolCallId: m['toolCallId'] as String?,
-              toolName: m['toolName'] as String?,
-              toolCallsJson: m['toolCallsJson'] as String?,
-              toolError: (m['toolError'] as bool?) ?? false,
-              toolCallsProcessed: (m['toolCallsProcessed'] as bool?) ?? false,
+            (message) => Message(
+              id: message['id'] as String,
+              timestamp: message['timestamp'] as String,
+              content: message['content'] as String,
+              role: MessageRole.values.firstWhere(
+                (r) => r.name == message['role'],
+              ),
+              toolCallId: message['toolCallId'] as String?,
+              toolName: message['toolName'] as String?,
+              toolCallsJson: message['toolCallsJson'] as String?,
+              toolError: (message['toolError'] as bool?) ?? false,
+              toolCallsProcessed:
+                  (message['toolCallsProcessed'] as bool?) ?? false,
+              images: message['images'] != null
+                  ? (message['images'] as List)
+                        .map(
+                          (image) => AssistantImage.fromJson(
+                            image as Map<String, dynamic>,
+                          ),
+                        )
+                        .toList()
+                  : null,
             ),
           )
           .toList(),

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:contextchat/chat/chat.model.dart';
 import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:path/path.dart';
 
 import 'database_filesystem.dart';
@@ -134,6 +135,15 @@ class ChatDatabaseService {
           toolError: (metadata['toolError'] as bool?) ?? false,
           toolCallsProcessed:
               (metadata['toolCallsProcessed'] as bool?) ?? false,
+          images: metadata['images'] != null
+              ? (metadata['images'] as List)
+                    .map(
+                      (image) => AssistantImage.fromJson(
+                        Map<String, dynamic>.from(image as Map),
+                      ),
+                    )
+                    .toList()
+              : null,
         ),
       );
     }
@@ -177,7 +187,7 @@ class ChatDatabaseService {
       buffer
         ..writeln()
         ..writeln(
-          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp, 'toolCallId': message.toolCallId, 'toolName': message.toolName, 'toolCallsJson': message.toolCallsJson, 'toolError': message.toolError, 'toolCallsProcessed': message.toolCallsProcessed})} -->',
+          '$_chatMessageStart ${json.encode({'id': message.id, 'role': message.role.value, 'timestamp': message.timestamp, 'toolCallId': message.toolCallId, 'toolName': message.toolName, 'toolCallsJson': message.toolCallsJson, 'toolError': message.toolError, 'toolCallsProcessed': message.toolCallsProcessed, 'images': message.images?.map((i) => i.toJson()).toList()})} -->',
         )
         ..writeln(message.content)
         ..writeln(_chatMessageEnd);

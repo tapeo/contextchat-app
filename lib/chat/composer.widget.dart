@@ -1,3 +1,4 @@
+import 'package:contextchat/chat/parameters_input.dialog.dart';
 import 'package:contextchat/chat/select_ai_model.dialog.dart';
 import 'package:contextchat/chat/select_prompt.widget.dart';
 import 'package:contextchat/components/icon_button.dart';
@@ -99,7 +100,8 @@ class ComposerWidget extends StatelessWidget {
                       onPicked: (promptText) => onInsertPrompt(promptText),
                     ),
                   ),
-                  Expanded(child: const SelectAiModelDialog()),
+                  const Expanded(child: SelectAiModelDialog()),
+                  const ParametersInputDialog(),
                   if (loading)
                     const SizedBox(
                       width: 20,

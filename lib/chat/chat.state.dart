@@ -1,4 +1,5 @@
 import 'package:contextchat/chat/chat.model.dart';
+import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:equatable/equatable.dart';
 
 class ChatState extends Equatable {
@@ -6,12 +7,22 @@ class ChatState extends Equatable {
   final bool loading;
   final String? accumulatedResponse;
   final String? selectedModelId;
+  final bool imageOutputEnabled;
+  final ImageModalities imageModalities;
+  final String imageAspectRatio;
+  final String imageSize;
+  final bool toolsEnabled;
 
   const ChatState({
     required this.chat,
     required this.loading,
     this.accumulatedResponse,
     this.selectedModelId,
+    this.imageOutputEnabled = false,
+    this.imageModalities = ImageModalities.imagePlusText,
+    this.imageAspectRatio = '1:1',
+    this.imageSize = '1K',
+    this.toolsEnabled = true,
   });
 
   ChatState copyWith({
@@ -19,6 +30,11 @@ class ChatState extends Equatable {
     bool? loading,
     Nullable<String?>? accumulatedResponse,
     String? selectedModelId,
+    bool? imageOutputEnabled,
+    ImageModalities? imageModalities,
+    String? imageAspectRatio,
+    String? imageSize,
+    bool? toolsEnabled,
   }) {
     return ChatState(
       chat: chat ?? this.chat,
@@ -27,6 +43,11 @@ class ChatState extends Equatable {
           ? accumulatedResponse.value
           : this.accumulatedResponse,
       selectedModelId: selectedModelId ?? this.selectedModelId,
+      imageOutputEnabled: imageOutputEnabled ?? this.imageOutputEnabled,
+      imageModalities: imageModalities ?? this.imageModalities,
+      imageAspectRatio: imageAspectRatio ?? this.imageAspectRatio,
+      imageSize: imageSize ?? this.imageSize,
+      toolsEnabled: toolsEnabled ?? this.toolsEnabled,
     );
   }
 
@@ -36,6 +57,11 @@ class ChatState extends Equatable {
     loading,
     accumulatedResponse,
     selectedModelId,
+    imageOutputEnabled,
+    imageModalities,
+    imageAspectRatio,
+    imageSize,
+    toolsEnabled,
   ];
 }
 

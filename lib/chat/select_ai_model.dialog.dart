@@ -6,6 +6,7 @@ import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/list_tile.dart';
 import 'package:contextchat/components/list_view_gradient_overlay.dart';
+import 'package:contextchat/components/switch.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
@@ -145,6 +146,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
   late final TextEditingController _searchController;
   String? _currentSort;
   bool _isAscending = true;
+  bool _imageCapableOnly = false;
 
   @override
   void initState() {
@@ -172,7 +174,11 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
   List<OpenRouterModel> get _filteredModels {
     final query = _searchController.text.toLowerCase();
     final filtered = widget.models
-        .where((model) => model.name.toLowerCase().contains(query))
+        .where(
+          (model) =>
+              model.name.toLowerCase().contains(query) &&
+              (!_imageCapableOnly || model.supportsImageOutput),
+        )
         .toList();
 
     if (_currentSort == null) {
@@ -237,10 +243,16 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               _buildSortButton('price', 'Price'),
               _buildSortButton('contextLength', 'Context'),
               _buildSortButton('created', 'Created'),
+              SwitchWidget(
+                value: _imageCapableOnly,
+                onChanged: (value) => setState(() => _imageCapableOnly = value),
+                label: 'Image capable only',
+              ),
             ],
           ),
           Expanded(

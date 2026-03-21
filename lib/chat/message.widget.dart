@@ -1,13 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:contextchat/chat/message.model.dart';
 import 'package:contextchat/chat/message.style.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MessageWidget extends StatefulWidget {
@@ -30,6 +33,7 @@ class MessageWidget extends StatefulWidget {
 
 class _MessageWidgetState extends State<MessageWidget> {
   bool _expanded = false;
+  final Map<String, Uint8List> _decodedImageCache = {};
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,8 @@ class _MessageWidgetState extends State<MessageWidget> {
         role == MessageRole.assistant &&
         widget.message.toolCallsJson != null &&
         !widget.message.toolCallsProcessed;
+    final hasImages =
+        widget.message.images != null && widget.message.images!.isNotEmpty;
 
     final toolHeader = _toolHeaderText();
 
@@ -69,8 +75,8 @@ class _MessageWidgetState extends State<MessageWidget> {
             decoration: BoxDecoration(
               color: colors.backgroundColor,
               borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
+                topLeft: const Radius.circular(AppTheme.radiusMedium),
+                topRight: const Radius.circular(AppTheme.radiusMedium),
                 bottomLeft: Radius.circular(style.bottomLeftRadius),
                 bottomRight: Radius.circular(style.bottomRightRadius),
               ),
@@ -96,21 +102,29 @@ class _MessageWidgetState extends State<MessageWidget> {
                           ),
                         ),
                       ),
-                    MarkdownBody(
-                      data: shouldTruncate
-                          ? '${content.substring(0, 100)}...'
-                          : (hasToolCalls
-                                ? _formatToolCallsSummary()
-                                : content),
-                      onTapLink: (text, href, title) {
-                        if (href != null) {
-                          launchUrlString(
-                            href,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        }
-                      },
-                    ),
+                    if ((hasToolCalls || content.trim().isNotEmpty))
+                      MarkdownBody(
+                        data: shouldTruncate
+                            ? '${content.substring(0, 100)}...'
+                            : (hasToolCalls
+                                  ? _formatToolCallsSummary()
+                                  : content),
+                        onTapLink: (text, href, title) {
+                          if (href != null) {
+                            launchUrlString(
+                              href,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
+                      ),
+                    if (hasImages)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: content.trim().isNotEmpty ? 8 : 0,
+                        ),
+                        child: _buildImageGallery(),
+                      ),
                     if (isTool && contentLength > 100)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
@@ -156,18 +170,32 @@ class _MessageWidgetState extends State<MessageWidget> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 2, 12, 0),
-            child: IconButtonWidget(
-              onPressed:
-                  widget.onCopy ??
-                  () {
-                    Clipboard.setData(ClipboardData(text: content));
-                    showAppSnackBar(context, 'Copied to clipboard');
-                  },
-              icon: Icon(
-                LucideIcons.copy,
-                size: 12,
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButtonWidget(
+                  onPressed:
+                      widget.onCopy ??
+                      () {
+                        Clipboard.setData(ClipboardData(text: content));
+                        showAppSnackBar(context, 'Copied to clipboard');
+                      },
+                  icon: Icon(
+                    LucideIcons.copy,
+                    size: 12,
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                if (hasImages)
+                  IconButtonWidget(
+                    onPressed: () => _downloadImages(context),
+                    icon: Icon(
+                      LucideIcons.download,
+                      size: 12,
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -208,6 +236,70 @@ class _MessageWidgetState extends State<MessageWidget> {
       return lines.join('\n');
     } catch (_) {
       return widget.message.content;
+    }
+  }
+
+  Widget _buildImageGallery() {
+    final images = widget.message.images ?? const [];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: images.map((image) {
+        final bytes = _getDecodedImageBytes(image.base64Data);
+        if (bytes == null) {
+          return const SizedBox.shrink();
+        }
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 280, maxHeight: 280),
+            child: Image.memory(
+              bytes,
+              fit: BoxFit.cover,
+              key: ValueKey(image.base64Data.hashCode),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Uint8List? _getDecodedImageBytes(String base64Data) {
+    if (_decodedImageCache.containsKey(base64Data)) {
+      return _decodedImageCache[base64Data];
+    }
+    try {
+      final bytes = base64Decode(base64Data);
+      _decodedImageCache[base64Data] = bytes;
+      return bytes;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _downloadImages(BuildContext context) async {
+    final images = widget.message.images ?? [];
+    if (images.isEmpty) return;
+
+    for (int i = 0; i < images.length; i++) {
+      final bytes = _getDecodedImageBytes(images[i].base64Data);
+      if (bytes == null) continue;
+
+      final result = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save image ${i + 1}',
+        fileName: 'image_$i.png',
+      );
+
+      if (result != null) {
+        final file = File(result);
+        await file.writeAsBytes(bytes);
+      }
+
+      if (context.mounted && i == images.length - 1) {
+        showAppSnackBar(context, 'Images downloaded');
+      }
     }
   }
 }

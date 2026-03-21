@@ -1,3 +1,4 @@
+import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:equatable/equatable.dart';
 
 enum MessageRole {
@@ -20,6 +21,7 @@ class Message extends Equatable {
   final String? toolCallsJson;
   final bool toolError;
   final bool toolCallsProcessed;
+  final List<AssistantImage>? images;
 
   const Message({
     required this.id,
@@ -31,6 +33,7 @@ class Message extends Equatable {
     this.toolCallsJson,
     this.toolError = false,
     this.toolCallsProcessed = false,
+    this.images,
   });
 
   @override
@@ -44,6 +47,7 @@ class Message extends Equatable {
     toolCallsJson,
     toolError,
     toolCallsProcessed,
+    images,
   ];
 
   Message copyWith({
@@ -56,6 +60,7 @@ class Message extends Equatable {
     String? toolCallsJson,
     bool? toolError,
     bool? toolCallsProcessed,
+    List<AssistantImage>? images,
   }) {
     return Message(
       id: id ?? this.id,
@@ -67,6 +72,7 @@ class Message extends Equatable {
       toolCallsJson: toolCallsJson ?? this.toolCallsJson,
       toolError: toolError ?? this.toolError,
       toolCallsProcessed: toolCallsProcessed ?? this.toolCallsProcessed,
+      images: images ?? this.images,
     );
   }
 }
