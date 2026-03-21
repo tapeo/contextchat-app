@@ -104,7 +104,7 @@ class _SelectAiModelViewState extends ConsumerState<SelectAiModelDialog> {
       return SizedBox(
         width: 24,
         height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       );
     }
 
