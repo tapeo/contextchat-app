@@ -73,16 +73,23 @@ class _SidebarFooter extends ConsumerWidget {
           const Spacer(),
           if (hasProjects)
             IconButtonWidget(
-              tooltip: 'Add project',
-              icon: const Icon(Icons.create_new_folder_outlined),
+              tooltip: 'License',
+              icon: const Icon(LucideIcons.fileText),
               onPressed: () {
-                Navigator.of(context).push(
-                  ThemeTransitionRoute(
-                    builder: (context) => const ProjectSetupPage(),
-                  ),
-                );
+                showLicensePage(context: context);
               },
             ),
+          IconButtonWidget(
+            tooltip: 'Add project',
+            icon: const Icon(Icons.create_new_folder_outlined),
+            onPressed: () {
+              Navigator.of(context).push(
+                ThemeTransitionRoute(
+                  builder: (context) => const ProjectSetupPage(),
+                ),
+              );
+            },
+          ),
           IconButtonWidget(
             tooltip: 'Prompts',
             icon: const Icon(LucideIcons.bookText),
