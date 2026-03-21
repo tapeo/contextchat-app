@@ -10,7 +10,7 @@ class OpenRouterState extends Equatable {
     this.apiKey,
     this.baseUrl = 'https://openrouter.ai/api/v1',
     this.modelId,
-    this.toolsEnabled = true,
+    this.toolsEnabled = false,
   });
 
   OpenRouterState copyWith({
