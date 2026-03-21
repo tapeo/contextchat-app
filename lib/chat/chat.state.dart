@@ -22,7 +22,7 @@ class ChatState extends Equatable {
     this.imageModalities = ImageModalities.imagePlusText,
     this.imageAspectRatio = ImageAspectRatio.ratio1x1,
     this.imageSize = ImageSize.size1K,
-    this.toolsEnabled = true,
+    this.toolsEnabled = false,
   });
 
   ChatState copyWith({
