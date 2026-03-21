@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/theme.dart';
+import 'package:flutter/material.dart';
 
 class MessageColors {
   final Color? backgroundColor;
@@ -36,32 +37,32 @@ class MessageStyle {
     alignment: Alignment.centerRight,
     crossAxisAlignment: CrossAxisAlignment.end,
     horizontalMargin: 16.0,
-    bottomLeftRadius: 16.0,
-    bottomRightRadius: 4.0,
+    bottomLeftRadius: AppTheme.radiusMedium,
+    bottomRightRadius: AppTheme.radiusMedium / 4,
   );
 
   static const tool = MessageStyle(
     alignment: Alignment.centerRight,
     crossAxisAlignment: CrossAxisAlignment.end,
     horizontalMargin: 16.0,
-    bottomLeftRadius: 16.0,
-    bottomRightRadius: 4.0,
+    bottomLeftRadius: AppTheme.radiusMedium,
+    bottomRightRadius: AppTheme.radiusMedium / 4,
   );
 
   static const assistant = MessageStyle(
     alignment: Alignment.centerLeft,
     crossAxisAlignment: CrossAxisAlignment.start,
     horizontalMargin: 0.0,
-    bottomLeftRadius: 4.0,
-    bottomRightRadius: 16.0,
+    bottomLeftRadius: AppTheme.radiusMedium / 4,
+    bottomRightRadius: AppTheme.radiusMedium,
   );
 
   static const system = MessageStyle(
     alignment: Alignment.centerLeft,
     crossAxisAlignment: CrossAxisAlignment.start,
     horizontalMargin: 0.0,
-    bottomLeftRadius: 4.0,
-    bottomRightRadius: 16.0,
+    bottomLeftRadius: AppTheme.radiusMedium / 4,
+    bottomRightRadius: AppTheme.radiusMedium,
   );
 
   static MessageStyle fromRole(MessageRole role) {
