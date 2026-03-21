@@ -210,7 +210,7 @@ class ChatNotifier extends Notifier<ChatState> {
     await _saveChat();
   }
 
-  Future<void> setImageAspectRatio(String aspectRatio) async {
+  Future<void> setImageAspectRatio(ImageAspectRatio aspectRatio) async {
     state = state.copyWith(
       imageAspectRatio: aspectRatio,
       chat: state.chat.copyWith(imageAspectRatio: aspectRatio),
@@ -218,7 +218,7 @@ class ChatNotifier extends Notifier<ChatState> {
     await _saveChat();
   }
 
-  Future<void> setImageSize(String imageSize) async {
+  Future<void> setImageSize(ImageSize imageSize) async {
     state = state.copyWith(
       imageSize: imageSize,
       chat: state.chat.copyWith(imageSize: imageSize),

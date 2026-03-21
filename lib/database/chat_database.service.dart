@@ -164,8 +164,10 @@ class ChatDatabaseService {
               orElse: () => ImageModalities.imagePlusText,
             )
           : ImageModalities.imagePlusText,
-      imageAspectRatio: (frontmatter['imageAspectRatio'] as String?) ?? '1:1',
-      imageSize: (frontmatter['imageSize'] as String?) ?? '1K',
+      imageAspectRatio: _parseImageAspectRatio(
+        frontmatter['imageAspectRatio'] as String?,
+      ),
+      imageSize: _parseImageSize(frontmatter['imageSize'] as String?),
     );
   }
 
@@ -193,8 +195,8 @@ class ChatDatabaseService {
       ..writeln('toolsEnabled: ${json.encode(chat.toolsEnabled)}')
       ..writeln('imageOutputEnabled: ${json.encode(chat.imageOutputEnabled)}')
       ..writeln('imageModalities: ${json.encode(chat.imageModalities.name)}')
-      ..writeln('imageAspectRatio: ${json.encode(chat.imageAspectRatio)}')
-      ..writeln('imageSize: ${json.encode(chat.imageSize)}')
+      ..writeln('imageAspectRatio: ${json.encode(chat.imageAspectRatio.value)}')
+      ..writeln('imageSize: ${json.encode(chat.imageSize.value)}')
       ..writeln('---')
       ..writeln('# Chat Transcript');
 
@@ -268,5 +270,21 @@ class ChatDatabaseService {
     }
 
     return 'Chat ${chat.id}';
+  }
+
+  ImageAspectRatio _parseImageAspectRatio(String? value) {
+    if (value == null) return ImageAspectRatio.ratio1x1;
+    return ImageAspectRatio.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageAspectRatio.ratio1x1,
+    );
+  }
+
+  ImageSize _parseImageSize(String? value) {
+    if (value == null) return ImageSize.size1K;
+    return ImageSize.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageSize.size1K,
+    );
   }
 }

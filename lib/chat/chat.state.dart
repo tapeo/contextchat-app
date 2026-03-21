@@ -9,8 +9,8 @@ class ChatState extends Equatable {
   final String? selectedModelId;
   final bool imageOutputEnabled;
   final ImageModalities imageModalities;
-  final String imageAspectRatio;
-  final String imageSize;
+  final ImageAspectRatio imageAspectRatio;
+  final ImageSize imageSize;
   final bool toolsEnabled;
 
   const ChatState({
@@ -20,8 +20,8 @@ class ChatState extends Equatable {
     this.selectedModelId,
     this.imageOutputEnabled = false,
     this.imageModalities = ImageModalities.imagePlusText,
-    this.imageAspectRatio = '1:1',
-    this.imageSize = '1K',
+    this.imageAspectRatio = ImageAspectRatio.ratio1x1,
+    this.imageSize = ImageSize.size1K,
     this.toolsEnabled = true,
   });
 
@@ -32,8 +32,8 @@ class ChatState extends Equatable {
     String? selectedModelId,
     bool? imageOutputEnabled,
     ImageModalities? imageModalities,
-    String? imageAspectRatio,
-    String? imageSize,
+    ImageAspectRatio? imageAspectRatio,
+    ImageSize? imageSize,
     bool? toolsEnabled,
   }) {
     return ChatState(

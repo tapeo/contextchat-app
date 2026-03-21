@@ -20,18 +20,6 @@ class ParametersInputDialog extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() {
     return _ParametersInputViewState();
   }
-
-  static const aspectRatios = [
-    '1:1',
-    '16:9',
-    '9:16',
-    '4:3',
-    '3:4',
-    '3:2',
-    '2:3',
-  ];
-
-  static const imageSizes = ['0.5K', '1K', '2K', '4K'];
 }
 
 class _ParametersInputViewState extends ConsumerState<ParametersInputDialog> {
@@ -117,15 +105,10 @@ class _ParametersContent extends ConsumerWidget {
               spacing: 8,
               children: [
                 Expanded(
-                  child: DropdownWidget<String>(
-                    value:
-                        ParametersInputDialog.aspectRatios.contains(
-                          chatState.imageAspectRatio,
-                        )
-                        ? chatState.imageAspectRatio
-                        : ParametersInputDialog.aspectRatios.first,
-                    items: ParametersInputDialog.aspectRatios,
-                    labelBuilder: (value) => value,
+                  child: DropdownWidget<ImageAspectRatio>(
+                    value: chatState.imageAspectRatio,
+                    items: ImageAspectRatio.values,
+                    labelBuilder: (value) => value.displayName,
                     labelText: 'Aspect ratio',
                     onChanged: (value) {
                       if (value != null) {
@@ -135,15 +118,10 @@ class _ParametersContent extends ConsumerWidget {
                   ),
                 ),
                 Expanded(
-                  child: DropdownWidget<String>(
-                    value:
-                        ParametersInputDialog.imageSizes.contains(
-                          chatState.imageSize,
-                        )
-                        ? chatState.imageSize
-                        : '1K',
-                    items: ParametersInputDialog.imageSizes,
-                    labelBuilder: (value) => value,
+                  child: DropdownWidget<ImageSize>(
+                    value: chatState.imageSize,
+                    items: ImageSize.values,
+                    labelBuilder: (value) => value.displayName,
                     labelText: 'Image size',
                     onChanged: (value) {
                       if (value != null) {

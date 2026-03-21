@@ -9,6 +9,33 @@ enum ImageModalities {
   const ImageModalities(this.modalities);
 }
 
+enum ImageAspectRatio {
+  ratio1x1('1:1'),
+  ratio16x9('16:9'),
+  ratio9x16('9:16'),
+  ratio4x3('4:3'),
+  ratio3x4('3:4'),
+  ratio3x2('3:2'),
+  ratio2x3('2:3');
+
+  final String value;
+  const ImageAspectRatio(this.value);
+
+  String get displayName => value;
+}
+
+enum ImageSize {
+  size0_5K('0.5K'),
+  size1K('1K'),
+  size2K('2K'),
+  size4K('4K');
+
+  final String value;
+  const ImageSize(this.value);
+
+  String get displayName => value;
+}
+
 class AssistantImage extends Equatable {
   final String base64Data;
   final String mimeType;
@@ -65,14 +92,14 @@ class AssistantImage extends Equatable {
 }
 
 class ImageConfig {
-  final String aspectRatio;
-  final String imageSize;
+  final ImageAspectRatio aspectRatio;
+  final ImageSize imageSize;
 
   const ImageConfig({required this.aspectRatio, required this.imageSize});
 
   Map<String, dynamic> toJson() => {
-    'aspect_ratio': aspectRatio,
-    'image_size': imageSize,
+    'aspect_ratio': aspectRatio.value,
+    'image_size': imageSize.value,
   };
 }
 

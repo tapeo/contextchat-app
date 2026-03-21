@@ -11,8 +11,8 @@ class Chat extends Equatable {
   final bool toolsEnabled;
   final bool imageOutputEnabled;
   final ImageModalities imageModalities;
-  final String imageAspectRatio;
-  final String imageSize;
+  final ImageAspectRatio imageAspectRatio;
+  final ImageSize imageSize;
 
   const Chat({
     required this.id,
@@ -23,8 +23,8 @@ class Chat extends Equatable {
     this.toolsEnabled = true,
     this.imageOutputEnabled = false,
     this.imageModalities = ImageModalities.imagePlusText,
-    this.imageAspectRatio = '1:1',
-    this.imageSize = '1K',
+    this.imageAspectRatio = ImageAspectRatio.ratio1x1,
+    this.imageSize = ImageSize.size1K,
   });
 
   Chat copyWith({
@@ -36,8 +36,8 @@ class Chat extends Equatable {
     bool? toolsEnabled,
     bool? imageOutputEnabled,
     ImageModalities? imageModalities,
-    String? imageAspectRatio,
-    String? imageSize,
+    ImageAspectRatio? imageAspectRatio,
+    ImageSize? imageSize,
   }) {
     return Chat(
       id: id ?? this.id,
@@ -126,8 +126,10 @@ class Chat extends Equatable {
               orElse: () => ImageModalities.imagePlusText,
             )
           : ImageModalities.imagePlusText,
-      imageAspectRatio: (json['imageAspectRatio'] as String?) ?? '1:1',
-      imageSize: (json['imageSize'] as String?) ?? '1K',
+      imageAspectRatio: _parseImageAspectRatio(
+        json['imageAspectRatio'] as String?,
+      ),
+      imageSize: _parseImageSize(json['imageSize'] as String?),
     );
   }
 
@@ -144,4 +146,20 @@ class Chat extends Equatable {
     imageAspectRatio,
     imageSize,
   ];
+
+  static ImageAspectRatio _parseImageAspectRatio(String? value) {
+    if (value == null) return ImageAspectRatio.ratio1x1;
+    return ImageAspectRatio.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageAspectRatio.ratio1x1,
+    );
+  }
+
+  static ImageSize _parseImageSize(String? value) {
+    if (value == null) return ImageSize.size1K;
+    return ImageSize.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageSize.size1K,
+    );
+  }
 }
