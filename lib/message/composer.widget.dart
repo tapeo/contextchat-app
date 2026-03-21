@@ -237,12 +237,6 @@ class _ComposerWidgetState extends ConsumerState<ComposerWidget> {
                   ),
                   const Expanded(child: SelectAiModelDialog()),
                   const ParametersInputDialog(),
-                  if (_loading)
-                    const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
                   if (!isPhone)
                     IconButtonWidget(
                       onPressed: _canSend

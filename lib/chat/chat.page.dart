@@ -138,6 +138,39 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     );
   }
 
+  Widget _loadingMessage() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(left: 0, right: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(8),
+            topRight: const Radius.circular(8),
+            bottomLeft: const Radius.circular(2),
+            bottomRight: const Radius.circular(8),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Thinking...',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            const SizedBox(width: 8),
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (chatId == null) {
@@ -198,7 +231,9 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                 padding: EdgeInsets.only(top: 16, bottom: 16),
                 itemCount:
                     chatState.chat.messages.length +
-                    (chatState.accumulatedResponse != null ? 1 : 0),
+                    (loading && chatState.accumulatedResponse == null
+                        ? 1
+                        : (chatState.accumulatedResponse != null ? 1 : 0)),
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 12),
                 itemBuilder: (context, index) {
@@ -225,7 +260,9 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                         }
                       },
                     );
-                  } else {
+                  } else if (loading && chatState.accumulatedResponse == null) {
+                    return _loadingMessage();
+                  } else if (chatState.accumulatedResponse != null) {
                     return MessageWidget(
                       message: Message(
                         id: 'streaming-preview',
@@ -235,6 +272,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
                       ),
                     );
                   }
+                  return const SizedBox.shrink();
                 },
               ),
             ),
