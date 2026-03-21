@@ -2,7 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chat.provider.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
+import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/button.dart';
+import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/list_tile.dart';
 import 'package:contextchat/components/list_view_gradient_overlay.dart';
@@ -227,18 +229,23 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
         maxHeight: isPhone ? MediaQuery.sizeOf(context).height * 0.7 : 420,
       ),
       child: Column(
-        spacing: 8,
+        spacing: 16,
         children: [
-          _CustomModelInput(
-            onSelect: (customModelId) =>
-                Navigator.of(context).pop(customModelId),
-          ),
-          InputWidget(
-            controller: _searchController,
-            onChanged: (_) => setState(() {}),
-            labelText: 'Search models',
-            labelStyle: theme.textTheme.bodySmall,
-            style: theme.textTheme.bodySmall,
+          Column(
+            spacing: 8,
+            children: [
+              _CustomModelInput(
+                onSelect: (customModelId) =>
+                    Navigator.of(context).pop(customModelId),
+              ),
+              InputWidget(
+                controller: _searchController,
+                onChanged: (_) => setState(() {}),
+                labelText: 'Search models',
+                labelStyle: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
           ),
           Wrap(
             spacing: 8,
@@ -261,6 +268,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                 : ListViewGradientOverlay(
                     showTop: true,
                     child: ListView.separated(
+                      padding: EdgeInsets.symmetric(vertical: 8),
                       itemCount: filteredModels.length,
                       separatorBuilder: (context, index) =>
                           const Divider(height: 16),
@@ -270,6 +278,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                         return ListTileWidget(
                           selected: model.id == widget.selectedModelId,
                           padding: EdgeInsets.zero,
+                          onTap: () => Navigator.of(context).pop(model.id),
                           title: Row(
                             children: [
                               Tooltip(
@@ -297,21 +306,40 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 2),
-                                    SelectionArea(
-                                      child: Text(
-                                        model.id,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              color: theme
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.color
-                                                  ?.withAlpha(128),
-                                              fontFamily: 'monospace',
-                                            ),
-                                      ),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            model.id,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  color: theme
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.color
+                                                      ?.withAlpha(128),
+                                                  fontFamily: 'monospace',
+                                                ),
+                                          ),
+                                        ),
+                                        IconButtonWidget(
+                                          icon: const Icon(
+                                            LucideIcons.copy,
+                                            size: 8,
+                                          ),
+                                          onPressed: () {
+                                            Clipboard.setData(
+                                              ClipboardData(text: model.id),
+                                            );
+                                            showAppSnackBar(
+                                              context,
+                                              'Model ID copied to clipboard',
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
@@ -330,7 +358,6 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                               ),
                             ],
                           ),
-                          onTap: () => Navigator.of(context).pop(model.id),
                         );
                       },
                     ),

@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/image/image_viewer.page.dart';
 import 'package:contextchat/message/message.model.dart';
 import 'package:contextchat/message/message.style.dart';
 import 'package:contextchat/theme.dart';
@@ -276,10 +278,22 @@ class _MessageWidgetState extends State<MessageWidget> {
           borderRadius: BorderRadius.circular(10),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 280, maxHeight: 280),
-            child: Image.memory(
-              bytes,
-              fit: BoxFit.cover,
-              key: ValueKey(image.base64Data.hashCode),
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  NoTransitionRoute(
+                    builder: (context) => ImageViewerPage(
+                      base64Data: image.base64Data,
+                      mimeType: image.mimeType,
+                    ),
+                  ),
+                );
+              },
+              child: Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+                key: ValueKey(image.base64Data.hashCode),
+              ),
             ),
           ),
         );
