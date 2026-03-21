@@ -33,6 +33,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
   bool _autoScrollEnabled = true;
   bool _scrollScheduled = false;
   bool _programmaticScrollInProgress = false;
+  String? _previousChatId;
 
   String? get chatId =>
       ref.watch(chatsProvider.select((state) => state.selectedChatId));
@@ -102,6 +103,33 @@ class _ChatUiState extends ConsumerState<ChatPage> {
         _programmaticScrollInProgress = false;
       }
     });
+  }
+
+  void _scrollToBottomAfterBuild() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _scrollToBottomWithRetries();
+    });
+  }
+
+  void _scrollToBottomWithRetries() {
+    _scrollToBottomAttempt();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _scrollToBottomAttempt();
+    });
+  }
+
+  void _scrollToBottomAttempt() {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (!position.hasContentDimensions) return;
+
+    _programmaticScrollInProgress = true;
+    try {
+      _scrollController.jumpTo(position.maxScrollExtent);
+    } finally {
+      _programmaticScrollInProgress = false;
+    }
   }
 
   Future<void> _submitCurrentMessage({
@@ -220,12 +248,21 @@ class _ChatUiState extends ConsumerState<ChatPage> {
       );
     });
 
+    final isInitialLoad = _previousChatId != chatId && !chatState.loading;
+    if (isInitialLoad) {
+      _autoScrollEnabled = true;
+    }
+    _previousChatId = chatId;
+
     ref.listen<ChatState>(chatProvider(chatId!), (previous, next) {
-      // If user is at/near bottom, keep following new messages and streamed content.
       if (_autoScrollEnabled) {
         _scheduleScrollToBottom();
       }
     });
+
+    if (isInitialLoad && chatState.chat.messages.isNotEmpty) {
+      _scrollToBottomAfterBuild();
+    }
 
     String? selectedModelId = chatState.selectedModelId;
 
