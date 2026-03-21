@@ -240,7 +240,6 @@ class _ChatUiState extends ConsumerState<ChatPage> {
             ),
           ),
         ),
-        Divider(height: 1, color: Theme.of(context).dividerColor),
         Padding(padding: const EdgeInsets.all(8), child: ComposerWidget()),
       ],
     );
