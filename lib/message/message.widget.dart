@@ -10,6 +10,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -110,8 +111,10 @@ class _MessageWidgetState extends State<MessageWidget> {
                                   ? _formatToolCallsSummary()
                                   : content),
                         styleSheet: MarkdownStyleSheet(
-                          p: TextStyle(color: colors.onColor),
-                          code: TextStyle(color: colors.onColor),
+                          code: GoogleFonts.jetBrainsMono(
+                            color: colors.onColor,
+                            fontSize: 11,
+                          ),
                           codeblockDecoration: BoxDecoration(
                             color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(
