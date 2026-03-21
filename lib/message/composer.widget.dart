@@ -50,7 +50,7 @@ class _ComposerWidgetState extends ConsumerState<ComposerWidget> {
 
   String? get _selectedModelId => _chatId != null
       ? ref.watch(
-          chatProvider(_chatId!).select((state) => state.selectedModelId),
+          chatProvider(_chatId!).select((state) => state.chat.selectedModelId),
         )
       : null;
 
@@ -108,7 +108,7 @@ class _ComposerWidgetState extends ConsumerState<ComposerWidget> {
     required ChatState chatState,
     required OpenRouterModel? selectedModel,
   }) {
-    if (!chatState.imageOutputEnabled) {
+    if (!chatState.chat.imageOutputEnabled) {
       return null;
     }
 
@@ -121,14 +121,14 @@ class _ComposerWidgetState extends ConsumerState<ComposerWidget> {
     );
 
     final selectedModalities = supportsTextOutput
-        ? chatState.imageModalities
+        ? chatState.chat.imageModalities
         : ImageModalities.imageOnly;
 
     return OpenRouterImageGenerationOptions(
       modalities: selectedModalities,
       imageConfig: ImageConfig(
-        imageSize: chatState.imageSize,
-        aspectRatio: chatState.imageAspectRatio,
+        imageSize: chatState.chat.imageSize,
+        aspectRatio: chatState.chat.imageAspectRatio,
       ),
     );
   }

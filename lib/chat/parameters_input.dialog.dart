@@ -76,19 +76,19 @@ class _ParametersContent extends ConsumerWidget {
         runSpacing: 16,
         children: [
           SwitchWidget(
-            value: chatState.toolsEnabled,
+            value: chatState.chat.toolsEnabled,
             onChanged: (value) => notifier.setToolsEnabled(value),
             label: 'Tool calling',
           ),
           SwitchWidget(
-            value: chatState.imageOutputEnabled,
+            value: chatState.chat.imageOutputEnabled,
             onChanged: (value) => notifier.setImageOutputEnabled(value),
             label: 'Image output',
           ),
-          if (chatState.imageOutputEnabled) ...[
+          if (chatState.chat.imageOutputEnabled) ...[
             ButtonSelectorWidget<ImageModalities>(
               options: ImageModalities.values,
-              selectedOption: chatState.imageModalities,
+              selectedOption: chatState.chat.imageModalities,
               labelBuilder: (option) {
                 switch (option) {
                   case ImageModalities.imageOnly:
@@ -106,7 +106,7 @@ class _ParametersContent extends ConsumerWidget {
               children: [
                 Expanded(
                   child: DropdownWidget<ImageAspectRatio>(
-                    value: chatState.imageAspectRatio,
+                    value: chatState.chat.imageAspectRatio,
                     items: ImageAspectRatio.values,
                     labelBuilder: (value) => value.displayName,
                     labelText: 'Aspect ratio',
@@ -119,7 +119,7 @@ class _ParametersContent extends ConsumerWidget {
                 ),
                 Expanded(
                   child: DropdownWidget<ImageSize>(
-                    value: chatState.imageSize,
+                    value: chatState.chat.imageSize,
                     items: ImageSize.values,
                     labelBuilder: (value) => value.displayName,
                     labelText: 'Image size',

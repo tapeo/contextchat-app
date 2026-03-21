@@ -53,14 +53,8 @@ class ChatNotifier extends Notifier<ChatState> {
     }
 
     return ChatState(
-      chat: effectiveChat,
+      chat: effectiveChat.copyWith(selectedModelId: initialModelId),
       loading: false,
-      selectedModelId: initialModelId,
-      toolsEnabled: effectiveChat.toolsEnabled,
-      imageOutputEnabled: effectiveChat.imageOutputEnabled,
-      imageModalities: effectiveChat.imageModalities,
-      imageAspectRatio: effectiveChat.imageAspectRatio,
-      imageSize: effectiveChat.imageSize,
     );
   }
 
@@ -96,7 +90,7 @@ class ChatNotifier extends Notifier<ChatState> {
           ? const _ProjectContextPayload.empty()
           : await _buildProjectContext(project);
 
-      final effectiveModelId = state.selectedModelId;
+      final effectiveModelId = state.chat.selectedModelId;
       final selectedModel = ref
           .read(openRouterModelsProvider)
           .models
@@ -127,19 +121,19 @@ class ChatNotifier extends Notifier<ChatState> {
 
       Chat updatedChat;
 
-      if (state.toolsEnabled) {
+      if (state.chat.toolsEnabled) {
         final registry = buildGlobalToolRegistry();
         updatedChat = await _sendMessageWithTools(
           initialMessages: initialMessages,
           registry: registry,
-          modelId: state.selectedModelId,
+          modelId: state.chat.selectedModelId,
           settings: settings,
           imageGeneration: imageGeneration,
         );
       } else {
         updatedChat = await _sendMessageStreaming(
           initialMessages: initialMessages,
-          modelId: state.selectedModelId,
+          modelId: state.chat.selectedModelId,
           imageGeneration: imageGeneration,
         );
       }
@@ -183,7 +177,7 @@ class ChatNotifier extends Notifier<ChatState> {
   }
 
   void selectModel(String id) {
-    state = state.copyWith(selectedModelId: id);
+    state = state.copyWith(chat: state.chat.copyWith(selectedModelId: id));
 
     final projectId = state.chat.projectId;
     if (projectId != null && id.isNotEmpty) {
@@ -193,7 +187,6 @@ class ChatNotifier extends Notifier<ChatState> {
 
   Future<void> setImageOutputEnabled(bool enabled) async {
     state = state.copyWith(
-      imageOutputEnabled: enabled,
       chat: state.chat.copyWith(imageOutputEnabled: enabled),
     );
     await _saveChat();
@@ -201,7 +194,6 @@ class ChatNotifier extends Notifier<ChatState> {
 
   Future<void> setImageModalities(ImageModalities modalities) async {
     state = state.copyWith(
-      imageModalities: modalities,
       chat: state.chat.copyWith(imageModalities: modalities),
     );
     await _saveChat();
@@ -209,25 +201,18 @@ class ChatNotifier extends Notifier<ChatState> {
 
   Future<void> setImageAspectRatio(ImageAspectRatio aspectRatio) async {
     state = state.copyWith(
-      imageAspectRatio: aspectRatio,
       chat: state.chat.copyWith(imageAspectRatio: aspectRatio),
     );
     await _saveChat();
   }
 
   Future<void> setImageSize(ImageSize imageSize) async {
-    state = state.copyWith(
-      imageSize: imageSize,
-      chat: state.chat.copyWith(imageSize: imageSize),
-    );
+    state = state.copyWith(chat: state.chat.copyWith(imageSize: imageSize));
     await _saveChat();
   }
 
   Future<void> setToolsEnabled(bool enabled) async {
-    state = state.copyWith(
-      toolsEnabled: enabled,
-      chat: state.chat.copyWith(toolsEnabled: enabled),
-    );
+    state = state.copyWith(chat: state.chat.copyWith(toolsEnabled: enabled));
     await _saveChat();
   }
 
@@ -499,7 +484,7 @@ class ChatNotifier extends Notifier<ChatState> {
       final updatedChat = await _sendMessageWithTools(
         initialMessages: completionMessages,
         registry: registry,
-        modelId: state.selectedModelId,
+        modelId: state.chat.selectedModelId,
         settings: ref.read(openRouterProvider),
       );
 

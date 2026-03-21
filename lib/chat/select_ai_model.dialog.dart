@@ -97,7 +97,7 @@ class _SelectAiModelViewState extends ConsumerState<SelectAiModelDialog> {
     }
 
     final selectedModelId = ref.watch(
-      chatProvider(chatId!).select((state) => state.selectedModelId),
+      chatProvider(chatId!).select((state) => state.chat.selectedModelId),
     );
 
     final openRouterModelsState = ref.watch(openRouterModelsProvider);

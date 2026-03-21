@@ -8,6 +8,7 @@ class Chat extends Equatable {
   final String? title;
   final List<Message> messages;
   final DateTime? updatedAt;
+  final String? selectedModelId;
   final bool toolsEnabled;
   final bool imageOutputEnabled;
   final ImageModalities imageModalities;
@@ -20,7 +21,8 @@ class Chat extends Equatable {
     this.title,
     required this.messages,
     this.updatedAt,
-    this.toolsEnabled = true,
+    this.selectedModelId,
+    this.toolsEnabled = false,
     this.imageOutputEnabled = false,
     this.imageModalities = ImageModalities.imagePlusText,
     this.imageAspectRatio = ImageAspectRatio.ratio1x1,
@@ -33,6 +35,7 @@ class Chat extends Equatable {
     String? title,
     List<Message>? messages,
     DateTime? updatedAt,
+    String? selectedModelId,
     bool? toolsEnabled,
     bool? imageOutputEnabled,
     ImageModalities? imageModalities,
@@ -45,6 +48,7 @@ class Chat extends Equatable {
       title: title ?? this.title,
       messages: messages ?? this.messages,
       updatedAt: updatedAt ?? this.updatedAt,
+      selectedModelId: selectedModelId ?? this.selectedModelId,
       toolsEnabled: toolsEnabled ?? this.toolsEnabled,
       imageOutputEnabled: imageOutputEnabled ?? this.imageOutputEnabled,
       imageModalities: imageModalities ?? this.imageModalities,
@@ -75,6 +79,7 @@ class Chat extends Equatable {
           )
           .toList(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'selectedModelId': selectedModelId,
       'toolsEnabled': toolsEnabled,
       'imageOutputEnabled': imageOutputEnabled,
       'imageModalities': imageModalities.name,
@@ -119,6 +124,7 @@ class Chat extends Equatable {
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt'] as String)
           : null,
+      selectedModelId: json['selectedModelId'] as String?,
       toolsEnabled: (json['toolsEnabled'] as bool?) ?? true,
       imageOutputEnabled: (json['imageOutputEnabled'] as bool?) ?? false,
       imageModalities: json['imageModalities'] != null
@@ -141,6 +147,7 @@ class Chat extends Equatable {
     title,
     messages,
     updatedAt,
+    selectedModelId,
     toolsEnabled,
     imageOutputEnabled,
     imageModalities,
