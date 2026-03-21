@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MessageWidget extends StatefulWidget {
@@ -366,6 +367,14 @@ class _MessageWidgetState extends State<MessageWidget> {
   Future<void> _downloadImages(BuildContext context) async {
     final images = widget.message.images ?? [];
     if (images.isEmpty) return;
+
+    final status = await Permission.photosAddOnly.request();
+    if (!status.isGranted) {
+      if (context.mounted) {
+        showAppSnackBar(context, 'Permission denied');
+      }
+      return;
+    }
 
     for (int i = 0; i < images.length; i++) {
       final bytes = _getDecodedImageBytes(images[i].base64Data);
