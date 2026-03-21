@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/no_transition_route.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/image/image_viewer.page.dart';
 import 'package:contextchat/message/message.model.dart';
 import 'package:contextchat/message/message.style.dart';
@@ -205,6 +207,39 @@ class _MessageWidgetState extends State<MessageWidget> {
                       },
                   icon: Icon(
                     LucideIcons.copy,
+                    size: 12,
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                IconButtonWidget(
+                  onPressed:
+                      widget.onCopy ??
+                      () {
+                        // show raw response json in a dialog
+                        showAppDialog(
+                          context: context,
+                          title: const Text('Raw Message Data'),
+                          content: SingleChildScrollView(
+                            child: SelectableText(
+                              const JsonEncoder.withIndent(
+                                '  ',
+                              ).convert(widget.message.toJson()),
+                              style: GoogleFonts.jetBrainsMono(
+                                color: colors.onColor,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            TextButtonWidget(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        );
+                      },
+                  icon: Icon(
+                    LucideIcons.code,
                     size: 12,
                     color: colorScheme.onSurface.withValues(alpha: 0.6),
                   ),

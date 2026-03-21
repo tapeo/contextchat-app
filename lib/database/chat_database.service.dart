@@ -156,6 +156,16 @@ class ChatDatabaseService {
       updatedAt: frontmatter['updatedAt'] != null
           ? DateTime.tryParse(frontmatter['updatedAt'] as String)
           : null,
+      toolsEnabled: (frontmatter['toolsEnabled'] as bool?) ?? true,
+      imageOutputEnabled: (frontmatter['imageOutputEnabled'] as bool?) ?? false,
+      imageModalities: frontmatter['imageModalities'] != null
+          ? ImageModalities.values.firstWhere(
+              (m) => m.name == frontmatter['imageModalities'],
+              orElse: () => ImageModalities.imagePlusText,
+            )
+          : ImageModalities.imagePlusText,
+      imageAspectRatio: (frontmatter['imageAspectRatio'] as String?) ?? '1:1',
+      imageSize: (frontmatter['imageSize'] as String?) ?? '1K',
     );
   }
 
@@ -180,6 +190,11 @@ class ChatDatabaseService {
       ..writeln('createdAt: ${json.encode(createdAt)}')
       ..writeln('updatedAt: ${json.encode(updatedAt)}')
       ..writeln('title: ${json.encode(title)}')
+      ..writeln('toolsEnabled: ${json.encode(chat.toolsEnabled)}')
+      ..writeln('imageOutputEnabled: ${json.encode(chat.imageOutputEnabled)}')
+      ..writeln('imageModalities: ${json.encode(chat.imageModalities.name)}')
+      ..writeln('imageAspectRatio: ${json.encode(chat.imageAspectRatio)}')
+      ..writeln('imageSize: ${json.encode(chat.imageSize)}')
       ..writeln('---')
       ..writeln('# Chat Transcript');
 

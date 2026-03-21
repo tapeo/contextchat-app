@@ -75,4 +75,41 @@ class Message extends Equatable {
       images: images ?? this.images,
     );
   }
+
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      id: json['id'] as String,
+      timestamp: json['timestamp'] as String,
+      content: json['content'] as String,
+      role: MessageRole.values.firstWhere((r) => r.name == json['role']),
+      toolCallId: json['toolCallId'] as String?,
+      toolName: json['toolName'] as String?,
+      toolCallsJson: json['toolCallsJson'] as String?,
+      toolError: (json['toolError'] as bool?) ?? false,
+      toolCallsProcessed: (json['toolCallsProcessed'] as bool?) ?? false,
+      images: json['images'] != null
+          ? (json['images'] as List)
+                .map(
+                  (image) =>
+                      AssistantImage.fromJson(image as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'timestamp': timestamp,
+      'content': content,
+      'role': role.name,
+      'toolCallId': toolCallId,
+      'toolName': toolName,
+      'toolCallsJson': toolCallsJson,
+      'toolError': toolError,
+      'toolCallsProcessed': toolCallsProcessed,
+      'images': images?.map((image) => image.toJson()).toList(),
+    };
+  }
 }

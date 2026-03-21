@@ -56,6 +56,11 @@ class ChatNotifier extends Notifier<ChatState> {
       chat: effectiveChat,
       loading: false,
       selectedModelId: initialModelId,
+      toolsEnabled: effectiveChat.toolsEnabled,
+      imageOutputEnabled: effectiveChat.imageOutputEnabled,
+      imageModalities: effectiveChat.imageModalities,
+      imageAspectRatio: effectiveChat.imageAspectRatio,
+      imageSize: effectiveChat.imageSize,
     );
   }
 
@@ -189,24 +194,44 @@ class ChatNotifier extends Notifier<ChatState> {
     }
   }
 
-  void setImageOutputEnabled(bool enabled) {
-    state = state.copyWith(imageOutputEnabled: enabled);
+  Future<void> setImageOutputEnabled(bool enabled) async {
+    state = state.copyWith(
+      imageOutputEnabled: enabled,
+      chat: state.chat.copyWith(imageOutputEnabled: enabled),
+    );
+    await _saveChat();
   }
 
-  void setImageModalities(ImageModalities modalities) {
-    state = state.copyWith(imageModalities: modalities);
+  Future<void> setImageModalities(ImageModalities modalities) async {
+    state = state.copyWith(
+      imageModalities: modalities,
+      chat: state.chat.copyWith(imageModalities: modalities),
+    );
+    await _saveChat();
   }
 
-  void setImageAspectRatio(String aspectRatio) {
-    state = state.copyWith(imageAspectRatio: aspectRatio);
+  Future<void> setImageAspectRatio(String aspectRatio) async {
+    state = state.copyWith(
+      imageAspectRatio: aspectRatio,
+      chat: state.chat.copyWith(imageAspectRatio: aspectRatio),
+    );
+    await _saveChat();
   }
 
-  void setImageSize(String imageSize) {
-    state = state.copyWith(imageSize: imageSize);
+  Future<void> setImageSize(String imageSize) async {
+    state = state.copyWith(
+      imageSize: imageSize,
+      chat: state.chat.copyWith(imageSize: imageSize),
+    );
+    await _saveChat();
   }
 
-  void setToolsEnabled(bool enabled) {
-    state = state.copyWith(toolsEnabled: enabled);
+  Future<void> setToolsEnabled(bool enabled) async {
+    state = state.copyWith(
+      toolsEnabled: enabled,
+      chat: state.chat.copyWith(toolsEnabled: enabled),
+    );
+    await _saveChat();
   }
 
   List<OpenRouterMessage> _buildOpenRouterMessages({

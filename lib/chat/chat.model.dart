@@ -8,6 +8,11 @@ class Chat extends Equatable {
   final String? title;
   final List<Message> messages;
   final DateTime? updatedAt;
+  final bool toolsEnabled;
+  final bool imageOutputEnabled;
+  final ImageModalities imageModalities;
+  final String imageAspectRatio;
+  final String imageSize;
 
   const Chat({
     required this.id,
@@ -15,6 +20,11 @@ class Chat extends Equatable {
     this.title,
     required this.messages,
     this.updatedAt,
+    this.toolsEnabled = true,
+    this.imageOutputEnabled = false,
+    this.imageModalities = ImageModalities.imagePlusText,
+    this.imageAspectRatio = '1:1',
+    this.imageSize = '1K',
   });
 
   Chat copyWith({
@@ -23,6 +33,11 @@ class Chat extends Equatable {
     String? title,
     List<Message>? messages,
     DateTime? updatedAt,
+    bool? toolsEnabled,
+    bool? imageOutputEnabled,
+    ImageModalities? imageModalities,
+    String? imageAspectRatio,
+    String? imageSize,
   }) {
     return Chat(
       id: id ?? this.id,
@@ -30,6 +45,11 @@ class Chat extends Equatable {
       title: title ?? this.title,
       messages: messages ?? this.messages,
       updatedAt: updatedAt ?? this.updatedAt,
+      toolsEnabled: toolsEnabled ?? this.toolsEnabled,
+      imageOutputEnabled: imageOutputEnabled ?? this.imageOutputEnabled,
+      imageModalities: imageModalities ?? this.imageModalities,
+      imageAspectRatio: imageAspectRatio ?? this.imageAspectRatio,
+      imageSize: imageSize ?? this.imageSize,
     );
   }
 
@@ -55,6 +75,11 @@ class Chat extends Equatable {
           )
           .toList(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'toolsEnabled': toolsEnabled,
+      'imageOutputEnabled': imageOutputEnabled,
+      'imageModalities': imageModalities.name,
+      'imageAspectRatio': imageAspectRatio,
+      'imageSize': imageSize,
     };
   }
 
@@ -93,9 +118,30 @@ class Chat extends Equatable {
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt'] as String)
           : null,
+      toolsEnabled: (json['toolsEnabled'] as bool?) ?? true,
+      imageOutputEnabled: (json['imageOutputEnabled'] as bool?) ?? false,
+      imageModalities: json['imageModalities'] != null
+          ? ImageModalities.values.firstWhere(
+              (m) => m.name == json['imageModalities'],
+              orElse: () => ImageModalities.imagePlusText,
+            )
+          : ImageModalities.imagePlusText,
+      imageAspectRatio: (json['imageAspectRatio'] as String?) ?? '1:1',
+      imageSize: (json['imageSize'] as String?) ?? '1K',
     );
   }
 
   @override
-  List<Object?> get props => [id, projectId, title, messages, updatedAt];
+  List<Object?> get props => [
+    id,
+    projectId,
+    title,
+    messages,
+    updatedAt,
+    toolsEnabled,
+    imageOutputEnabled,
+    imageModalities,
+    imageAspectRatio,
+    imageSize,
+  ];
 }
