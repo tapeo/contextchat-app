@@ -258,7 +258,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
               SwitchWidget(
                 value: _imageCapableOnly,
                 onChanged: (value) => setState(() => _imageCapableOnly = value),
-                label: 'Image capable only',
+                label: 'Image output',
               ),
             ],
           ),

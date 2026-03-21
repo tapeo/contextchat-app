@@ -107,10 +107,22 @@ Future<T?> showAppDialog<T>({
     isScrollControlled: true,
     isDismissible: barrierDismissible,
     backgroundColor: Colors.transparent,
-    builder: (context) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child:
-          child ?? AppDialog(title: title, content: content, actions: actions),
-    ),
+    builder: (context) {
+      final theme = Theme.of(context);
+      final sheetBackground = theme.cardColor.withValues(alpha: 1.0);
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: sheetBackground,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          top: false,
+          child:
+              child ??
+              AppDialog(title: title, content: content, actions: actions),
+        ),
+      );
+    },
   );
 }
