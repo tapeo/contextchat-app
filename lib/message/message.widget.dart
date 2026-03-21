@@ -110,6 +110,8 @@ class _MessageWidgetState extends State<MessageWidget> {
                                   ? _formatToolCallsSummary()
                                   : content),
                         styleSheet: MarkdownStyleSheet(
+                          p: TextStyle(color: colors.onColor),
+                          code: TextStyle(color: colors.onColor),
                           codeblockDecoration: BoxDecoration(
                             color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(
