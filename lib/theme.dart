@@ -53,7 +53,7 @@ class ContentWidths {
 }
 
 class AppTheme {
-  static const double radiusMedium = 8;
+  static const double radiusMedium = 10;
 
   static const Color _systemBlue = Color(0xFF0A84FF);
 
