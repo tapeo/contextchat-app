@@ -1,19 +1,13 @@
-import 'package:collection/collection.dart';
 import 'package:contextchat/chat/chat.provider.dart';
 import 'package:contextchat/chat/chat.state.dart';
-import 'package:contextchat/chat/chat_draft.provider.dart';
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
-import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/list_view_gradient_overlay.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/message/composer.widget.dart';
 import 'package:contextchat/message/message.model.dart';
 import 'package:contextchat/message/message.widget.dart';
-import 'package:contextchat/openrouter/openrouter.model.dart';
-import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
-import 'package:contextchat/settings/settings.page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,7 +21,6 @@ class ChatPage extends ConsumerStatefulWidget {
 class _ChatUiState extends ConsumerState<ChatPage> {
   static const double _bottomTolerancePx = 48.0;
 
-  final TextEditingController _textController = TextEditingController();
   late ScrollController _scrollController;
 
   bool _autoScrollEnabled = true;
@@ -51,7 +44,6 @@ class _ChatUiState extends ConsumerState<ChatPage> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _textController.dispose();
     super.dispose();
   }
 
@@ -132,88 +124,6 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     }
   }
 
-  Future<void> _submitCurrentMessage({
-    required String? selectedModelId,
-    required ChatState chatState,
-  }) async {
-    final text = _textController.text.trim();
-    if (text.isEmpty || selectedModelId == null) return;
-
-    final openRouterState = ref.read(openRouterProvider);
-    if (openRouterState.apiKey == null || openRouterState.apiKey!.isEmpty) {
-      _showSetupRequiredDialog();
-      return;
-    }
-
-    final openRouterModelsState = ref.read(openRouterModelsProvider);
-    final selectedModel = openRouterModelsState.models.firstWhereOrNull(
-      (model) => model.id == selectedModelId,
-    );
-
-    await send(
-      text,
-      selectedModelId,
-      imageGeneration: _buildImageGenerationOptions(
-        chatState: chatState,
-        selectedModel: selectedModel,
-      ),
-    );
-  }
-
-  OpenRouterImageGenerationOptions? _buildImageGenerationOptions({
-    required ChatState chatState,
-    required OpenRouterModel? selectedModel,
-  }) {
-    if (!chatState.imageOutputEnabled) {
-      return null;
-    }
-
-    if (selectedModel == null || !selectedModel.supportsImageOutput) {
-      return null;
-    }
-
-    final supportsTextOutput = selectedModel.architecture.outputModalities.any(
-      (modality) => modality.toLowerCase() == 'text',
-    );
-
-    final selectedModalities = supportsTextOutput
-        ? chatState.imageModalities
-        : ImageModalities.imageOnly;
-
-    return OpenRouterImageGenerationOptions(
-      modalities: selectedModalities,
-      imageConfig: ImageConfig(
-        aspectRatio: chatState.imageAspectRatio,
-        imageSize: chatState.imageSize,
-      ),
-    );
-  }
-
-  void _showSetupRequiredDialog() {
-    showAppDialog(
-      context: context,
-      title: const Text('OpenRouter setup required'),
-      content: const Text(
-        'You need to configure your OpenRouter API key before sending messages. Please go to Settings to set it up.',
-      ),
-      actions: [
-        TextButtonWidget(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        ButtonWidget(
-          onPressed: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SettingsPage()),
-            );
-          },
-          child: const Text('Go to Settings'),
-        ),
-      ],
-    );
-  }
-
   void _showOpenRouterErrorDialog(Object error) {
     showAppDialog(
       context: context,
@@ -237,16 +147,6 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     }
 
     ChatState chatState = ref.watch(chatProvider(chatId!));
-    ref.watch(chatDraftProvider(chatId!));
-
-    ref.listen<String>(chatDraftProvider(chatId!), (previous, next) {
-      if (!mounted) return;
-      if (_textController.text == next) return;
-      _textController.value = TextEditingValue(
-        text: next,
-        selection: TextSelection.collapsed(offset: next.length),
-      );
-    });
 
     final isInitialLoad = _previousChatId != chatId && !chatState.loading;
     if (isInitialLoad) {
@@ -263,8 +163,6 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     if (isInitialLoad && chatState.chat.messages.isNotEmpty) {
       _scrollToBottomAfterBuild();
     }
-
-    String? selectedModelId = chatState.selectedModelId;
 
     bool loading = chatState.loading;
 
@@ -343,54 +241,8 @@ class _ChatUiState extends ConsumerState<ChatPage> {
           ),
         ),
         Divider(height: 1, color: Theme.of(context).dividerColor),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: ComposerWidget(
-            controller: _textController,
-            onChanged: (value) =>
-                ref.read(chatDraftProvider(chatId!).notifier).setDraft(value),
-            loading: loading,
-            selectedModelId: selectedModelId,
-            onInsertPrompt: (promptText) {
-              if (chatId == null) return;
-              ref
-                  .read(chatDraftProvider(chatId!).notifier)
-                  .insert(promptText, replace: false);
-            },
-            onSubmit: () => _submitCurrentMessage(
-              selectedModelId: selectedModelId,
-              chatState: chatState,
-            ),
-          ),
-        ),
+        Padding(padding: const EdgeInsets.all(8), child: ComposerWidget()),
       ],
     );
-  }
-
-  Future<void> send(
-    String text,
-    String? modelId, {
-    OpenRouterImageGenerationOptions? imageGeneration,
-  }) async {
-    if (text.isEmpty || modelId == null || chatId == null) return;
-
-    String temporaryText = text;
-
-    try {
-      await ref
-          .read(chatProvider(chatId!).notifier)
-          .sendMessage(text, imageGeneration: imageGeneration);
-
-      _textController.clear();
-      ref.read(chatDraftProvider(chatId!).notifier).clear();
-    } catch (e) {
-      _textController.text = temporaryText;
-      _textController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _textController.text.length),
-      );
-      if (mounted) {
-        _showOpenRouterErrorDialog(e);
-      }
-    }
   }
 }
