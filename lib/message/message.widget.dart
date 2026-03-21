@@ -119,6 +119,20 @@ class _MessageWidgetState extends State<MessageWidget> {
                             color: colors.onColor,
                             fontSize: 11,
                           ),
+                          blockquoteDecoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusMedium,
+                            ),
+                            border: Border.all(color: theme.dividerColor),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
                           codeblockDecoration: BoxDecoration(
                             color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(
