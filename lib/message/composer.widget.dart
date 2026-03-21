@@ -6,8 +6,10 @@ import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/chat/parameters_input.dialog.dart';
 import 'package:contextchat/chat/select_ai_model.dialog.dart';
 import 'package:contextchat/chat/select_prompt.widget.dart';
+import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
+import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
@@ -132,36 +134,32 @@ class _ComposerWidgetState extends ConsumerState<ComposerWidget> {
   }
 
   void _showSetupRequiredDialog() {
-    showDialog<void>(
+    showAppDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Setup Required'),
-        content: const Text(
-          'Please add your OpenRouter API key in settings to start chatting.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
+      title: const Text('Setup Required'),
+      content: const Text(
+        'Please add your OpenRouter API key in settings to start chatting.',
       ),
+      actions: [
+        TextButtonWidget(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('OK'),
+        ),
+      ],
     );
   }
 
   void _showOpenRouterErrorDialog(Object error) {
-    showDialog<void>(
+    showAppDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(error.toString()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+      title: const Text('Error'),
+      content: Text(error.toString()),
+      actions: [
+        TextButtonWidget(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('OK'),
+        ),
+      ],
     );
   }
 
