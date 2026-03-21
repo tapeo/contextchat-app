@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:contextchat/chat/message.model.dart';
-import 'package:contextchat/chat/message.style.dart';
 import 'package:contextchat/components/app_snackbar.dart';
 import 'package:contextchat/components/icon_button.dart';
+import 'package:contextchat/message/message.model.dart';
+import 'package:contextchat/message/message.style.dart';
 import 'package:contextchat/theme.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MessageWidget extends StatefulWidget {

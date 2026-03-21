@@ -1,4 +1,4 @@
-import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/message/message.model.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 

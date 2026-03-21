@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:contextchat/chat/chat.model.dart';
-import 'package:contextchat/chat/message.model.dart';
+import 'package:contextchat/message/message.model.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
 import 'package:path/path.dart';
 
