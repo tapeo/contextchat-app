@@ -129,10 +129,7 @@ class ChatNotifier extends Notifier<ChatState> {
       Chat updatedChat;
 
       if (state.toolsEnabled) {
-        final registry = buildGlobalToolRegistry(
-          project: project,
-          projectsDatabase: projectsDatabase,
-        );
+        final registry = buildGlobalToolRegistry();
         updatedChat = await _sendMessageWithTools(
           initialMessages: initialMessages,
           registry: registry,
@@ -436,10 +433,7 @@ class ChatNotifier extends Notifier<ChatState> {
       final projectContext = project == null
           ? const _ProjectContextPayload.empty()
           : await _buildProjectContext(project);
-      final registry = buildGlobalToolRegistry(
-        project: project,
-        projectsDatabase: projectsDatabase,
-      );
+      final registry = buildGlobalToolRegistry();
 
       for (final toolCall in toolCalls) {
         final alreadyResolved = state.chat.messages.any(
