@@ -244,6 +244,7 @@ class _PromptEditPageState extends ConsumerState<PromptEditPage> {
         if (didPop) return;
         () async {
           if (!await _confirmDiscardIfDirty() || !mounted) return;
+          if (!context.mounted) return;
           Navigator.of(context).pop();
         }();
       },
@@ -252,6 +253,7 @@ class _PromptEditPageState extends ConsumerState<PromptEditPage> {
           title: selectedPrompt?.name ?? 'Edit Prompt',
           onBackPressed: () async {
             if (!await _confirmDiscardIfDirty() || !mounted) return;
+            if (!context.mounted) return;
             Navigator.of(context).pop();
           },
           actions: [
