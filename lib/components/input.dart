@@ -53,6 +53,7 @@ class InputWidget extends StatelessWidget {
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 12),
       constraints: BoxConstraints(minHeight: labelText != null ? 50 : 36),
       decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
