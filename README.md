@@ -20,16 +20,11 @@ ContextChat is a powerful AI interface designed for developers and power users w
 | Reusable instructions | Set base system prompts for each project. |
 | File knowledge | Import text files (PDF, code, docs) directly into the AI's context. |
 | Import from URL | Paste any URL to extract and import its content for AI context. |
-| Model defaults | Assign specific AI models to different projects. |
 | Local storage | All project data and files stay on your machine. |
 | OpenRouter integration | Access any model from OpenAI, Anthropic, Google, and more. |
-| Vision support | Drag and drop images into vision-capable models. |
 | Real-time streaming | Smooth, responsive message delivery. |
 | Context assembly | Automatically builds the prompt with project rules + files + history. |
 | Save and reuse | Build a library of frequently used prompts. |
-| Variables | Define variables in prompts for quick customization. |
-| Quick insert | Access your library directly from the chat composer. |
-| Pin and search | Keep your most important prompts at the top. |
 | Markdown support | Full rendering for code blocks and formatting. |
 
 ---
