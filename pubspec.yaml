@@ -37,6 +37,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.7
 
 flutter:
   uses-material-design: true
@@ -50,3 +51,11 @@ icons_launcher:
       enable: true
     macos:
       enable: true
+
+flutter_native_splash:
+  image: assets/foreground.png
+  background_image: assets/background.png
+  android_12:
+    image: assets/foreground.png
+    color: "#ffffff"
+    icon_background_color: "#ffffff"

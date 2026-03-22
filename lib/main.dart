@@ -61,7 +61,6 @@ class _Main extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      title: "ContextChat",
       home: App(),
     );
   }
