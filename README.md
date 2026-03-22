@@ -1,13 +1,14 @@
 # ContextChat
 
-![Logo](assets/logo.png)
+<img src="assets/macos-icon.png" width="200">
 
 ContextChat is a powerful AI interface designed for developers and power users who need project-specific AI assistance. It streamlines your workflow by automatically injecting project context, files, and reusable prompts into your conversations.
 
 ### Chat and settings
-| Light | Dark |
-| :---: | :---: |
-| ![Home Light](assets/home-light.png) | ![Home Dark](assets/home-dark.png) |
+
+|                    Light                     |                    Dark                    |
+| :------------------------------------------: | :----------------------------------------: |
+|     ![Home Light](assets/home-light.png)     |     ![Home Dark](assets/home-dark.png)     |
 | ![Settings Light](assets/settings-light.png) | ![Settings Dark](assets/settings-dark.png) |
 
 ---
@@ -46,7 +47,9 @@ All data is stored as plain JSON files, making it easy to backup, sync with git,
 ---
 
 ## How context works
+
 When you send a message, ContextChat automatically assembles a rich prompt:
+
 1.  **System Prompt**: Your Project's base context instructions.
 2.  **Files**: The content of all text files attached to the project.
 3.  **Images**: Any images you've attached to the current message.
@@ -55,6 +58,7 @@ When you send a message, ContextChat automatically assembles a rich prompt:
 ---
 
 ## Roadmap
+
 - [ ] **Search**: Full-text search across all chat histories.
 - [ ] **Message Editing**: Edit and regenerate AI responses.
 - [ ] **Multi-Provider**: Direct support for OpenAI, Anthropic, and Local (Ollama) APIs.
@@ -64,4 +68,5 @@ When you send a message, ContextChat automatically assembles a rich prompt:
 - [ ] **Sync**: Sync projects and chats with cloud storage (iCloud, Google Drive, Dropbox).
 
 ---
+
 Built with Flutter.
