@@ -78,8 +78,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       IconButtonWidget(
                         onPressed:
                             onBackPressed ?? () => Navigator.maybePop(context),
-                        icon: const Icon(LucideIcons.chevronLeft),
-                        small: true,
+                        icon: const Icon(LucideIcons.chevronLeft, size: 24),
                       ),
                       if (titleWidget != null) Flexible(child: titleWidget),
                     ],

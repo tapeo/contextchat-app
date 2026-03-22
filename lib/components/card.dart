@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class CardWidget extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
   final VoidCallback? onTap;
   final Color? color;
   final Color? borderColor;
@@ -13,6 +14,7 @@ class CardWidget extends StatelessWidget {
     super.key,
     required this.child,
     this.padding,
+    this.margin,
     this.onTap,
     this.color,
     this.borderColor,
@@ -22,6 +24,7 @@ class CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content = Container(
       padding: padding ?? const EdgeInsets.all(8),
+      margin: margin,
       decoration: BoxDecoration(
         color: color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),

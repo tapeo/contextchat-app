@@ -1,9 +1,7 @@
 import 'package:contextchat/chat/chat.provider.dart';
 import 'package:contextchat/chat/chat.state.dart';
 import 'package:contextchat/chat/chats.provider.dart';
-import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/list_view_gradient_overlay.dart';
-import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/message/composer.widget.dart';
 import 'package:contextchat/message/message.model.dart';
 import 'package:contextchat/message/message.widget.dart';
@@ -124,20 +122,6 @@ class _ChatUiState extends ConsumerState<ChatPage> {
     }
   }
 
-  void _showOpenRouterErrorDialog(Object error) {
-    showAppDialog(
-      context: context,
-      title: const Text('OpenRouter Error'),
-      content: Text(error.toString()),
-      actions: [
-        TextButtonWidget(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
-        ),
-      ],
-    );
-  }
-
   Widget _loadingMessage() {
     return Align(
       alignment: Alignment.centerLeft,
@@ -241,25 +225,7 @@ class _ChatUiState extends ConsumerState<ChatPage> {
 
                   if (index < visibleMessages.length) {
                     final msg = visibleMessages[index];
-                    return MessageWidget(
-                      message: msg,
-                      onApproveToolCalls: (assistantMessage) async {
-                        if (chatId == null) {
-                          return;
-                        }
-
-                        try {
-                          await ref
-                              .read(chatProvider(chatId!).notifier)
-                              .approveToolCallsAndContinue(assistantMessage.id);
-                        } catch (error) {
-                          if (!context.mounted) {
-                            return;
-                          }
-                          _showOpenRouterErrorDialog(error);
-                        }
-                      },
-                    );
+                    return MessageWidget(message: msg);
                   } else if (loading && chatState.accumulatedResponse == null) {
                     return _loadingMessage();
                   } else if (chatState.accumulatedResponse != null) {
