@@ -30,6 +30,7 @@ dependencies:
   google_fonts: ^8.0.2
   lucide_icons_flutter: ^3.1.10
   flutter_markdown_plus: ^1.0.7
+  icons_launcher: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -39,3 +40,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+icons_launcher:
+  image_path: "assets/ic_logo_radius.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+    macos:
+      enable: true
