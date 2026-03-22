@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'icon_button.dart';
@@ -37,7 +38,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final titleWidget =
         this.titleWidget ??
         (title != null
-            ? Text(title!, style: Theme.of(context).appBarTheme.titleTextStyle)
+            ? Text(
+                title!,
+                style: TextStyle(
+                  color:
+                      theme.appBarTheme.foregroundColor ??
+                      theme.colorScheme.onSurface,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
             : null);
 
     return AppBar(
@@ -50,6 +60,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       automaticallyImplyLeading: false,
       actions: actions,
+      systemOverlayStyle: theme.brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: theme.dividerColor),
