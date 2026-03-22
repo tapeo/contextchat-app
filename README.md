@@ -1,5 +1,7 @@
 # ContextChat
 
+![Logo](assets/logo.png)
+
 ContextChat is a powerful AI interface designed for developers and power users who need project-specific AI assistance. It streamlines your workflow by automatically injecting project context, files, and reusable prompts into your conversations.
 
 ### Chat and settings
