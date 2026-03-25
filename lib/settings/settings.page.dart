@@ -1,4 +1,5 @@
 import 'package:contextchat/components/app_snackbar.dart';
+import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
@@ -6,6 +7,10 @@ import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_storage/file_storage.provider.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
+import 'package:contextchat/sync/models/enums.dart';
+import 'package:contextchat/sync/models/sync_config.dart';
+import 'package:contextchat/sync/sync_credential.provider.dart';
+import 'package:contextchat/sync/sync_provider.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +28,11 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
   late final TextEditingController _baseUrlController;
   late final TextEditingController _apiKeyController;
   late final TextEditingController _storagePathController;
+  late final TextEditingController _githubOwnerController;
+  late final TextEditingController _githubRepoController;
+  late final TextEditingController _githubBranchController;
+  late final TextEditingController _githubSubdirectoryController;
+  late final TextEditingController _githubTokenController;
 
   @override
   void initState() {
@@ -33,6 +43,19 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
     _storagePathController = TextEditingController(
       text: ref.read(databaseProvider).memoryPath,
     );
+
+    final syncConfig = ref.read(syncProvider).config;
+    _githubOwnerController = TextEditingController(
+      text: syncConfig?.owner ?? '',
+    );
+    _githubRepoController = TextEditingController(text: syncConfig?.repo ?? '');
+    _githubBranchController = TextEditingController(
+      text: syncConfig?.branch ?? 'main',
+    );
+    _githubSubdirectoryController = TextEditingController(
+      text: syncConfig?.subdirectory ?? '',
+    );
+    _githubTokenController = TextEditingController();
   }
 
   @override
@@ -40,7 +63,40 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
     _baseUrlController.dispose();
     _apiKeyController.dispose();
     _storagePathController.dispose();
+    _githubOwnerController.dispose();
+    _githubRepoController.dispose();
+    _githubBranchController.dispose();
+    _githubSubdirectoryController.dispose();
+    _githubTokenController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveGitHubConfig() async {
+    final owner = _githubOwnerController.text.trim();
+    final repo = _githubRepoController.text.trim();
+    final branch = _githubBranchController.text.trim();
+    final subdirectory = _githubSubdirectoryController.text.trim();
+    final token = _githubTokenController.text.trim();
+
+    if (owner.isEmpty || repo.isEmpty || branch.isEmpty) {
+      showAppSnackBar(context, 'Please fill in owner, repo, and branch');
+      return;
+    }
+
+    if (token.isNotEmpty) {
+      await ref.read(githubCredentialsProvider).setToken(token);
+    }
+
+    final config = SyncConfig(
+      owner: owner,
+      repo: repo,
+      branch: branch,
+      subdirectory: subdirectory.isEmpty ? null : subdirectory,
+    );
+
+    await ref.read(syncProvider.notifier).configure(config);
+    if (!mounted) return;
+    showAppSnackBar(context, 'GitHub sync configuration saved');
   }
 
   void _save() {
@@ -140,6 +196,137 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
                 hintStyle: theme.textTheme.bodySmall,
               ),
             ],
+          ),
+          SizedBox(height: Spacing.md),
+          Consumer(
+            builder: (context, ref, child) {
+              final syncState = ref.watch(syncProvider);
+
+              return Column(
+                spacing: 8,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('GitHub Sync', style: theme.textTheme.titleMedium),
+                  InputWidget(
+                    controller: _githubOwnerController,
+                    labelText: 'Repository Owner',
+                    hintText: 'username',
+                    labelStyle: theme.textTheme.bodySmall,
+                    hintStyle: theme.textTheme.bodySmall,
+                  ),
+                  InputWidget(
+                    controller: _githubRepoController,
+                    labelText: 'Repository Name',
+                    hintText: 'my-repo',
+                    labelStyle: theme.textTheme.bodySmall,
+                    hintStyle: theme.textTheme.bodySmall,
+                  ),
+                  InputWidget(
+                    controller: _githubBranchController,
+                    labelText: 'Branch',
+                    hintText: 'main',
+                    labelStyle: theme.textTheme.bodySmall,
+                    hintStyle: theme.textTheme.bodySmall,
+                  ),
+                  InputWidget(
+                    controller: _githubSubdirectoryController,
+                    labelText: 'Subdirectory (optional)',
+                    hintText: 'data',
+                    labelStyle: theme.textTheme.bodySmall,
+                    hintStyle: theme.textTheme.bodySmall,
+                  ),
+                  InputWidget(
+                    controller: _githubTokenController,
+                    labelText: 'GitHub Token',
+                    hintText: 'ghp_...',
+                    labelStyle: theme.textTheme.bodySmall,
+                    hintStyle: theme.textTheme.bodySmall,
+                    obscureText: true,
+                  ),
+                  if (syncState.error != null)
+                    Text(
+                      'Error: ${syncState.error}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  if (syncState.status != SyncStatus.idle &&
+                      syncState.status != SyncStatus.error)
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            syncState.progress?.displayMessage ??
+                                switch (syncState.status) {
+                                  SyncStatus.pulling =>
+                                    'Pulling from GitHub...',
+                                  SyncStatus.pushing => 'Pushing to GitHub...',
+                                  SyncStatus.divergence =>
+                                    'Checking for divergence...',
+                                  _ => '',
+                                },
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (syncState.lastSyncedAt != null)
+                    Text(
+                      'Last synced: ${syncState.lastSyncedAt}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
+                      ),
+                    ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ButtonWidget(
+                        label: 'Save Config',
+                        onPressed: _saveGitHubConfig,
+                      ),
+
+                      ButtonWidget(
+                        label: syncState.status == SyncStatus.pulling
+                            ? 'Pulling...'
+                            : 'Pull',
+                        onPressed: syncState.status == SyncStatus.pulling
+                            ? null
+                            : () => ref.read(syncProvider.notifier).pull(),
+                      ),
+                      ButtonWidget(
+                        label: syncState.status == SyncStatus.pushing
+                            ? 'Pushing...'
+                            : 'Push',
+                        onPressed: syncState.status == SyncStatus.pushing
+                            ? null
+                            : () => ref.read(syncProvider.notifier).push(),
+                      ),
+                      if (syncState.config != null)
+                        ButtonWidget(
+                          label: 'Clear',
+                          onPressed: () =>
+                              ref.read(syncProvider.notifier).clearConfig(),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
