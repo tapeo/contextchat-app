@@ -6,10 +6,9 @@ ContextChat is a powerful AI interface designed for developers and power users w
 
 ### Chat and settings
 
-|                    Light                     |                    Dark                    |
-| :------------------------------------------: | :----------------------------------------: |
-|     ![Home Light](assets/home-light.png)     |     ![Home Dark](assets/home-dark.png)     |
-| ![Settings Light](assets/settings-light.png) | ![Settings Dark](assets/settings-dark.png) |
+|        Home        |      Settings      |
+| :----------------: | :----------------: |
+| ![Home](assets/home.png) | ![Settings](assets/settings.png) |
 
 ---
 
