@@ -158,8 +158,6 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       children: [
         GestureDetector(
@@ -179,9 +177,13 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
             },
             child: ListTileWidget(
               leading: Icon(LucideIcons.folder, size: 12),
-              title: Text(widget.projectName),
+              title: Text(
+                widget.projectName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               selected: widget.isSelected,
-              style: ListTileStyle2.compact,
+              style: ListTileStyle2.dense,
               borderRadius: AppTheme.radiusMedium,
               borderRadiusGeometry: const BorderRadius.all(
                 Radius.circular(AppTheme.radiusMedium),

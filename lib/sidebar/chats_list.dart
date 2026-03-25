@@ -113,9 +113,8 @@ class _ChatsListState extends ConsumerState<ChatsList> {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
       itemCount: chats.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
         final chat = chats[index];
         return Dismissible(
@@ -142,7 +141,7 @@ class _ChatsListState extends ConsumerState<ChatsList> {
                 _showChatContextMenu(details.globalPosition, chat.id),
             child: ListTileWidget(
               selected: chat.id == selectedChatId,
-              style: ListTileStyle2.compact,
+              style: ListTileStyle2.dense,
               title: Text(
                 _formatChatTitle(chat.title) ?? 'Chat ${index + 1}',
                 maxLines: 1,
