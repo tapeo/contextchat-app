@@ -2,13 +2,13 @@ import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/custom_app_bar.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/route_transitions.dart';
+import 'package:contextchat/github_sync/github_sync_provider.dart';
+import 'package:contextchat/github_sync/models/enums.dart';
 import 'package:contextchat/projects/project_setup.page.dart';
 import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/prompts/prompts_library.page.dart';
 import 'package:contextchat/settings/settings.page.dart';
 import 'package:contextchat/sidebar/projects_list.dart';
-import 'package:contextchat/sync/models/enums.dart';
-import 'package:contextchat/sync/sync_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -20,7 +20,7 @@ class SidebarView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    ref.listen(syncProvider, (previous, next) {
+    ref.listen(githubSyncProvider, (previous, next) {
       if (previous?.status == SyncStatus.pulling &&
           next.status == SyncStatus.idle) {
         ref.read(projectsProvider.notifier).initialize();

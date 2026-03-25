@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:contextchat/sync/models/sync_manifest.dart';
+import 'package:contextchat/github_sync/models/github_sync_manifest.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('SyncManifest', () {
     test('should serialize and deserialize correctly', () {
-      final manifest = SyncManifest(
+      final manifest = GithubSyncManifest(
         version: '1.0',
         generatedAt: DateTime(2024, 1, 15, 10, 30),
         files: [

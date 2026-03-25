@@ -1,9 +1,7 @@
-import 'package:contextchat/sync/models/github_models.dart';
-
-import 'models/result_models.dart';
+import 'package:contextchat/github_sync/models/github_models.dart';
 
 /// Builds indexes for remote files
-class SyncIndexBuilder {
+class GithubSyncIndexBuilder {
   /// Build remote file index from tree entries
   static Map<String, RemoteFileInfo> buildRemoteIndex(
     List<GitHubTreeEntry> entries,

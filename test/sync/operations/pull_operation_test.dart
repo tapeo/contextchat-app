@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:contextchat/sync/models/operation_results.dart';
-import 'package:contextchat/sync/models/sync_manifest.dart';
-import 'package:contextchat/sync/models/sync_models.dart';
-import 'package:contextchat/sync/sync_conflict_resolver.dart';
+import 'package:contextchat/github_sync/github_sync_conflict_resolver.dart';
+import 'package:contextchat/github_sync/models/github_operation_results.dart';
+import 'package:contextchat/github_sync/models/github_sync_manifest.dart';
+import 'package:contextchat/github_sync/models/github_sync_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class FakeConflictResolver extends SyncConflictResolver {
+class FakeConflictResolver extends GithubSyncConflictResolver {
   bool resolveCalled = false;
 
   @override
@@ -22,18 +22,18 @@ class FakeConflictResolver extends SyncConflictResolver {
 }
 
 class FakeManifestManager {
-  SyncManifest? loadedManifest;
-  SyncManifest? savedManifest;
+  GithubSyncManifest? loadedManifest;
+  GithubSyncManifest? savedManifest;
   int saveManifestCallCount = 0;
 
-  SyncManifest? loadManifest() => loadedManifest;
+  GithubSyncManifest? loadManifest() => loadedManifest;
 
-  Future<void> saveManifest(SyncManifest manifest) async {
+  Future<void> saveManifest(GithubSyncManifest manifest) async {
     savedManifest = manifest;
     saveManifestCallCount++;
   }
 
-  Map<String, SyncFileEntry> buildManifestIndex(SyncManifest manifest) {
+  Map<String, SyncFileEntry> buildManifestIndex(GithubSyncManifest manifest) {
     return {for (var entry in manifest.files) entry.path: entry};
   }
 }
@@ -63,7 +63,7 @@ class FakeRepository {
 void main() {
   group('PullOperationResult', () {
     test('should create result with all fields', () {
-      final result = PullOperationResult(
+      final result = GithubPullOperationResult(
         downloaded: 5,
         skipped: 10,
         deleted: 2,
@@ -144,7 +144,7 @@ void main() {
 
   group('SyncManifest', () {
     test('should serialize and deserialize correctly', () {
-      final manifest = SyncManifest(
+      final manifest = GithubSyncManifest(
         version: '1.0',
         generatedAt: DateTime(2024, 1, 15, 10, 30),
         files: [
@@ -160,7 +160,7 @@ void main() {
       );
 
       final json = manifest.toJson();
-      final restored = SyncManifest.fromJson(json);
+      final restored = GithubSyncManifest.fromJson(json);
 
       expect(restored.version, '1.0');
       expect(restored.files.length, 1);
@@ -189,7 +189,7 @@ void main() {
 
   group('CompareResult', () {
     test('should store comparison data correctly', () {
-      const result = CompareResult(
+      const result = GithubCompareResult(
         status: 'diverged',
         aheadBy: 3,
         behindBy: 2,

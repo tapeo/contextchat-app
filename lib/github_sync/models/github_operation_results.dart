@@ -1,7 +1,7 @@
-import 'package:contextchat/sync/models/sync_manifest.dart';
+import 'package:contextchat/github_sync/models/github_sync_manifest.dart';
 import 'package:equatable/equatable.dart';
 
-class PullOperationResult extends Equatable {
+class GithubPullOperationResult extends Equatable {
   final int downloaded;
   final int skipped;
   final int deleted;
@@ -9,9 +9,9 @@ class PullOperationResult extends Equatable {
   final List<String> conflictedFiles;
   final String? commitSha;
   final DateTime? syncedAt;
-  final SyncManifest? manifest;
+  final GithubSyncManifest? manifest;
 
-  const PullOperationResult({
+  const GithubPullOperationResult({
     required this.downloaded,
     required this.skipped,
     required this.deleted,
@@ -43,7 +43,7 @@ class PushOperationResult extends Equatable {
   final List<String> conflictedFiles;
   final String? commitSha;
   final DateTime? syncedAt;
-  final SyncManifest? manifest;
+  final GithubSyncManifest? manifest;
 
   const PushOperationResult({
     required this.uploaded,

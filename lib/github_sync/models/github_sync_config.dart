@@ -1,25 +1,25 @@
 import 'package:equatable/equatable.dart';
 
-class SyncConfig extends Equatable {
+class GithubSyncConfig extends Equatable {
   final String owner;
   final String repo;
   final String branch;
   final String? subdirectory;
 
-  const SyncConfig({
+  const GithubSyncConfig({
     required this.owner,
     required this.repo,
     required this.branch,
     this.subdirectory,
   });
 
-  SyncConfig copyWith({
+  GithubSyncConfig copyWith({
     String? owner,
     String? repo,
     String? branch,
     String? subdirectory,
   }) {
-    return SyncConfig(
+    return GithubSyncConfig(
       owner: owner ?? this.owner,
       repo: repo ?? this.repo,
       branch: branch ?? this.branch,
@@ -36,8 +36,8 @@ class SyncConfig extends Equatable {
     };
   }
 
-  factory SyncConfig.fromJson(Map<String, dynamic> json) {
-    return SyncConfig(
+  factory GithubSyncConfig.fromJson(Map<String, dynamic> json) {
+    return GithubSyncConfig(
       owner: json['owner'] as String,
       repo: json['repo'] as String,
       branch: json['branch'] as String,

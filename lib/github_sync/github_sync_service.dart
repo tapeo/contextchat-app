@@ -5,13 +5,13 @@ import 'package:github/github.dart' hide CommitInfo;
 
 import 'models/exceptions.dart';
 import 'models/github_models.dart';
-import 'models/sync_models.dart';
+import 'models/github_sync_models.dart';
 
-class SyncService {
+class GithubSyncService {
   late final GitHub _github;
   RepositorySlug? _currentRepo;
 
-  SyncService({String? token}) {
+  GithubSyncService({String? token}) {
     _github = GitHub(
       auth: token != null
           ? Authentication.withToken(token)
@@ -320,7 +320,7 @@ class SyncService {
     );
   }
 
-  Future<CompareResult> compareCommits(
+  Future<GithubCompareResult> compareCommits(
     String owner,
     String repo,
     String base,
@@ -339,7 +339,7 @@ class SyncService {
     final commits =
         comparison.commits
             ?.map(
-              (c) => CommitInfo(
+              (c) => GithubCommitInfo(
                 sha: c.sha!,
                 message: c.commit?.message ?? '',
                 date: c.commit?.committer?.date,
@@ -352,7 +352,7 @@ class SyncService {
     final files =
         comparison.files
             ?.map(
-              (f) => FileChange(
+              (f) => GithubFileChange(
                 path: f.name ?? '',
                 status: f.status ?? '',
                 additions: f.additions,
@@ -363,7 +363,7 @@ class SyncService {
             .toList() ??
         [];
 
-    return CompareResult(
+    return GithubCompareResult(
       status: comparison.status ?? 'unknown',
       aheadBy: comparison.aheadBy ?? 0,
       behindBy: comparison.behindBy ?? 0,

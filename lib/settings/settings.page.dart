@@ -5,12 +5,12 @@ import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_storage/file_storage.provider.dart';
+import 'package:contextchat/github_sync/github_sync_provider.dart';
+import 'package:contextchat/github_sync/models/enums.dart';
+import 'package:contextchat/github_sync/models/github_sync_config.dart';
 import 'package:contextchat/openrouter/openrouter.provider.dart';
 import 'package:contextchat/openrouter/openrouter_models.provider.dart';
-import 'package:contextchat/sync/models/enums.dart';
-import 'package:contextchat/sync/models/sync_config.dart';
-import 'package:contextchat/sync/sync_credential.provider.dart';
-import 'package:contextchat/sync/sync_provider.dart';
+import 'package:contextchat/secure_storage/secure_storage.service.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,7 +44,7 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
       text: ref.read(databaseProvider).memoryPath,
     );
 
-    final syncConfig = ref.read(syncProvider).config;
+    final syncConfig = ref.read(githubSyncProvider).config;
     _githubOwnerController = TextEditingController(
       text: syncConfig?.owner ?? '',
     );
@@ -84,17 +84,17 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
     }
 
     if (token.isNotEmpty) {
-      await ref.read(githubCredentialsProvider).setToken(token);
+      await SecureStorageService.saveGithubToken(token);
     }
 
-    final config = SyncConfig(
+    final config = GithubSyncConfig(
       owner: owner,
       repo: repo,
       branch: branch,
       subdirectory: subdirectory.isEmpty ? null : subdirectory,
     );
 
-    await ref.read(syncProvider.notifier).configure(config);
+    await ref.read(githubSyncProvider.notifier).configure(config);
     if (!mounted) return;
     showAppSnackBar(context, 'GitHub sync configuration saved');
   }
@@ -200,7 +200,7 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
           SizedBox(height: Spacing.md),
           Consumer(
             builder: (context, ref, child) {
-              final syncState = ref.watch(syncProvider);
+              final syncState = ref.watch(githubSyncProvider);
 
               return Column(
                 spacing: 8,
@@ -306,7 +306,8 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
                             : 'Pull',
                         onPressed: syncState.status == SyncStatus.pulling
                             ? null
-                            : () => ref.read(syncProvider.notifier).pull(),
+                            : () =>
+                                  ref.read(githubSyncProvider.notifier).pull(),
                       ),
                       ButtonWidget(
                         label: syncState.status == SyncStatus.pushing
@@ -314,13 +315,15 @@ class _SettingsViewState extends ConsumerState<SettingsPage> {
                             : 'Push',
                         onPressed: syncState.status == SyncStatus.pushing
                             ? null
-                            : () => ref.read(syncProvider.notifier).push(),
+                            : () =>
+                                  ref.read(githubSyncProvider.notifier).push(),
                       ),
                       if (syncState.config != null)
                         ButtonWidget(
                           label: 'Clear',
-                          onPressed: () =>
-                              ref.read(syncProvider.notifier).clearConfig(),
+                          onPressed: () => ref
+                              .read(githubSyncProvider.notifier)
+                              .clearConfig(),
                         ),
                     ],
                   ),

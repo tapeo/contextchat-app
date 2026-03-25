@@ -3,12 +3,12 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 
-import 'models/sync_manifest.dart';
+import 'models/github_sync_manifest.dart';
 
-class SyncRepository {
+class GithubSyncRepository {
   final String basePath;
 
-  SyncRepository({required this.basePath});
+  GithubSyncRepository({required this.basePath});
 
   Future<void> writeFile(String relativePath, Uint8List content) async {
     final baseDir = Directory(basePath);

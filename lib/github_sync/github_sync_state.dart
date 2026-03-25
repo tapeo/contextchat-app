@@ -1,18 +1,18 @@
-import 'package:contextchat/sync/models/sync_config.dart';
+import 'package:contextchat/github_sync/models/github_sync_config.dart';
 import 'package:equatable/equatable.dart';
 
 import 'models/enums.dart';
-import 'models/sync_progress.dart';
+import 'models/github_sync_progress.dart';
 
-class SyncState extends Equatable {
+class GithubSyncState extends Equatable {
   final SyncStatus status;
   final String? error;
   final DateTime? lastSyncedAt;
   final String? lastSyncedCommitSha;
-  final SyncConfig? config;
-  final SyncProgress? progress;
+  final GithubSyncConfig? config;
+  final GithubSyncProgress? progress;
 
-  const SyncState({
+  const GithubSyncState({
     this.status = SyncStatus.idle,
     this.error,
     this.lastSyncedAt,
@@ -21,15 +21,15 @@ class SyncState extends Equatable {
     this.progress,
   });
 
-  SyncState copyWith({
+  GithubSyncState copyWith({
     SyncStatus? status,
     String? error,
     DateTime? lastSyncedAt,
     String? lastSyncedCommitSha,
-    SyncConfig? config,
-    SyncProgress? progress,
+    GithubSyncConfig? config,
+    GithubSyncProgress? progress,
   }) {
-    return SyncState(
+    return GithubSyncState(
       status: status ?? this.status,
       error: error ?? this.error,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
@@ -49,8 +49,8 @@ class SyncState extends Equatable {
     };
   }
 
-  factory SyncState.fromJson(Map<String, dynamic> json) {
-    return SyncState(
+  factory GithubSyncState.fromJson(Map<String, dynamic> json) {
+    return GithubSyncState(
       status: SyncStatus.values.byName(json['status'] as String),
       error: json['error'] as String?,
       lastSyncedAt: json['lastSyncedAt'] != null
@@ -58,7 +58,7 @@ class SyncState extends Equatable {
           : null,
       lastSyncedCommitSha: json['lastSyncedCommitSha'] as String?,
       config: json['config'] != null
-          ? SyncConfig.fromJson(json['config'] as Map<String, dynamic>)
+          ? GithubSyncConfig.fromJson(json['config'] as Map<String, dynamic>)
           : null,
     );
   }

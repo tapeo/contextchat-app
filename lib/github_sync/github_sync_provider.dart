@@ -2,76 +2,82 @@ import 'dart:convert';
 
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_storage/file_storage.provider.dart';
-import 'package:contextchat/sync/models/enums.dart';
-import 'package:contextchat/sync/models/exceptions.dart';
-import 'package:contextchat/sync/models/sync_config.dart';
-import 'package:contextchat/sync/models/sync_progress.dart';
-import 'package:contextchat/sync/operations/pull_operation.dart';
-import 'package:contextchat/sync/operations/push_operation.dart';
-import 'package:contextchat/sync/sync_credential.provider.dart';
-import 'package:contextchat/sync/sync_service.dart';
-import 'package:contextchat/sync/sync_state.dart';
+import 'package:contextchat/github_sync/github_sync_service.dart';
+import 'package:contextchat/github_sync/github_sync_state.dart';
+import 'package:contextchat/github_sync/models/enums.dart';
+import 'package:contextchat/github_sync/models/exceptions.dart';
+import 'package:contextchat/github_sync/models/github_sync_config.dart';
+import 'package:contextchat/github_sync/models/github_sync_progress.dart';
+import 'package:contextchat/github_sync/operations/github_pull_operation.dart';
+import 'package:contextchat/github_sync/operations/github_push_operation.dart';
+import 'package:contextchat/secure_storage/secure_storage.service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'sync_conflict_resolver.dart';
-import 'sync_manifest_manager.dart';
-import 'sync_repository.dart';
+import 'github_sync_conflict_resolver.dart';
+import 'github_sync_manifest_manager.dart';
+import 'github_sync_repository.dart';
 
 const _syncConfigKey = 'sync_config';
 const _syncLastAtKey = 'sync_last_at';
 const _syncLastShaKey = 'sync_last_sha';
 
-final syncServiceProvider = Provider<SyncService>((ref) {
-  return SyncService();
+final githubSyncServiceProvider = Provider<GithubSyncService>((ref) {
+  return GithubSyncService();
 });
 
-final syncRepositoryProvider = Provider<SyncRepository>((ref) {
+final githubSyncRepositoryProvider = Provider<GithubSyncRepository>((ref) {
   final database = ref.watch(databaseProvider);
-  return SyncRepository(basePath: database.memoryPath);
+  return GithubSyncRepository(basePath: database.memoryPath);
 });
 
-final syncManifestManagerProvider = Provider<SyncManifestManager>((ref) {
+final githubSyncManifestManagerProvider = Provider<GithubSyncManifestManager>((
+  ref,
+) {
   final fileStorage = ref.watch(fileStorageProvider);
-  return SyncManifestManager(fileStorage: fileStorage);
+  return GithubSyncManifestManager(fileStorage: fileStorage);
 });
 
-final syncConflictResolverProvider = Provider<SyncConflictResolver>((ref) {
-  return SyncConflictResolver();
-});
-
-final syncProvider = NotifierProvider<SyncNotifier, SyncState>(
-  () => SyncNotifier(),
+final githubSyncConflictResolverProvider = Provider<GithubSyncConflictResolver>(
+  (ref) {
+    return GithubSyncConflictResolver();
+  },
 );
 
-class SyncNotifier extends Notifier<SyncState> {
-  FileStorage get _fileStorage => ref.watch(fileStorageProvider);
-  GitHubCredentialsService get _credentials =>
-      ref.watch(githubCredentialsProvider);
-  SyncService get _syncService => ref.watch(syncServiceProvider);
-  SyncRepository get _repository => ref.watch(syncRepositoryProvider);
-  SyncManifestManager get _manifestManager =>
-      ref.watch(syncManifestManagerProvider);
-  SyncConflictResolver get _conflictResolver =>
-      ref.watch(syncConflictResolverProvider);
+final githubSyncProvider =
+    NotifierProvider<GithubSyncNotifier, GithubSyncState>(
+      () => GithubSyncNotifier(),
+    );
 
-  PullOperation get _pullOperation => PullOperation(
+class GithubSyncNotifier extends Notifier<GithubSyncState> {
+  FileStorage get _fileStorage => ref.watch(fileStorageProvider);
+  GithubSyncService get _syncService => ref.watch(githubSyncServiceProvider);
+  GithubSyncRepository get _repository =>
+      ref.watch(githubSyncRepositoryProvider);
+  GithubSyncManifestManager get _manifestManager =>
+      ref.watch(githubSyncManifestManagerProvider);
+  GithubSyncConflictResolver get _conflictResolver =>
+      ref.watch(githubSyncConflictResolverProvider);
+
+  GithubPullOperation get _pullOperation => GithubPullOperation(
     syncService: _syncService,
     repository: _repository,
     manifestManager: _manifestManager,
     conflictResolver: _conflictResolver,
   );
 
-  PushOperation get _pushOperation => PushOperation(
+  GithubPushOperation get _pushOperation => GithubPushOperation(
     syncService: _syncService,
     repository: _repository,
     manifestManager: _manifestManager,
   );
 
   @override
-  SyncState build() {
+  GithubSyncState build() {
     final configJson = _fileStorage.getString(_syncConfigKey);
     final config = configJson != null
-        ? SyncConfig.fromJson(jsonDecode(configJson) as Map<String, dynamic>)
+        ? GithubSyncConfig.fromJson(
+            jsonDecode(configJson) as Map<String, dynamic>,
+          )
         : null;
 
     final lastSyncedAtStr = _fileStorage.getString(_syncLastAtKey);
@@ -79,7 +85,7 @@ class SyncNotifier extends Notifier<SyncState> {
         ? DateTime.tryParse(lastSyncedAtStr)
         : null;
 
-    return SyncState(
+    return GithubSyncState(
       status: SyncStatus.idle,
       config: config,
       lastSyncedAt: lastSyncedAt,
@@ -87,7 +93,7 @@ class SyncNotifier extends Notifier<SyncState> {
     );
   }
 
-  Future<void> configure(SyncConfig config) async {
+  Future<void> configure(GithubSyncConfig config) async {
     await _fileStorage.setString(_syncConfigKey, jsonEncode(config.toJson()));
     state = state.copyWith(config: config);
   }
@@ -97,8 +103,8 @@ class SyncNotifier extends Notifier<SyncState> {
     await _fileStorage.remove(_syncLastAtKey);
     await _fileStorage.remove(_syncLastShaKey);
     await _fileStorage.remove('sync_manifest');
-    await _credentials.deleteToken();
-    state = SyncState(status: SyncStatus.idle);
+    await SecureStorageService.deleteGithubToken();
+    state = GithubSyncState(status: SyncStatus.idle);
   }
 
   Future<void> pull() async {
@@ -111,7 +117,7 @@ class SyncNotifier extends Notifier<SyncState> {
       return;
     }
 
-    final token = await _credentials.getToken();
+    final token = await SecureStorageService.getGithubToken();
     if (token == null || token.isEmpty) {
       state = state.copyWith(
         status: SyncStatus.error,
@@ -123,7 +129,7 @@ class SyncNotifier extends Notifier<SyncState> {
     state = state.copyWith(
       status: SyncStatus.pulling,
       error: null,
-      progress: const SyncProgress(message: 'Connecting to GitHub...'),
+      progress: const GithubSyncProgress(message: 'Connecting to GitHub...'),
     );
 
     try {
@@ -133,7 +139,7 @@ class SyncNotifier extends Notifier<SyncState> {
         lastSyncedCommitSha: state.lastSyncedCommitSha,
         onProgress: (message, current, total) {
           state = state.copyWith(
-            progress: SyncProgress(
+            progress: GithubSyncProgress(
               message: message,
               current: current,
               total: total,
@@ -182,7 +188,7 @@ class SyncNotifier extends Notifier<SyncState> {
       return;
     }
 
-    final token = await _credentials.getToken();
+    final token = await SecureStorageService.getGithubToken();
     if (token == null || token.isEmpty) {
       state = state.copyWith(
         status: SyncStatus.error,
@@ -194,7 +200,7 @@ class SyncNotifier extends Notifier<SyncState> {
     state = state.copyWith(
       status: SyncStatus.pushing,
       error: null,
-      progress: const SyncProgress(message: 'Connecting to GitHub...'),
+      progress: const GithubSyncProgress(message: 'Connecting to GitHub...'),
     );
 
     try {
@@ -204,7 +210,7 @@ class SyncNotifier extends Notifier<SyncState> {
         lastSyncedCommitSha: state.lastSyncedCommitSha,
         onProgress: (message, current, total) {
           state = state.copyWith(
-            progress: SyncProgress(
+            progress: GithubSyncProgress(
               message: message,
               current: current,
               total: total,

@@ -1,21 +1,21 @@
 import 'dart:convert';
 
 import '../file_storage/file_storage.provider.dart';
-import 'models/sync_manifest.dart';
+import 'models/github_sync_manifest.dart';
 
-class SyncManifestManager {
+class GithubSyncManifestManager {
   static const _syncManifestKey = 'sync_manifest';
 
   final FileStorage _fileStorage;
 
-  SyncManifestManager({required FileStorage fileStorage})
+  GithubSyncManifestManager({required FileStorage fileStorage})
     : _fileStorage = fileStorage;
 
-  SyncManifest? loadManifest() {
+  GithubSyncManifest? loadManifest() {
     final manifestJson = _fileStorage.getString(_syncManifestKey);
     if (manifestJson == null) return null;
     try {
-      return SyncManifest.fromJson(
+      return GithubSyncManifest.fromJson(
         jsonDecode(manifestJson) as Map<String, dynamic>,
       );
     } catch (e) {
@@ -23,14 +23,14 @@ class SyncManifestManager {
     }
   }
 
-  Future<void> saveManifest(SyncManifest manifest) async {
+  Future<void> saveManifest(GithubSyncManifest manifest) async {
     await _fileStorage.setString(
       _syncManifestKey,
       jsonEncode(manifest.toJson()),
     );
   }
 
-  Map<String, SyncFileEntry> buildManifestIndex(SyncManifest manifest) {
+  Map<String, SyncFileEntry> buildManifestIndex(GithubSyncManifest manifest) {
     return {for (var entry in manifest.files) entry.path: entry};
   }
 }

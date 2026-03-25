@@ -1,23 +1,22 @@
-import 'package:contextchat/sync/models/github_models.dart';
-import 'package:contextchat/sync/models/operation_results.dart';
-import 'package:contextchat/sync/models/result_models.dart';
-import 'package:contextchat/sync/models/sync_manifest.dart';
-import 'package:contextchat/sync/models/sync_models.dart';
+import 'package:contextchat/github_sync/models/github_models.dart';
+import 'package:contextchat/github_sync/models/github_operation_results.dart';
+import 'package:contextchat/github_sync/models/github_sync_manifest.dart';
+import 'package:contextchat/github_sync/models/github_sync_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeManifestManager {
-  SyncManifest? loadedManifest;
-  SyncManifest? savedManifest;
+  GithubSyncManifest? loadedManifest;
+  GithubSyncManifest? savedManifest;
   int saveManifestCallCount = 0;
 
-  SyncManifest? loadManifest() => loadedManifest;
+  GithubSyncManifest? loadManifest() => loadedManifest;
 
-  Future<void> saveManifest(SyncManifest manifest) async {
+  Future<void> saveManifest(GithubSyncManifest manifest) async {
     savedManifest = manifest;
     saveManifestCallCount++;
   }
 
-  Map<String, SyncFileEntry> buildManifestIndex(SyncManifest manifest) {
+  Map<String, SyncFileEntry> buildManifestIndex(GithubSyncManifest manifest) {
     return {for (var entry in manifest.files) entry.path: entry};
   }
 }
@@ -56,7 +55,7 @@ void main() {
     });
 
     test('should include manifest in result', () {
-      final manifest = SyncManifest(
+      final manifest = GithubSyncManifest(
         version: '1.0',
         generatedAt: DateTime.now(),
         files: [
@@ -88,7 +87,7 @@ void main() {
 
   group('Divergence Detection', () {
     test('should detect when remote has new commits', () {
-      const compareResult = CompareResult(
+      const compareResult = GithubCompareResult(
         status: 'diverged',
         aheadBy: 5,
         behindBy: 0,
@@ -102,7 +101,7 @@ void main() {
     });
 
     test('should allow push when only behind', () {
-      const compareResult = CompareResult(
+      const compareResult = GithubCompareResult(
         status: 'behind',
         aheadBy: 0,
         behindBy: 3,

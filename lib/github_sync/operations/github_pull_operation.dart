@@ -1,31 +1,31 @@
-import 'package:contextchat/sync/models/operation_results.dart';
-import 'package:contextchat/sync/models/result_models.dart';
-import 'package:contextchat/sync/models/sync_config.dart';
-import 'package:contextchat/sync/models/sync_manifest.dart';
-import 'package:contextchat/sync/sync_conflict_resolver.dart';
-import 'package:contextchat/sync/sync_index_builder.dart';
-import 'package:contextchat/sync/sync_manifest_manager.dart';
-import 'package:contextchat/sync/sync_repository.dart';
-import 'package:contextchat/sync/sync_service.dart';
+import 'package:contextchat/github_sync/github_sync_conflict_resolver.dart';
+import 'package:contextchat/github_sync/github_sync_index_builder.dart';
+import 'package:contextchat/github_sync/github_sync_manifest_manager.dart';
+import 'package:contextchat/github_sync/github_sync_repository.dart';
+import 'package:contextchat/github_sync/github_sync_service.dart';
+import 'package:contextchat/github_sync/models/github_models.dart';
+import 'package:contextchat/github_sync/models/github_operation_results.dart';
+import 'package:contextchat/github_sync/models/github_sync_config.dart';
+import 'package:contextchat/github_sync/models/github_sync_manifest.dart';
 
-class PullOperation {
-  final SyncService _syncService;
-  final SyncRepository _repository;
-  final SyncManifestManager _manifestManager;
-  final SyncConflictResolver _conflictResolver;
+class GithubPullOperation {
+  final GithubSyncService _syncService;
+  final GithubSyncRepository _repository;
+  final GithubSyncManifestManager _manifestManager;
+  final GithubSyncConflictResolver _conflictResolver;
 
-  PullOperation({
-    required SyncService syncService,
-    required SyncRepository repository,
-    required SyncManifestManager manifestManager,
-    required SyncConflictResolver conflictResolver,
+  GithubPullOperation({
+    required GithubSyncService syncService,
+    required GithubSyncRepository repository,
+    required GithubSyncManifestManager manifestManager,
+    required GithubSyncConflictResolver conflictResolver,
   }) : _syncService = syncService,
        _repository = repository,
        _manifestManager = manifestManager,
        _conflictResolver = conflictResolver;
 
-  Future<PullOperationResult> execute({
-    required SyncConfig config,
+  Future<GithubPullOperationResult> execute({
+    required GithubSyncConfig config,
     required String token,
     required String? lastSyncedCommitSha,
     required void Function(String message, int current, int total) onProgress,
@@ -53,7 +53,10 @@ class PullOperation {
         ? _manifestManager.buildManifestIndex(lastManifest)
         : <String, SyncFileEntry>{};
 
-    final remoteIndex = SyncIndexBuilder.buildRemoteIndex(tree.entries, prefix);
+    final remoteIndex = GithubSyncIndexBuilder.buildRemoteIndex(
+      tree.entries,
+      prefix,
+    );
 
     final currentLocalFiles = await _repository.buildManifest();
     final currentLocalIndex = {
@@ -160,7 +163,7 @@ class PullOperation {
       }
     }
 
-    final newManifest = SyncManifest(
+    final newManifest = GithubSyncManifest(
       version: '1.0',
       generatedAt: DateTime.now(),
       files: [...downloadedFiles, ...skippedFiles],
@@ -174,7 +177,7 @@ class PullOperation {
     );
     await _manifestManager.saveManifest(newManifest);
 
-    return PullOperationResult(
+    return GithubPullOperationResult(
       downloaded: filesToDownload.length,
       skipped: filesToSkip.length,
       deleted: filesToDelete.length,

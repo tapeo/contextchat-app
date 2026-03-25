@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
-class CompareResult extends Equatable {
+class GithubCompareResult extends Equatable {
   final String status;
   final int aheadBy;
   final int behindBy;
   final int totalCommits;
-  final List<CommitInfo> commits;
-  final List<FileChange> files;
+  final List<GithubCommitInfo> commits;
+  final List<GithubFileChange> files;
 
-  const CompareResult({
+  const GithubCompareResult({
     required this.status,
     required this.aheadBy,
     required this.behindBy,
@@ -28,13 +28,13 @@ class CompareResult extends Equatable {
   ];
 }
 
-class CommitInfo extends Equatable {
+class GithubCommitInfo extends Equatable {
   final String sha;
   final String message;
   final DateTime? date;
   final String? author;
 
-  const CommitInfo({
+  const GithubCommitInfo({
     required this.sha,
     required this.message,
     this.date,
@@ -45,14 +45,14 @@ class CommitInfo extends Equatable {
   List<Object?> get props => [sha, message, date, author];
 }
 
-class FileChange extends Equatable {
+class GithubFileChange extends Equatable {
   final String path;
   final String status;
   final int? additions;
   final int? deletions;
   final int? changes;
 
-  const FileChange({
+  const GithubFileChange({
     required this.path,
     required this.status,
     this.additions,

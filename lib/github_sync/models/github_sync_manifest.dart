@@ -1,25 +1,25 @@
 import 'package:equatable/equatable.dart';
 
-class SyncManifest extends Equatable {
+class GithubSyncManifest extends Equatable {
   final String version;
   final DateTime generatedAt;
   final List<SyncFileEntry> files;
   final Map<String, dynamic> syncedSettings;
 
-  const SyncManifest({
+  const GithubSyncManifest({
     required this.version,
     required this.generatedAt,
     required this.files,
     required this.syncedSettings,
   });
 
-  SyncManifest copyWith({
+  GithubSyncManifest copyWith({
     String? version,
     DateTime? generatedAt,
     List<SyncFileEntry>? files,
     Map<String, dynamic>? syncedSettings,
   }) {
-    return SyncManifest(
+    return GithubSyncManifest(
       version: version ?? this.version,
       generatedAt: generatedAt ?? this.generatedAt,
       files: files ?? this.files,
@@ -36,8 +36,8 @@ class SyncManifest extends Equatable {
     };
   }
 
-  factory SyncManifest.fromJson(Map<String, dynamic> json) {
-    return SyncManifest(
+  factory GithubSyncManifest.fromJson(Map<String, dynamic> json) {
+    return GithubSyncManifest(
       version: json['version'] as String,
       generatedAt: DateTime.parse(json['generatedAt'] as String),
       files: (json['files'] as List)

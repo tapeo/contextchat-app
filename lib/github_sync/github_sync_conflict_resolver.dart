@@ -1,5 +1,5 @@
 /// Resolves conflicts using last-write-wins strategy
-class SyncConflictResolver {
+class GithubSyncConflictResolver {
   /// Resolves conflict using last-write-wins strategy
   /// Returns true if local wins, false if remote wins
   bool resolve({

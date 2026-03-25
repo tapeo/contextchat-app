@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 
-class SyncProgress extends Equatable {
+class GithubSyncProgress extends Equatable {
   final String message;
   final int? current;
   final int? total;
   final Map<String, int>? stats; // e.g., {'downloaded': 5, 'skipped': 10}
 
-  const SyncProgress({
+  const GithubSyncProgress({
     required this.message,
     this.current,
     this.total,
@@ -41,13 +41,13 @@ class SyncProgress extends Equatable {
     return message;
   }
 
-  SyncProgress copyWith({
+  GithubSyncProgress copyWith({
     String? message,
     int? current,
     int? total,
     Map<String, int>? stats,
   }) {
-    return SyncProgress(
+    return GithubSyncProgress(
       message: message ?? this.message,
       current: current ?? this.current,
       total: total ?? this.total,

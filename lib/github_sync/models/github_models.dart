@@ -72,3 +72,14 @@ class GitHubBlob extends Equatable {
   @override
   List<Object?> get props => [sha, content, encoding, size];
 }
+
+class RemoteFileInfo extends Equatable {
+  final String path;
+  final String sha;
+  final int? size;
+
+  const RemoteFileInfo({required this.path, required this.sha, this.size});
+
+  @override
+  List<Object?> get props => [path, sha, size];
+}
