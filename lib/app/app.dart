@@ -90,8 +90,8 @@ class _DesktopShell extends StatelessWidget {
     required this.onSidebarFractionChanged,
   });
 
-  static const double _minSidebarFraction = 0.2;
-  static const double _maxSidebarFraction = 0.4;
+  static const double _minSidebarFraction = 0.3;
+  static const double _maxSidebarFraction = 0.5;
 
   final double sidebarFraction;
   final ValueChanged<double> onSidebarFractionChanged;

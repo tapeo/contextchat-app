@@ -3,6 +3,7 @@ import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/popup_menu.dart';
 import 'package:contextchat/components/route_transitions.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
@@ -75,14 +76,7 @@ class ProjectSection extends ConsumerStatefulWidget {
 }
 
 class _ProjectSectionState extends ConsumerState<ProjectSection> {
-  final ContextMenuController _contextMenuController = ContextMenuController();
   DateTime _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
-
-  @override
-  void dispose() {
-    _contextMenuController.remove();
-    super.dispose();
-  }
 
   void _editProject() {
     Navigator.of(context).push(
@@ -118,44 +112,11 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
     );
   }
 
-  void _showProjectContextMenu(Offset offset) {
-    _contextMenuController.show(
-      context: context,
-      contextMenuBuilder: (context) {
-        return TapRegion(
-          onTapOutside: (event) => _contextMenuController.remove(),
-          child: AdaptiveTextSelectionToolbar.buttonItems(
-            anchors: TextSelectionToolbarAnchors(primaryAnchor: offset),
-            buttonItems: [
-              ContextMenuButtonItem(
-                label: 'Open in file explorer',
-                onPressed: () async {
-                  _contextMenuController.remove();
-                  final directory = ref
-                      .read(projectDatabaseProvider)
-                      .getProjectDirectory(widget.projectId);
-                  await FileUtils.revealInFileManager(directory.path);
-                },
-              ),
-              ContextMenuButtonItem(
-                label: 'Edit',
-                onPressed: () {
-                  _contextMenuController.remove();
-                  _editProject();
-                },
-              ),
-              ContextMenuButtonItem(
-                label: 'Delete',
-                onPressed: () {
-                  _contextMenuController.remove();
-                  _deleteProject();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  void _revealInFileExplorer() async {
+    final directory = ref
+        .read(projectDatabaseProvider)
+        .getProjectDirectory(widget.projectId);
+    await FileUtils.revealInFileManager(directory.path);
   }
 
   @override
@@ -163,8 +124,6 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
     return Column(
       children: [
         GestureDetector(
-          onSecondaryTapUp: (details) =>
-              _showProjectContextMenu(details.globalPosition),
           child: Listener(
             behavior: HitTestBehavior.translucent,
             onPointerDown: (event) {
@@ -193,6 +152,44 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  PopupMenuWidget<String>(
+                    tooltip: 'More options',
+                    items: [
+                      PopupMenuItemWidget(
+                        value: 'reveal',
+                        label: 'Open in file explorer',
+                        icon: const Icon(LucideIcons.folder, size: 16),
+                      ),
+                      PopupMenuItemWidget(
+                        value: 'edit',
+                        label: 'Edit',
+                        icon: const Icon(LucideIcons.pencil, size: 16),
+                      ),
+                      PopupMenuItemWidget(
+                        value: 'delete',
+                        label: 'Delete',
+                        icon: const Icon(LucideIcons.trash, size: 16),
+                      ),
+                    ],
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'reveal':
+                          _revealInFileExplorer();
+                          break;
+                        case 'edit':
+                          _editProject();
+                          break;
+                        case 'delete':
+                          _deleteProject();
+                          break;
+                      }
+                    },
+                    child: IconButtonWidget(
+                      tooltip: 'More options',
+                      icon: const Icon(LucideIcons.ellipsisVertical, size: 12),
+                      onPressed: null,
+                    ),
+                  ),
                   IconButtonWidget(
                     tooltip: 'New chat',
                     icon: const Icon(LucideIcons.plus, size: 12),
