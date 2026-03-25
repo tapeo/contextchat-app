@@ -95,9 +95,18 @@ class _ChatsListState extends ConsumerState<ChatsList> {
   @override
   Widget build(BuildContext context) {
     final chatsState = ref.watch(chatsProvider);
-    final chats = chatsState.chats
-        .where((c) => c.projectId == widget.projectId)
-        .toList();
+
+    final chats =
+        chatsState.chats.where((c) => c.projectId == widget.projectId).toList()
+          ..sort((a, b) {
+            final aTime = a.updatedAt;
+            final bTime = b.updatedAt;
+            if (aTime == null && bTime == null) return 0;
+            if (aTime == null) return 1;
+            if (bTime == null) return -1;
+            return bTime.compareTo(aTime);
+          });
+
     final selectedChatId = chatsState.selectedChatId;
 
     if (chats.isEmpty) {

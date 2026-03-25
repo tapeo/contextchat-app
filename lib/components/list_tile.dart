@@ -37,7 +37,7 @@ class ListTileStyle2 {
     titleFontSize: 13,
     subtitleFontSize: 11,
     leadingSpacing: 10,
-    trailingSpacing: 8,
+    trailingSpacing: 4,
     subtitleSpacing: 2,
   );
 

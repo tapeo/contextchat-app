@@ -77,9 +77,14 @@ class ChatNotifier extends Notifier<ChatState> {
       );
 
       state = state.copyWith(
-        chat: state.chat.copyWith(messages: [...currentMessages, message]),
+        chat: state.chat.copyWith(
+          messages: [...currentMessages, message],
+          updatedAt: DateTime.now(),
+        ),
         loading: true,
       );
+
+      ref.read(chatsProvider.notifier).updateChat(state.chat);
 
       final project = ref
           .read(projectsProvider)
@@ -159,6 +164,8 @@ class ChatNotifier extends Notifier<ChatState> {
           // If title generation fails, we'll just use the default title
         }
       }
+
+      updatedChat = updatedChat.copyWith(updatedAt: DateTime.now());
 
       state = state.copyWith(
         chat: updatedChat,

@@ -38,11 +38,14 @@ class ProjectsList extends ConsumerWidget {
       );
     }
 
+    final projects = [...projectsState.projects]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: projectsState.projects.length,
+      itemCount: projects.length,
       itemBuilder: (context, index) {
-        final project = projectsState.projects[index];
+        final project = projects[index];
         final isSelected = project.id == projectsState.currentProjectId;
 
         return ProjectSection(
