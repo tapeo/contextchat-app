@@ -160,9 +160,13 @@ class ProjectsNotifier extends Notifier<ProjectsState> {
     await databaseService.saveProject(updated);
   }
 
-  Future<void> selectProject(String id) async {
+  Future<void> selectProject(String? id) async {
     state = state.copyWith(currentProjectId: id);
-    await _fileStorage.setString(_currentProjectIdKey, id);
+    if (id != null) {
+      await _fileStorage.setString(_currentProjectIdKey, id);
+    } else {
+      await _fileStorage.remove(_currentProjectIdKey);
+    }
   }
 
   Future<void> setProjectDefaultModel(String projectId, String? modelId) async {

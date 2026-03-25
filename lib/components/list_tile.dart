@@ -36,7 +36,7 @@ class ListTileStyle2 {
     iconSize: 20,
     titleFontSize: 13,
     subtitleFontSize: 11,
-    leadingSpacing: 16,
+    leadingSpacing: 10,
     trailingSpacing: 8,
     subtitleSpacing: 2,
   );

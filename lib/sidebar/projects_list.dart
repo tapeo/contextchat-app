@@ -210,9 +210,13 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
                 ],
               ),
               onTap: () {
-                ref
-                    .read(projectsProvider.notifier)
-                    .selectProject(widget.projectId);
+                if (widget.isSelected) {
+                  ref.read(projectsProvider.notifier).selectProject(null);
+                } else {
+                  ref
+                      .read(projectsProvider.notifier)
+                      .selectProject(widget.projectId);
+                }
               },
             ),
           ),
