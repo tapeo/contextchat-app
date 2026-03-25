@@ -100,34 +100,47 @@ class _DesktopShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final sidebarWidth = constraints.maxWidth * sidebarFraction;
+        child: Column(
+          children: [
+            Divider(height: 1),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final sidebarWidth = constraints.maxWidth * sidebarFraction;
 
-            return Stack(
-              children: [
-                Row(
-                  children: [
-                    SizedBox(width: sidebarWidth, child: const SidebarView()),
-                    const Expanded(child: ChatPage()),
-                  ],
-                ),
-                Positioned(
-                  left: sidebarWidth - 8,
-                  top: 0,
-                  bottom: 0,
-                  child: _ResizeHandle(
-                    onDragUpdate: (delta) {
-                      onSidebarFractionChanged(
-                        (sidebarFraction + (delta / constraints.maxWidth))
-                            .clamp(_minSidebarFraction, _maxSidebarFraction),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
+                  return Stack(
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: sidebarWidth,
+                            child: const SidebarView(),
+                          ),
+                          const Expanded(child: ChatPage()),
+                        ],
+                      ),
+                      Positioned(
+                        left: sidebarWidth - 8,
+                        top: 0,
+                        bottom: 0,
+                        child: _ResizeHandle(
+                          onDragUpdate: (delta) {
+                            onSidebarFractionChanged(
+                              (sidebarFraction + (delta / constraints.maxWidth))
+                                  .clamp(
+                                    _minSidebarFraction,
+                                    _maxSidebarFraction,
+                                  ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
