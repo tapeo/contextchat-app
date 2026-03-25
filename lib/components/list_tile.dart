@@ -52,7 +52,7 @@ class ListTileStyle2 {
   );
 }
 
-class ListTileWidget extends StatelessWidget {
+class ListTileWidget extends StatefulWidget {
   final Widget? leading;
   final Widget title;
   final Widget? subtitle;
@@ -83,20 +83,36 @@ class ListTileWidget extends StatelessWidget {
   });
 
   @override
+  State<ListTileWidget> createState() => _ListTileWidgetState();
+}
+
+class _ListTileWidgetState extends State<ListTileWidget> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    Color backgroundColor;
+    if (widget.selected) {
+      backgroundColor = theme.colorScheme.primary.withValues(alpha: 0.1);
+    } else if (_isHovered) {
+      backgroundColor = theme.colorScheme.onSurface.withValues(alpha: 0.05);
+    } else {
+      backgroundColor = Colors.transparent;
+    }
+
     Widget content = Container(
-      padding: padding ?? style.padding,
+      padding: widget.padding ?? widget.style.padding,
       decoration: BoxDecoration(
-        color: selected
-            ? theme.colorScheme.primary.withValues(alpha: 0.1)
-            : Colors.transparent,
+        color: backgroundColor,
         borderRadius:
-            borderRadiusGeometry ??
+            widget.borderRadiusGeometry ??
             BorderRadius.circular(AppTheme.radiusMedium),
-        border: showBorder ? Border.all(color: theme.dividerColor) : null,
-        boxShadow: showShadow
+        border: widget.showBorder
+            ? Border.all(color: theme.dividerColor)
+            : null,
+        boxShadow: widget.showShadow
             ? [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -108,17 +124,17 @@ class ListTileWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          if (leading != null) ...[
+          if (widget.leading != null) ...[
             IconTheme(
               data: theme.iconTheme.copyWith(
-                size: style.iconSize,
-                color: selected
+                size: widget.style.iconSize,
+                color: widget.selected
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
-              child: leading!,
+              child: widget.leading!,
             ),
-            SizedBox(width: style.leadingSpacing),
+            SizedBox(width: widget.style.leadingSpacing),
           ],
           Expanded(
             child: Column(
@@ -127,39 +143,47 @@ class ListTileWidget extends StatelessWidget {
               children: [
                 DefaultTextStyle(
                   style: theme.textTheme.bodyMedium!.copyWith(
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: selected
+                    fontWeight: widget.selected
+                        ? FontWeight.w600
+                        : FontWeight.w500,
+                    color: widget.selected
                         ? theme.colorScheme.primary
                         : theme.colorScheme.onSurface,
-                    fontSize: style.titleFontSize,
+                    fontSize: widget.style.titleFontSize,
                   ),
-                  child: title,
+                  child: widget.title,
                 ),
-                if (subtitle != null) ...[
-                  SizedBox(height: style.subtitleSpacing),
+                if (widget.subtitle != null) ...[
+                  SizedBox(height: widget.style.subtitleSpacing),
                   DefaultTextStyle(
                     style: theme.textTheme.bodySmall!.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontSize: style.subtitleFontSize,
+                      fontSize: widget.style.subtitleFontSize,
                     ),
-                    child: subtitle!,
+                    child: widget.subtitle!,
                   ),
                 ],
               ],
             ),
           ),
-          if (trailing != null) ...[
-            SizedBox(width: style.trailingSpacing),
-            trailing!,
+          if (widget.trailing != null) ...[
+            SizedBox(width: widget.style.trailingSpacing),
+            widget.trailing!,
           ],
         ],
       ),
     );
 
-    if (onTap != null) {
-      return ClickOpacity(onTap: onTap, child: content);
+    Widget child = MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: content,
+    );
+
+    if (widget.onTap != null) {
+      return ClickOpacity(onTap: widget.onTap, child: child);
     }
 
-    return content;
+    return child;
   }
 }
