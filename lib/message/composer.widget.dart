@@ -93,12 +93,12 @@ class _ComposerWidgetState extends ConsumerState<ComposerWidget> {
     );
 
     try {
+      _controller.clear();
+      ref.read(chatDraftProvider(_chatId!).notifier).clear();
+
       await ref
           .read(chatProvider(_chatId!).notifier)
           .sendMessage(text, imageGeneration: imageGeneration);
-
-      _controller.clear();
-      ref.read(chatDraftProvider(_chatId!).notifier).clear();
     } catch (e) {
       _showOpenRouterErrorDialog(e);
     }

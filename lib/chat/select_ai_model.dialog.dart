@@ -7,7 +7,6 @@ import 'package:contextchat/components/button.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/input.dart';
 import 'package:contextchat/components/list_tile.dart';
-import 'package:contextchat/components/list_view_gradient_overlay.dart';
 import 'package:contextchat/components/switch.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/openrouter/openrouter.model.dart';
@@ -228,142 +227,134 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
       constraints: BoxConstraints(
         maxHeight: isPhone ? MediaQuery.sizeOf(context).height * 0.7 : 420,
       ),
-      child: Column(
-        spacing: 16,
-        children: [
-          Column(
-            spacing: 8,
-            children: [
-              _CustomModelInput(
-                onSelect: (customModelId) =>
-                    Navigator.of(context).pop(customModelId),
-              ),
-              InputWidget(
-                controller: _searchController,
-                onChanged: (_) => setState(() {}),
-                labelText: 'Search models',
-                labelStyle: theme.textTheme.bodySmall,
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
-          ),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              _buildSortButton('price', 'Price'),
-              _buildSortButton('contextLength', 'Context'),
-              _buildSortButton('created', 'Created'),
-              SwitchWidget(
-                value: _imageCapableOnly,
-                onChanged: (value) => setState(() => _imageCapableOnly = value),
-                label: 'Image output',
-              ),
-            ],
-          ),
-          Expanded(
-            child: filteredModels.isEmpty
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: 16,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _CustomModelInput(
+              onSelect: (customModelId) =>
+                  Navigator.of(context).pop(customModelId),
+            ),
+            InputWidget(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              labelText: 'Search models',
+              labelStyle: theme.textTheme.bodySmall,
+              style: theme.textTheme.bodySmall,
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              children: [
+                _buildSortButton('price', 'Price'),
+                _buildSortButton('contextLength', 'Context'),
+                _buildSortButton('created', 'Created'),
+                SwitchWidget(
+                  value: _imageCapableOnly,
+                  onChanged: (value) =>
+                      setState(() => _imageCapableOnly = value),
+                  label: 'Image output',
+                ),
+              ],
+            ),
+            filteredModels.isEmpty
                 ? const Center(child: Text('No models match your search.'))
-                : ListViewGradientOverlay(
-                    showTop: true,
-                    child: ListView.separated(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      itemCount: filteredModels.length,
-                      separatorBuilder: (context, index) =>
-                          const Divider(height: 16),
-                      itemBuilder: (context, index) {
-                        final model = filteredModels[index];
+                : ListView.separated(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: filteredModels.length,
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 16),
+                    itemBuilder: (context, index) {
+                      final model = filteredModels[index];
 
-                        return ListTileWidget(
-                          selected: model.id == widget.selectedModelId,
-                          padding: EdgeInsets.zero,
-                          onTap: () => Navigator.of(context).pop(model.id),
-                          title: Row(
-                            children: [
-                              Tooltip(
-                                richMessage: WidgetSpan(
-                                  child: SizedBox(
-                                    width: 300,
-                                    child: Text(model.description),
+                      return ListTileWidget(
+                        selected: model.id == widget.selectedModelId,
+                        padding: EdgeInsets.zero,
+                        onTap: () => Navigator.of(context).pop(model.id),
+                        title: Row(
+                          children: [
+                            Tooltip(
+                              richMessage: WidgetSpan(
+                                child: SizedBox(
+                                  width: 300,
+                                  child: Text(model.description),
+                                ),
+                              ),
+                              child: Icon(
+                                LucideIcons.info,
+                                size: 14,
+                                color: theme.iconTheme.color?.withAlpha(128),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    model.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                child: Icon(
-                                  LucideIcons.info,
-                                  size: 14,
-                                  color: theme.iconTheme.color?.withAlpha(128),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      model.name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            model.id,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                                  color: theme
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.color
-                                                      ?.withAlpha(128),
-                                                  fontFamily: 'monospace',
-                                                ),
-                                          ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          model.id,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                color: theme
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.color
+                                                    ?.withAlpha(128),
+                                                fontFamily: 'monospace',
+                                              ),
                                         ),
-                                        IconButtonWidget(
-                                          icon: const Icon(
-                                            LucideIcons.copy,
-                                            size: 8,
-                                          ),
-                                          onPressed: () {
-                                            Clipboard.setData(
-                                              ClipboardData(text: model.id),
-                                            );
-                                            showAppSnackBar(
-                                              context,
-                                              'Model ID copied to clipboard',
-                                            );
-                                          },
+                                      ),
+                                      IconButtonWidget(
+                                        icon: const Icon(
+                                          LucideIcons.copy,
+                                          size: 8,
                                         ),
-                                      ],
+                                        onPressed: () {
+                                          Clipboard.setData(
+                                            ClipboardData(text: model.id),
+                                          );
+                                          showAppSnackBar(
+                                            context,
+                                            'Model ID copied to clipboard',
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'In: ${widget.formatPrice(model.pricing.prompt)} • Out: ${widget.formatPrice(model.pricing.completion)} • ${widget.formatContextLength(model.contextLength)}',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.textTheme.bodySmall?.color
+                                          ?.withAlpha(128),
                                     ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'In: ${widget.formatPrice(model.pricing.prompt)} • Out: ${widget.formatPrice(model.pricing.completion)} • ${widget.formatContextLength(model.contextLength)}',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(
-                                            color: theme
-                                                .textTheme
-                                                .bodySmall
-                                                ?.color
-                                                ?.withAlpha(128),
-                                          ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
