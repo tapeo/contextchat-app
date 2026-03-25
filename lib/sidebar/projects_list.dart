@@ -153,11 +153,10 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   PopupMenuWidget<String>(
-                    tooltip: 'More options',
                     items: [
                       PopupMenuItemWidget(
                         value: 'reveal',
-                        label: 'Open in file explorer',
+                        label: 'Open file',
                         icon: const Icon(LucideIcons.folder, size: 16),
                       ),
                       PopupMenuItemWidget(
@@ -185,7 +184,6 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
                       }
                     },
                     child: IconButtonWidget(
-                      tooltip: 'More options',
                       icon: const Icon(LucideIcons.ellipsisVertical, size: 12),
                       onPressed: null,
                     ),

@@ -1,6 +1,8 @@
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
+import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/list_tile.dart';
+import 'package:contextchat/components/popup_menu.dart';
 import 'package:contextchat/components/text_button.dart';
 import 'package:contextchat/database/database.service.dart';
 import 'package:contextchat/file_utils.dart';
@@ -8,6 +10,9 @@ import 'package:contextchat/projects/projects.provider.dart';
 import 'package:contextchat/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+enum ChatMenuAction { openInExplorer, delete }
 
 class ChatsList extends ConsumerStatefulWidget {
   const ChatsList({super.key, required this.projectId});
@@ -19,11 +24,8 @@ class ChatsList extends ConsumerStatefulWidget {
 }
 
 class _ChatsListState extends ConsumerState<ChatsList> {
-  final ContextMenuController _contextMenuController = ContextMenuController();
-
   @override
   void dispose() {
-    _contextMenuController.remove();
     super.dispose();
   }
 
@@ -58,38 +60,14 @@ class _ChatsListState extends ConsumerState<ChatsList> {
     );
   }
 
-  void _showChatContextMenu(Offset offset, String chatId) {
-    _contextMenuController.show(
-      context: context,
-      contextMenuBuilder: (context) {
-        return TapRegion(
-          onTapOutside: (event) => _contextMenuController.remove(),
-          child: AdaptiveTextSelectionToolbar.buttonItems(
-            anchors: TextSelectionToolbarAnchors(primaryAnchor: offset),
-            buttonItems: [
-              ContextMenuButtonItem(
-                label: 'Open in file explorer',
-                onPressed: () async {
-                  _contextMenuController.remove();
-                  final file = ref
-                      .read(chatDatabaseProvider)
-                      .getChatFile(chatId);
-
-                  await FileUtils.revealInFileManager(file.path);
-                },
-              ),
-              ContextMenuButtonItem(
-                label: 'Delete',
-                onPressed: () {
-                  _contextMenuController.remove();
-                  _deleteChat(chatId);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  void _onChatMenuSelected(ChatMenuAction action, String chatId) {
+    switch (action) {
+      case ChatMenuAction.openInExplorer:
+        final file = ref.read(chatDatabaseProvider).getChatFile(chatId);
+        FileUtils.revealInFileManager(file.path);
+      case ChatMenuAction.delete:
+        _deleteChat(chatId);
+    }
   }
 
   @override
@@ -119,11 +97,10 @@ class _ChatsListState extends ConsumerState<ChatsList> {
       );
     }
 
-    return ListView.separated(
+    return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: chats.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
         final chat = chats[index];
         return Dismissible(
@@ -145,24 +122,40 @@ class _ChatsListState extends ConsumerState<ChatsList> {
               color: Theme.of(context).colorScheme.onError,
             ),
           ),
-          child: GestureDetector(
-            onSecondaryTapUp: (details) =>
-                _showChatContextMenu(details.globalPosition, chat.id),
-            child: ListTileWidget(
-              selected: chat.id == selectedChatId,
-              style: ListTileStyle2.dense,
-              title: Text(
-                _formatChatTitle(chat.title) ?? 'Chat ${index + 1}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          child: ListTileWidget(
+            selected: chat.id == selectedChatId,
+            style: ListTileStyle2.dense,
+            title: Text(
+              _formatChatTitle(chat.title) ?? 'Chat ${index + 1}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+              ref
+                  .read(projectsProvider.notifier)
+                  .selectProject(widget.projectId);
+              ref.read(chatsProvider.notifier).selectChat(chat.id);
+              Scaffold.maybeOf(context)?.closeDrawer();
+            },
+            trailing: PopupMenuWidget<ChatMenuAction>(
+              key: ValueKey('chat_menu_${chat.id}'),
+              items: [
+                PopupMenuItemWidget(
+                  value: ChatMenuAction.openInExplorer,
+                  label: 'Open file',
+                  icon: const Icon(LucideIcons.folder, size: 16),
+                ),
+                PopupMenuItemWidget(
+                  value: ChatMenuAction.delete,
+                  label: 'Delete',
+                  icon: const Icon(LucideIcons.trash, size: 16),
+                ),
+              ],
+              onSelected: (action) => _onChatMenuSelected(action, chat.id),
+              child: IconButtonWidget(
+                icon: const Icon(LucideIcons.ellipsisVertical, size: 14),
+                onPressed: null,
               ),
-              onTap: () {
-                ref
-                    .read(projectsProvider.notifier)
-                    .selectProject(widget.projectId);
-                ref.read(chatsProvider.notifier).selectChat(chat.id);
-                Scaffold.maybeOf(context)?.closeDrawer();
-              },
             ),
           ),
         );
