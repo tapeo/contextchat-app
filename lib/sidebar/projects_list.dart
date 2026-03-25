@@ -38,10 +38,9 @@ class ProjectsList extends ConsumerWidget {
       );
     }
 
-    return ListView.separated(
+    return ListView.builder(
       padding: const EdgeInsets.all(8),
       itemCount: projectsState.projects.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
         final project = projectsState.projects[index];
         final isSelected = project.id == projectsState.currentProjectId;
