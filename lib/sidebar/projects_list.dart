@@ -1,7 +1,6 @@
 import 'package:contextchat/chat/chats.provider.dart';
 import 'package:contextchat/components/app_dialog.dart';
 import 'package:contextchat/components/button.dart';
-import 'package:contextchat/components/card.dart';
 import 'package:contextchat/components/icon_button.dart';
 import 'package:contextchat/components/list_tile.dart';
 import 'package:contextchat/components/route_transitions.dart';
@@ -161,72 +160,67 @@ class _ProjectSectionState extends ConsumerState<ProjectSection> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return CardWidget(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          GestureDetector(
-            onSecondaryTapUp: (details) =>
-                _showProjectContextMenu(details.globalPosition),
-            child: Listener(
-              behavior: HitTestBehavior.translucent,
-              onPointerDown: (event) {
-                final now = DateTime.now();
-                final diff = now.difference(_lastTapTime);
-                if (diff < const Duration(milliseconds: 300)) {
-                  _editProject();
-                  _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
-                } else {
-                  _lastTapTime = now;
-                }
-              },
-              child: ListTileWidget(
-                leading: Icon(LucideIcons.folder, size: 12),
-                title: Text(widget.projectName),
-                selected: widget.isSelected,
-                style: ListTileStyle2.compact,
-                borderRadius: AppTheme.radiusMedium,
-                borderRadiusGeometry: const BorderRadius.only(
-                  topLeft: Radius.circular(AppTheme.radiusMedium),
-                  topRight: Radius.circular(AppTheme.radiusMedium),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButtonWidget(
-                      tooltip: 'New chat',
-                      icon: const Icon(LucideIcons.plus, size: 12),
-                      onPressed: () async {
-                        ref
-                            .read(projectsProvider.notifier)
-                            .selectProject(widget.projectId);
-                        final chatId = await ref
-                            .read(chatsProvider.notifier)
-                            .createChat(widget.projectId);
-                        ref.read(chatsProvider.notifier).selectChat(chatId);
-                        if (context.mounted) {
-                          Scaffold.of(context).closeDrawer();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  ref
-                      .read(projectsProvider.notifier)
-                      .selectProject(widget.projectId);
-                },
+    return Column(
+      children: [
+        GestureDetector(
+          onSecondaryTapUp: (details) =>
+              _showProjectContextMenu(details.globalPosition),
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (event) {
+              final now = DateTime.now();
+              final diff = now.difference(_lastTapTime);
+              if (diff < const Duration(milliseconds: 300)) {
+                _editProject();
+                _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
+              } else {
+                _lastTapTime = now;
+              }
+            },
+            child: ListTileWidget(
+              leading: Icon(LucideIcons.folder, size: 12),
+              title: Text(widget.projectName),
+              selected: widget.isSelected,
+              style: ListTileStyle2.compact,
+              borderRadius: AppTheme.radiusMedium,
+              borderRadiusGeometry: const BorderRadius.all(
+                Radius.circular(AppTheme.radiusMedium),
               ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButtonWidget(
+                    tooltip: 'New chat',
+                    icon: const Icon(LucideIcons.plus, size: 12),
+                    onPressed: () async {
+                      ref
+                          .read(projectsProvider.notifier)
+                          .selectProject(widget.projectId);
+                      final chatId = await ref
+                          .read(chatsProvider.notifier)
+                          .createChat(widget.projectId);
+                      ref.read(chatsProvider.notifier).selectChat(chatId);
+                      if (context.mounted) {
+                        Scaffold.of(context).closeDrawer();
+                      }
+                    },
+                  ),
+                ],
+              ),
+              onTap: () {
+                ref
+                    .read(projectsProvider.notifier)
+                    .selectProject(widget.projectId);
+              },
             ),
           ),
-          if (widget.isSelected) Divider(height: 1, color: theme.dividerColor),
-          if (widget.isSelected)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-              child: ChatsList(projectId: widget.projectId),
-            ),
-        ],
-      ),
+        ),
+        if (widget.isSelected)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+            child: ChatsList(projectId: widget.projectId),
+          ),
+      ],
     );
   }
 }
