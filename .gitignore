@@ -49,3 +49,5 @@ android/local.properties
 
 # FVM Version Cache
 .fvm/
+
+.env
