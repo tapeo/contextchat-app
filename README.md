@@ -6,25 +6,25 @@ ContextChat is a powerful AI interface designed for developers and power users w
 
 ### Chat and settings
 
-|        Home        |      Settings      |
-| :----------------: | :----------------: |
+|           Home           |             Settings             |
+| :----------------------: | :------------------------------: |
 | ![Home](assets/home.png) | ![Settings](assets/settings.png) |
 
 ---
 
 ## Key features
 
-| Feature | Description |
-|---------|-------------|
-| Reusable instructions | Set base system prompts for each project. |
-| File knowledge | Import text files (PDF, code, docs) directly into the AI's context. |
-| Import from URL | Paste any URL to extract and import its content for AI context. |
-| Local storage | All project data and files stay on your machine. |
-| OpenRouter integration | Access any model from OpenAI, Anthropic, Google, and more. |
-| Real-time streaming | Smooth, responsive message delivery. |
-| Context assembly | Automatically builds the prompt with project rules + files + history. |
-| Save and reuse | Build a library of frequently used prompts. |
-| Markdown support | Full rendering for code blocks and formatting. |
+| Feature                | Description                                                           |
+| ---------------------- | --------------------------------------------------------------------- |
+| Reusable instructions  | Set base system prompts for each project.                             |
+| File knowledge         | Import text files (PDF, code, docs) directly into the AI's context.   |
+| Import from URL        | Paste any URL to extract and import its content for AI context.       |
+| Local storage          | All project data and files stay on your machine.                      |
+| OpenRouter integration | Access any model from OpenAI, Anthropic, Google, and more.            |
+| Real-time streaming    | Smooth, responsive message delivery.                                  |
+| Context assembly       | Automatically builds the prompt with project rules + files + history. |
+| Save and reuse         | Build a library of frequently used prompts.                           |
+| Markdown support       | Full rendering for code blocks and formatting.                        |
 
 ---
 
@@ -66,3 +66,46 @@ When you send a message, ContextChat automatically assembles a rich prompt:
 ---
 
 Built with Flutter.
+
+## Build From Source
+
+### Prerequisites
+
+- Flutter SDK (stable channel) and Dart
+- Platform-specific tooling (Xcode for iOS/macOS, Android SDK for Android, etc.)
+- Optional: FVM (if you prefer pinned Flutter versions)
+
+### Run in debug mode
+
+1. Clone this repository.
+2. From the project root, install dependencies:
+
+```bash
+flutter pub get
+```
+
+3. Launch the app:
+
+```bash
+flutter run
+```
+
+To run on a specific platform or device:
+
+```bash
+flutter run -d macos     # macOS
+flutter run -d linux     # Linux
+flutter run -d windows    # Windows
+flutter run -d chrome     # Web (Chrome)
+flutter run -d <device-id> # Specific device
+```
+
+List available devices with `flutter devices`.
+
+### Build a local release
+
+```bash
+flutter build <platform> --release
+```
+
+Replace `<platform>` with `macos`, `linux`, `windows`, `web`, or `apk` (Android).
